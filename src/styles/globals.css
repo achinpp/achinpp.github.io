@@ -1,0 +1,459 @@
+@import 'tailwindcss';
+
+/* =========================================================================
+   SHADOW COMMAND CENTER — Design Tokens
+   Stage 0. OKLCH throughout: perceptually uniform ramps, predictable
+   lightness steps, and glows that don't shift hue as they fade.
+   ========================================================================= */
+
+/*
+  `static` emits every variable below, whether or not Tailwind can see a
+  utility using it. Without it, v4 tree-shakes unused theme vars — and any
+  token referenced only through a runtime-composed inline style (e.g.
+  `blur(var(--blur-${tier}))`, or a canvas reading a colour via
+  getComputedStyle) silently resolves to nothing. A design system's tokens
+  are a public contract, so they all ship.
+*/
+@theme static {
+  /* ---------------------------------------------------------------------
+     OBSIDIAN — the base. Not #000. True black has no elevation story and
+     crushes to mud on OLED; a faint blue-violet chroma (h 265) keeps the
+     dark readable and makes the mint accent sit forward.
+     --------------------------------------------------------------------- */
+  --color-obsidian-950: oklch(0.105 0.012 265);
+  --color-obsidian-900: oklch(0.14 0.013 265);
+  --color-obsidian-850: oklch(0.165 0.014 265);
+  --color-obsidian-800: oklch(0.192 0.015 265);
+  --color-obsidian-700: oklch(0.242 0.016 265);
+  --color-obsidian-600: oklch(0.312 0.017 265);
+  --color-obsidian-500: oklch(0.422 0.016 265);
+  --color-obsidian-400: oklch(0.552 0.015 265);
+  --color-obsidian-300: oklch(0.682 0.013 265);
+  --color-obsidian-200: oklch(0.802 0.011 265);
+  --color-obsidian-100: oklch(0.902 0.008 265);
+  --color-obsidian-50: oklch(0.972 0.005 265);
+
+  /* ---------------------------------------------------------------------
+     MINT — the one signature accent (#5EF6C9). Every interactive
+     affordance, focus ring and glow derives from this ramp.
+     --------------------------------------------------------------------- */
+  --color-mint-100: oklch(0.955 0.055 168);
+  --color-mint-200: oklch(0.932 0.088 168);
+  --color-mint-300: oklch(0.912 0.118 168);
+  --color-mint-400: oklch(0.888 0.145 168);
+  --color-mint-500: oklch(0.818 0.152 168);
+  --color-mint-600: oklch(0.718 0.138 168);
+  --color-mint-700: oklch(0.598 0.116 168);
+  --color-mint-800: oklch(0.448 0.088 168);
+  --color-mint-900: oklch(0.318 0.062 168);
+  --color-mint-950: oklch(0.218 0.042 168);
+
+  /* ---------------------------------------------------------------------
+     BREACH — semantic danger only (#FF3B47). Never decorative. If this
+     colour appears, something is urgent, failed, or classified.
+     --------------------------------------------------------------------- */
+  --color-breach-300: oklch(0.782 0.158 22);
+  --color-breach-400: oklch(0.702 0.198 22);
+  --color-breach-500: oklch(0.642 0.225 22);
+  --color-breach-600: oklch(0.558 0.208 22);
+  --color-breach-900: oklch(0.282 0.102 22);
+
+  /* Single warning hue — status badges only (ACTIVE / IN-PROGRESS). */
+  --color-signal-400: oklch(0.842 0.152 82);
+  --color-signal-900: oklch(0.332 0.072 82);
+
+  /* ---------------------------------------------------------------------
+     SEMANTIC ALIASES — components reference these, not raw ramp steps.
+     Retheming later means editing this block only.
+     --------------------------------------------------------------------- */
+  --color-canvas: var(--color-obsidian-900);
+  --color-surface: var(--color-obsidian-850);
+  --color-surface-raised: var(--color-obsidian-800);
+  --color-hairline: oklch(1 0 0 / 0.08);
+  --color-hairline-strong: oklch(1 0 0 / 0.14);
+  --color-ink: var(--color-obsidian-50);
+  --color-ink-muted: var(--color-obsidian-300);
+  --color-ink-faint: var(--color-obsidian-400);
+  --color-accent: var(--color-mint-400);
+  --color-accent-dim: var(--color-mint-700);
+
+  /* ---------------------------------------------------------------------
+     TYPOGRAPHY
+     --------------------------------------------------------------------- */
+  --font-display: 'Space Grotesk Variable', 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* Fluid display scale. clamp() means no breakpoint-juggling for headings. */
+  --text-display-2xl: clamp(3.25rem, 13vw, 11rem);
+  --text-display-2xl--line-height: 0.88;
+  --text-display-2xl--letter-spacing: -0.045em;
+  --text-display-2xl--font-weight: 700;
+
+  --text-display-xl: clamp(2.5rem, 8.5vw, 6.5rem);
+  --text-display-xl--line-height: 0.92;
+  --text-display-xl--letter-spacing: -0.038em;
+  --text-display-xl--font-weight: 700;
+
+  --text-display-lg: clamp(2rem, 5.5vw, 4rem);
+  --text-display-lg--line-height: 0.98;
+  --text-display-lg--letter-spacing: -0.03em;
+  --text-display-lg--font-weight: 600;
+
+  --text-display-md: clamp(1.625rem, 3.6vw, 2.5rem);
+  --text-display-md--line-height: 1.08;
+  --text-display-md--letter-spacing: -0.022em;
+  --text-display-md--font-weight: 600;
+
+  /* Monospace eyebrow / HUD label. Tracking-heavy, always uppercase. */
+  --text-label: 0.6875rem;
+  --text-label--line-height: 1;
+  --text-label--letter-spacing: 0.18em;
+  --text-label--font-weight: 500;
+
+  --text-label-lg: 0.8125rem;
+  --text-label-lg--line-height: 1.1;
+  --text-label-lg--letter-spacing: 0.14em;
+
+  /* ---------------------------------------------------------------------
+     RADII — tighter than the Tailwind defaults. Soft corners read
+     consumer-friendly; this site should read instrument-panel.
+     --------------------------------------------------------------------- */
+  --radius-xs: 0.1875rem;
+  --radius-sm: 0.3125rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.375rem;
+
+  /* ---------------------------------------------------------------------
+     ELEVATION & GLOW
+     Dark UI gets depth from glow and hairlines, not drop shadows.
+     --------------------------------------------------------------------- */
+  --shadow-hairline: inset 0 1px 0 0 oklch(1 0 0 / 0.07);
+  --shadow-elev-1: 0 1px 2px 0 oklch(0 0 0 / 0.5), 0 4px 12px -4px oklch(0 0 0 / 0.5);
+  --shadow-elev-2:
+    0 2px 4px 0 oklch(0 0 0 / 0.5), 0 12px 32px -8px oklch(0 0 0 / 0.6),
+    inset 0 1px 0 0 oklch(1 0 0 / 0.06);
+  --shadow-elev-3:
+    0 4px 8px 0 oklch(0 0 0 / 0.55), 0 24px 64px -12px oklch(0 0 0 / 0.7),
+    inset 0 1px 0 0 oklch(1 0 0 / 0.08);
+
+  --shadow-glow-xs: 0 0 8px -1px oklch(0.888 0.145 168 / 0.32);
+  --shadow-glow-sm: 0 0 14px -2px oklch(0.888 0.145 168 / 0.38);
+  --shadow-glow-md:
+    0 0 24px -4px oklch(0.888 0.145 168 / 0.45), 0 0 64px -12px oklch(0.888 0.145 168 / 0.22);
+  --shadow-glow-lg:
+    0 0 36px -4px oklch(0.888 0.145 168 / 0.5), 0 0 120px -16px oklch(0.888 0.145 168 / 0.28);
+  --shadow-glow-breach:
+    0 0 24px -4px oklch(0.642 0.225 22 / 0.45), 0 0 64px -12px oklch(0.642 0.225 22 / 0.22);
+
+  /* ---------------------------------------------------------------------
+     BLUR TIERS — backdrop-filter is expensive. Three tiers, used
+     deliberately, never "everything is glass".
+     --------------------------------------------------------------------- */
+  --blur-veil: 6px;
+  --blur-pane: 14px;
+  --blur-shroud: 28px;
+
+  /* ---------------------------------------------------------------------
+     EASING — expo/quint curves. Nothing uses ease-in-out; it feels
+     mechanical. Motion here should feel decisive, then settle.
+     --------------------------------------------------------------------- */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-back: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
+  --ease-mask: cubic-bezier(0.33, 1, 0.68, 1);
+
+  /* ---------------------------------------------------------------------
+     KEYFRAME ANIMATIONS
+     --------------------------------------------------------------------- */
+  --animate-caret: caret 1.05s steps(1, end) infinite;
+  --animate-pulse-dot: pulse-dot 2.4s var(--ease-in-out-circ) infinite;
+  --animate-shimmer: shimmer 2.6s linear infinite;
+  --animate-drift: drift 9s ease-in-out infinite;
+  --animate-spin-slow: spin 9s linear infinite;
+  --animate-scan: scan 11s linear infinite;
+
+  /* Ultrawide tier beyond Tailwind's defaults. */
+  --breakpoint-3xl: 120rem;
+}
+
+@keyframes caret {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 oklch(0.888 0.145 168 / 0.55);
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 0 5px oklch(0.888 0.145 168 / 0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(220%);
+  }
+}
+
+/* Scanline sweep. translate3d only, so it stays on the compositor and never
+   triggers a repaint of what it passes over. */
+@keyframes scan {
+  0% {
+    transform: translate3d(0, -40vh, 0);
+  }
+  100% {
+    transform: translate3d(0, 140vh, 0);
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  33% {
+    transform: translate3d(3px, -5px, 0);
+  }
+  66% {
+    transform: translate3d(-4px, 3px, 0);
+  }
+}
+
+/* =========================================================================
+   VARIANTS
+   `data-motion` and `data-grain` are written to <html> by MotionProvider.
+   One attribute is the single switch for every animated path on the site.
+   ========================================================================= */
+
+@custom-variant motion-ok (&:where([data-motion='on'], [data-motion='on'] *));
+@custom-variant motion-off (&:where([data-motion='off'], [data-motion='off'] *));
+@custom-variant pointer-fine (@media (hover: hover) and (pointer: fine));
+
+/* =========================================================================
+   BASE
+   ========================================================================= */
+
+@layer base {
+  :root {
+    /* Stacking order, declared once so no component invents its own. */
+    --z-backdrop: 0;
+    --z-content: 10;
+    --z-raised: 20;
+    --z-nav: 40;
+    --z-hud: 45;
+    --z-overlay: 60;
+    --z-palette: 70;
+    --z-toast: 80;
+    --z-cursor: 90;
+    --z-grain: 100;
+
+    --grid-cell: 32px;
+
+    color-scheme: dark;
+  }
+
+  * {
+    border-color: var(--color-hairline);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* Lenis owns scrolling; native smooth would fight it. */
+    scroll-behavior: auto;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+    min-height: 100dvh;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  code,
+  kbd,
+  pre,
+  samp {
+    font-family: var(--font-mono);
+    font-feature-settings: 'calt', 'liga';
+  }
+
+  ::selection {
+    background-color: oklch(0.888 0.145 168 / 0.26);
+    color: var(--color-mint-100);
+  }
+
+  /* Focus: always visible, always mint, never removed. */
+  :focus-visible {
+    outline: 2px solid var(--color-mint-400);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  /* Scrollbar — thin, obsidian track, dimmed-mint thumb on hover. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-obsidian-600) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-obsidian-950);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-obsidian-600);
+    border: 3px solid var(--color-obsidian-950);
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-mint-800);
+  }
+
+  /* -----------------------------------------------------------------------
+     REDUCED MOTION — the global kill switch.
+     MotionProvider resolves prefers-reduced-motion + the user's own toggle
+     into data-motion, so this one rule covers every CSS animation on the
+     site. Framer Motion is handled in parallel by <MotionConfig>.
+     ----------------------------------------------------------------------- */
+  [data-motion='off'] *,
+  [data-motion='off'] *::before,
+  [data-motion='off'] *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* -----------------------------------------------------------------------
+     CUSTOM CURSOR
+     <CustomCursor /> sets data-cursor="custom" on <html>, and only ever when
+     the pointer is a real mouse AND motion is enabled. The attribute is the
+     gate: if the component never mounts, the native cursor is untouched.
+     !important is needed to beat `cursor-pointer` on buttons and links.
+     ----------------------------------------------------------------------- */
+  [data-cursor='custom'],
+  [data-cursor='custom'] * {
+    cursor: none !important;
+  }
+}
+
+/* =========================================================================
+   AMBIENCE
+   Grain stays on <body>: it is the topmost layer, it must cover everything,
+   and no component should own it. The dot matrix moved out to
+   <GridBackdrop /> at Stage 1 — it needs to parallax on scroll and brighten
+   under the cursor, which a pseudo-element can't do.
+   ========================================================================= */
+
+@layer base {
+  /* Film grain. feTurbulence beats a tiled PNG: no request, no visible seams. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-grain);
+    pointer-events: none;
+    opacity: 0.032;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  [data-grain='off'] body::after {
+    display: none;
+  }
+}
+
+/* =========================================================================
+   UTILITIES — only patterns reused across three or more components earn a
+   shortcut here. Everything else stays inline.
+   ========================================================================= */
+
+@utility hairline {
+  border: 1px solid var(--color-hairline);
+  box-shadow: var(--shadow-hairline);
+}
+
+/* The base dot matrix. Tiled background rather than canvas: the dots that
+   never change should cost nothing per frame. <GridBackdrop /> parallaxes
+   this with a transform and paints only the cursor-lit dots on canvas. */
+@utility dot-matrix {
+  background-image: radial-gradient(circle at 1px 1px, oklch(1 0 0 / 0.07) 1px, transparent 0);
+  background-size: var(--grid-cell) var(--grid-cell);
+}
+
+@utility pane {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  box-shadow: var(--shadow-elev-2);
+  border-radius: var(--radius-xl);
+}
+
+/* Masked text reveal: the clip container. The child slides up out of it.
+   The padding/margin pair stops descenders being shaved off. */
+@utility mask-line {
+  display: block;
+  overflow: hidden;
+  padding-block: 0.08em;
+  margin-block: -0.08em;
+}
+
+@utility text-gradient-ink {
+  background-image: linear-gradient(
+    180deg,
+    var(--color-obsidian-50) 0%,
+    var(--color-obsidian-300) 100%
+  );
+  background-clip: text;
+  color: transparent;
+}
+
+@utility text-gradient-accent {
+  background-image: linear-gradient(180deg, var(--color-mint-200) 0%, var(--color-mint-600) 100%);
+  background-clip: text;
+  color: transparent;
+}
+
+/* Stable gutter so opening an overlay doesn't shift the page. */
+@utility scroll-lock {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}

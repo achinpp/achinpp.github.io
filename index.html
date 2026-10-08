@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" data-motion="on" data-grain="on">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#151722" />
+    <title>Shadow Command Center</title>
+    <meta
+      name="description"
+      content="Portfolio of a cybersecurity student, DevSecOps engineer and AI researcher."
+    />
+    <!--
+      Resolve the motion + grain preference before first paint.
+      Without this the page renders with animation enabled for a frame or two
+      and then snaps off, which is both a flash and a reduced-motion failure.
+      Mirrors the storage keys in src/providers/motion-context.ts.
+    -->
+    <script>
+      (function () {
+        try {
+          var root = document.documentElement;
+          var stored = localStorage.getItem('scc.motion');
+          var systemReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          var motionOn = stored === 'on' ? true : stored === 'off' ? false : !systemReduced;
+          root.dataset.motion = motionOn ? 'on' : 'off';
+          root.dataset.grain = localStorage.getItem('scc.grain') === 'off' ? 'off' : 'on';
+        } catch (e) {
+          /* storage blocked — the defaults in the <html> tag stand */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

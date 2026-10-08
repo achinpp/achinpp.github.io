@@ -1,0 +1,89 @@
+import { motion } from 'motion/react';
+import { SECTIONS } from '@/data/sections';
+import { fadeUp, maskReveal, maskRevealGroup, revealViewport } from '@/lib/motion/variants';
+
+/** Which stage replaces each placeholder. */
+const FILLED_BY: Record<string, string> = {
+  hero: 'STAGE 2 — Hero + Resume CTA',
+  experience: 'STAGE 3 — Experience & Leadership timeline',
+  projects: 'STAGE 4 — Mission Briefings grid',
+  battlestation: 'STAGE 5 — Battle Station (CTF & achievements)',
+  arsenal: 'STAGE 6 — Arsenal (tech stack)',
+  contact: 'STAGE 7 — Secure Channel (contact + footer)',
+};
+
+/**
+ * Stage 1 scaffolding: six full-height anchors so the shell has something
+ * real to navigate. The nav indicator, the active-section detection band and
+ * the HUD readout can't be judged against a single blank page.
+ *
+ * Each section is replaced wholesale by its own stage; this file is deleted
+ * once Stage 7 lands.
+ */
+export function SectionScaffold() {
+  return (
+    <>
+      {SECTIONS.map((section) => (
+        <section
+          key={section.id}
+          id={section.id}
+          // min-h-svh matters: useActiveSection needs each section to cross
+          // the middle of the viewport to ever become active.
+          className="relative flex min-h-svh flex-col justify-center border-b border-hairline px-5 py-28 sm:px-10"
+        >
+          <motion.div
+            variants={maskRevealGroup()}
+            initial="hidden"
+            whileInView="visible"
+            viewport={revealViewport}
+            className="mx-auto w-full max-w-6xl"
+          >
+            <span className="mask-line">
+              <motion.span
+                variants={maskReveal}
+                className="block font-mono text-label text-mint-600"
+              >
+                {section.index} / {section.codename}
+              </motion.span>
+            </span>
+
+            <h2 className="mt-4">
+              <span className="mask-line">
+                <motion.span
+                  variants={maskReveal}
+                  className="block text-gradient-ink text-display-xl"
+                >
+                  {section.label}
+                </motion.span>
+              </span>
+            </h2>
+
+            <motion.p
+              variants={fadeUp}
+              className="mt-8 font-mono text-[0.6875rem] tracking-[0.14em] text-ink-faint uppercase"
+            >
+              Placeholder · {FILLED_BY[section.id]}
+            </motion.p>
+
+            {/* A couple of interactive targets, so the cursor ring and the
+                focus ring have something to react to on every section. */}
+            <motion.div variants={fadeUp} className="mt-8 flex flex-wrap gap-3">
+              <button
+                type="button"
+                className="pane px-4 py-2.5 font-mono text-label text-mint-300 uppercase transition-all duration-200 ease-out-expo hover:border-mint-800 hover:shadow-glow-sm"
+              >
+                Interactive target
+              </button>
+              <button
+                type="button"
+                className="rounded-xl border border-hairline px-4 py-2.5 font-mono text-label text-ink-faint uppercase transition-colors duration-200 hover:text-ink"
+              >
+                Secondary
+              </button>
+            </motion.div>
+          </motion.div>
+        </section>
+      ))}
+    </>
+  );
+}
