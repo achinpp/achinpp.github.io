@@ -18,15 +18,16 @@ npm install
 npm run dev        # http://localhost:5173
 ```
 
-| Script              | What it does                                          |
-| ------------------- | ----------------------------------------------------- |
-| `npm run dev`       | Dev server                                            |
-| `npm run build`     | Typecheck, then production build into `dist/`         |
-| `npm run preview`   | Serve `dist/` locally                                 |
-| `npm run test`      | Fuzzy-scorer tests (esbuild → Node's built-in runner) |
-| `npm run lint`      | ESLint, zero warnings tolerated                       |
-| `npm run format`    | Prettier                                              |
-| `npm run typecheck` | `tsc --noEmit`                                        |
+| Script                  | What it does                                            |
+| ----------------------- | ------------------------------------------------------- |
+| `npm run dev`           | Dev server                                              |
+| `npm run build`         | Typecheck, then production build into `dist/`           |
+| `npm run preview`       | Serve `dist/` locally                                   |
+| `npm run test`          | Fuzzy-scorer tests (esbuild → Node's built-in runner)   |
+| `npm run check:browser` | Drives real Chromium over CDP against `npm run preview` |
+| `npm run lint`          | ESLint, zero warnings tolerated                         |
+| `npm run format`        | Prettier                                                |
+| `npm run typecheck`     | `tsc --noEmit`                                          |
 
 Requires **Node 20.15+**. Vite is pinned to 6.x — Vite 7 needs Node `^20.19 || >=22.12`.
 
@@ -127,6 +128,24 @@ current browser, and its geometry is matched 1:1 to the script.
 The script needs **Pillow**. It renders the card with system fonts rather than the brand fonts,
 because those ship as woff2 and decompressing woff2 needs Brotli; the header comment explains
 how to use the real faces if you want them.
+
+---
+
+## The browser check
+
+```bash
+npm run build && npm run preview   # terminal 1
+npm run check:browser              # terminal 2
+```
+
+`scripts/browser-check.py` drives an installed Chrome or Edge over the DevTools Protocol. It
+needs **Python with `websockets`** and no npm packages at all. It measures LCP and CLS for real,
+fails on any console error, asserts the DOM once React has mounted, drives the command palette
+from the keyboard, and writes screenshots into `.browser-check/` — one per section, plus 1440 /
+768 / 390, the palette open, reduced motion, and the 404 page.
+
+It exits non-zero on failure, so it can gate a deploy. It is not Lighthouse: no throttling, no
+TBT, no audit catalogue. Run Lighthouse on the deployed site as well.
 
 ---
 

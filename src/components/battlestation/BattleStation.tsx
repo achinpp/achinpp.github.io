@@ -39,7 +39,12 @@ export function BattleStation() {
           initial="hidden"
           whileInView="visible"
           viewport={revealViewport}
-          className="flex flex-wrap items-start gap-x-8 gap-y-11 lg:col-span-7"
+          // 8/4, not 7/5. Measured in the Stage 10 browser pass: at
+          // `lg:col-span-7` the column is 655px and the four badges need
+          // 656px, so the last locked slot wrapped onto a row of its own and
+          // read as broken rather than as a second row. One column over gives
+          // ~100px of slack, which also survives the hero badge growing.
+          className="flex flex-wrap items-start gap-x-8 gap-y-11 lg:col-span-8"
         >
           {ACHIEVEMENTS.map((achievement, i) => (
             <AchievementBadge key={achievement.id} achievement={achievement} hero={i === 0} />
@@ -50,7 +55,7 @@ export function BattleStation() {
         </motion.ul>
 
         {/* ---------------------------------------------------- counters */}
-        <div className="lg:col-span-5 lg:self-start">
+        <div className="lg:col-span-4 lg:self-start">
           <StatGrid />
         </div>
 

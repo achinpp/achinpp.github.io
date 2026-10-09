@@ -1,0 +1,564 @@
+"""
+Drive a real Chromium over the DevTools Protocol and check the built site.
+
+    npm run build && npm run preview          # terminal 1
+    python scripts/browser-check.py           # terminal 2
+
+Why this exists: nine build stages shipped with "not verified by me: anything
+visual, and no real LCP number". This closes that. It needs no npm packages -
+Chrome or Edge is already installed, and `websockets` drives CDP directly.
+
+It is not Lighthouse. It measures the three things that were actually written
+into the stage acceptance criteria and never checked:
+
+    * console errors and page exceptions           (Stage 7)
+    * Largest Contentful Paint, measured           (Stage 2)
+    * Cumulative Layout Shift, measured            (Stage 6 - the idle drift)
+
+...plus screenshots at three widths and in reduced-motion, and a set of DOM
+assertions that only hold once React has actually mounted and run.
+
+Exit code is non-zero if any check fails, so it can gate a deploy.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import base64
+import json
+import pathlib
+import shutil
+import subprocess
+import sys
+import tempfile
+import urllib.request
+
+import websockets
+
+ORIGIN = "http://localhost:4173"
+OUT = pathlib.Path(__file__).resolve().parent.parent / ".browser-check"
+DEBUG_PORT = 9222
+
+BROWSERS = [
+    r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+    r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+    r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+    r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
+]
+
+# Settle time after load before measuring. The hero's boot overlay is 900ms and
+# the typing script runs after it, so anything shorter measures a page that is
+# still mid-animation.
+SETTLE_MS = 3500
+
+failures: list[str] = []
+notes: list[str] = []
+
+
+def check(ok: bool, label: str, detail: str = "") -> bool:
+    mark = "PASS" if ok else "FAIL"
+    print(f"  [{mark}] {label}{(' — ' + detail) if detail else ''}")
+    if not ok:
+        failures.append(f"{label}{(': ' + detail) if detail else ''}")
+    return ok
+
+
+# --------------------------------------------------------------------------
+# Minimal CDP client
+# --------------------------------------------------------------------------
+
+
+class CDP:
+    """
+    One websocket, a background reader, and futures keyed by message id.
+
+    The reader task matters: CDP interleaves command replies with events, so
+    a naive "send then read until my id comes back" loop silently drops every
+    event that arrives while a command is in flight — which is most of them,
+    including the console errors this script exists to collect.
+    """
+
+    def __init__(self, ws: websockets.ClientConnection) -> None:
+        self.ws = ws
+        self._id = 0
+        self._pending: dict[int, asyncio.Future] = {}
+        self.events: list[dict] = []
+        self._reader = asyncio.create_task(self._read())
+
+    async def _read(self) -> None:
+        try:
+            async for raw in self.ws:
+                message = json.loads(raw)
+                if "id" in message:
+                    future = self._pending.pop(message["id"], None)
+                    if future and not future.done():
+                        future.set_result(message)
+                else:
+                    self.events.append(message)
+        except Exception:
+            pass
+
+    async def send(self, method: str, **params):
+        self._id += 1
+        future: asyncio.Future = asyncio.get_running_loop().create_future()
+        self._pending[self._id] = future
+        await self.ws.send(json.dumps({"id": self._id, "method": method, "params": params}))
+        message = await asyncio.wait_for(future, 45)
+        if "error" in message:
+            raise RuntimeError(f"{method}: {message['error']}")
+        return message.get("result", {})
+
+    async def evaluate(self, expression: str):
+        result = await self.send(
+            "Runtime.evaluate",
+            expression=expression,
+            awaitPromise=True,
+            returnByValue=True,
+        )
+        if "exceptionDetails" in result:
+            raise RuntimeError(result["exceptionDetails"].get("text", "evaluate threw"))
+        return result["result"].get("value")
+
+    def take_events(self, method: str) -> list[dict]:
+        found = [e for e in self.events if e.get("method") == method]
+        return found
+
+    def clear(self) -> None:
+        self.events.clear()
+
+
+# --------------------------------------------------------------------------
+# Browser lifecycle
+# --------------------------------------------------------------------------
+
+
+def launch() -> tuple[subprocess.Popen, str]:
+    binary = next((b for b in BROWSERS if pathlib.Path(b).exists()), None)
+    if binary is None:
+        sys.exit("No Chrome or Edge found. Edit BROWSERS at the top of this file.")
+
+    profile = tempfile.mkdtemp(prefix="scc-browser-check-")
+    process = subprocess.Popen(
+        [
+            binary,
+            "--headless=new",
+            f"--remote-debugging-port={DEBUG_PORT}",
+            f"--user-data-dir={profile}",
+            "--no-first-run",
+            "--no-default-browser-check",
+            "--disable-extensions",
+            "--hide-scrollbars",
+            # Deterministic: without this the measured LCP depends on whatever
+            # else the machine is doing.
+            "--disable-background-timer-throttling",
+            "--force-device-scale-factor=1",
+            "about:blank",
+        ],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    print(f"  browser: {pathlib.Path(binary).name}")
+    return process, profile
+
+
+def websocket_url() -> str:
+    """
+    Note the hostname. Chrome 155 hardened the DevTools HTTP endpoint against
+    DNS rebinding and now rejects `Host: 127.0.0.1` outright — it closes the
+    connection with no response, which reads exactly like "the port never
+    opened". Only `localhost` is accepted, so every DevTools URL here uses it.
+    """
+    import time
+
+    last: Exception | None = None
+    for _ in range(80):
+        try:
+            with urllib.request.urlopen(
+                f"http://localhost:{DEBUG_PORT}/json/version", timeout=1
+            ) as response:
+                return json.load(response)["webSocketDebuggerUrl"]
+        except Exception as error:  # noqa: BLE001 - reported below
+            last = error
+            time.sleep(0.25)
+    sys.exit(f"Browser never opened its debugging port: {last}")
+
+
+# --------------------------------------------------------------------------
+# Web-vitals collection, injected before any page script runs
+# --------------------------------------------------------------------------
+
+VITALS = """
+window.__vitals = { lcp: 0, cls: 0, shifts: [] };
+new PerformanceObserver((list) => {
+  for (const entry of list.getEntries()) window.__vitals.lcp = entry.startTime;
+}).observe({ type: 'largest-contentful-paint', buffered: true });
+new PerformanceObserver((list) => {
+  for (const entry of list.getEntries()) {
+    // Shifts the user caused by interacting are not the page's fault.
+    if (entry.hadRecentInput) continue;
+    window.__vitals.cls += entry.value;
+    window.__vitals.shifts.push(entry.value);
+  }
+}).observe({ type: 'layout-shift', buffered: true });
+"""
+
+
+async def new_page(ws_url: str) -> tuple[websockets.ClientConnection, CDP]:
+    ws = await websockets.connect(
+        ws_url.replace("127.0.0.1", "localhost"), max_size=80 * 1024 * 1024
+    )
+    browser = CDP(ws)
+    target = await browser.send("Target.createTarget", url="about:blank")
+    session = await browser.send(
+        "Target.attachToTarget", targetId=target["targetId"], flatten=True
+    )
+    await ws.close()
+
+    page_ws = await websockets.connect(
+        f"ws://localhost:{DEBUG_PORT}/devtools/page/{target['targetId']}",
+        max_size=80 * 1024 * 1024,
+    )
+    del session
+    page = CDP(page_ws)
+    await page.send("Page.enable")
+    await page.send("Runtime.enable")
+    await page.send("Log.enable")
+    await page.send("Page.addScriptToEvaluateOnNewDocument", source=VITALS)
+    return page_ws, page
+
+
+async def goto(page: CDP, url: str, settle: int = SETTLE_MS) -> None:
+    page.clear()
+    await page.send("Page.navigate", url=url)
+    # Poll for readyState rather than racing Page.loadEventFired, which can
+    # fire before the module graph has executed.
+    for _ in range(80):
+        await asyncio.sleep(0.1)
+        try:
+            if await page.evaluate("document.readyState") == "complete":
+                break
+        except Exception:
+            continue
+    await asyncio.sleep(settle / 1000)
+
+
+def console_problems(page: CDP) -> list[str]:
+    problems: list[str] = []
+    for event in page.take_events("Runtime.consoleAPICalled"):
+        params = event["params"]
+        if params["type"] in ("error", "warning", "assert"):
+            text = " ".join(
+                str(a.get("value", a.get("description", "?"))) for a in params.get("args", [])
+            )
+            problems.append(f"console.{params['type']}: {text[:200]}")
+    for event in page.take_events("Runtime.exceptionThrown"):
+        details = event["params"]["exceptionDetails"]
+        problems.append(f"uncaught: {details.get('text', '?')[:200]}")
+    for event in page.take_events("Log.entryAdded"):
+        entry = event["params"]["entry"]
+        if entry["level"] in ("error", "warning"):
+            # A favicon 404 on a preview server is not a site defect; nothing
+            # else is filtered.
+            if "favicon" in entry.get("url", ""):
+                continue
+            problems.append(f"log.{entry['level']}: {entry.get('text', '?')[:200]}")
+    return problems
+
+
+async def screenshot(page: CDP, name: str, width: int, height: int, *, full: bool = False) -> None:
+    await page.send(
+        "Emulation.setDeviceMetricsOverride",
+        width=width,
+        height=height,
+        deviceScaleFactor=1,
+        mobile=width < 500,
+    )
+    await asyncio.sleep(0.6)
+    result = await page.send("Page.captureScreenshot", format="png", captureBeyondViewport=full)
+    path = OUT / f"{name}.png"
+    path.write_bytes(base64.b64decode(result["data"]))
+    print(f"         {path.relative_to(OUT.parent)}  {width}x{height}")
+
+
+# --------------------------------------------------------------------------
+# Checks
+# --------------------------------------------------------------------------
+
+DOM_ASSERTIONS = """
+(() => {
+  const q = (s) => Array.from(document.querySelectorAll(s));
+  const ids = q('[id]').map((el) => el.id);
+  const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
+
+  // Every control must have an accessible name from somewhere.
+  const namelessButtons = q('button').filter((b) => {
+    const text = (b.textContent || '').trim();
+    return !text && !b.getAttribute('aria-label') && !b.getAttribute('aria-labelledby');
+  }).length;
+
+  const namelessLinks = q('a[href]').filter((a) => {
+    const text = (a.textContent || '').trim();
+    return !text && !a.getAttribute('aria-label') && !a.getAttribute('aria-labelledby');
+  }).length;
+
+  const imgsWithoutAlt = q('img').filter((i) => !i.hasAttribute('alt')).length;
+
+  // Section order and uniqueness of the one h1.
+  const h1s = q('h1').length;
+  const headings = q('h1,h2,h3,h4').map((h) => Number(h.tagName[1]));
+  let badOrder = 0;
+  for (let i = 1; i < headings.length; i++) {
+    if (headings[i] - headings[i - 1] > 1) badOrder++;
+  }
+
+  return {
+    sections: q('main > section').map((s) => s.id),
+    h1s,
+    h1Text: (q('h1')[0]?.textContent || '').trim(),
+    badHeadingJumps: badOrder,
+    duplicateIds: Array.from(new Set(dupes)),
+    namelessButtons,
+    namelessLinks,
+    imgsWithoutAlt,
+    skipLink: !!document.querySelector('a[href="#main"]'),
+    mainLandmark: !!document.querySelector('main#main'),
+    footerLandmark: !!document.querySelector('footer'),
+    navLandmark: !!document.querySelector('nav[aria-label]'),
+    lang: document.documentElement.lang,
+    motionAttr: document.documentElement.dataset.motion,
+    title: document.title,
+    bodyWidth: document.body.scrollWidth,
+    viewportWidth: window.innerWidth,
+  };
+})()
+"""
+
+
+async def main() -> None:
+    if OUT.exists():
+        shutil.rmtree(OUT)
+    OUT.mkdir(parents=True)
+
+    print("launching")
+    process, profile = launch()
+    try:
+        ws_url = websocket_url()
+        page_ws, page = await new_page(ws_url)
+
+        # ---------------------------------------------------------- load
+        print(f"\nloading {ORIGIN}/ (settling {SETTLE_MS}ms)")
+        await page.send(
+            "Emulation.setDeviceMetricsOverride",
+            width=1440,
+            height=900,
+            deviceScaleFactor=1,
+            mobile=False,
+        )
+        await goto(page, f"{ORIGIN}/")
+
+        # ------------------------------------------------------- console
+        print("\nconsole")
+        problems = console_problems(page)
+        check(not problems, "no console errors, warnings or exceptions", "; ".join(problems[:4]))
+
+        # -------------------------------------------------------- vitals
+        print("\nweb vitals (measured, finally)")
+        vitals = await page.evaluate("window.__vitals")
+        lcp = round(vitals["lcp"])
+        cls = round(vitals["cls"], 4)
+        notes.append(f"LCP {lcp}ms · CLS {cls} · {len(vitals['shifts'])} layout shifts")
+        check(lcp > 0, "LCP was reported", f"{lcp}ms")
+        check(lcp < 2000, "LCP under the 2.0s target set in Stage 2", f"{lcp}ms")
+        check(cls < 0.1, "CLS under 0.1 (Stage 6: the idle drift must not shift layout)", str(cls))
+
+        lcp_element = await page.evaluate(
+            "(performance.getEntriesByType('largest-contentful-paint').pop()?.element?.outerHTML "
+            "|| '').slice(0, 120)"
+        )
+        if lcp_element:
+            notes.append(f"LCP element: {lcp_element}")
+
+        # ----------------------------------------------------------- DOM
+        print("\nDOM (only true once React has mounted and run)")
+        dom = await page.evaluate(DOM_ASSERTIONS)
+        expected = ["hero", "experience", "projects", "battlestation", "arsenal", "contact"]
+        check(dom["sections"] == expected, "all six sections rendered in order", str(dom["sections"]))
+        check(dom["h1s"] == 1, "exactly one <h1>", f"{dom['h1s']} found")
+        check(bool(dom["h1Text"]), "the <h1> has text", repr(dom["h1Text"])[:60])
+        check(dom["badHeadingJumps"] == 0, "no skipped heading levels", str(dom["badHeadingJumps"]))
+        check(not dom["duplicateIds"], "no duplicate element ids", str(dom["duplicateIds"])[:120])
+        check(dom["namelessButtons"] == 0, "every button has an accessible name", str(dom["namelessButtons"]))
+        check(dom["namelessLinks"] == 0, "every link has an accessible name", str(dom["namelessLinks"]))
+        check(dom["imgsWithoutAlt"] == 0, "every <img> has alt", str(dom["imgsWithoutAlt"]))
+        check(dom["skipLink"], "skip link present")
+        check(dom["mainLandmark"] and dom["footerLandmark"] and dom["navLandmark"], "landmarks present")
+        check(dom["lang"] == "en", "html lang set", dom["lang"])
+        check(dom["motionAttr"] in ("on", "off"), "data-motion resolved before paint", str(dom["motionAttr"]))
+
+        # The counterpart to the reduced-motion check below. If this is zero
+        # with motion ON, the kill switch is stuck and the reduced-motion pass
+        # proves nothing.
+        running = await page.evaluate(
+            "document.getAnimations().filter((a) => a.playState === 'running').length"
+        )
+        check(running > 0, "animations are running with motion on", f"{running} running")
+
+        # ------------------------------------------------- screenshots
+        print("\nscreenshots")
+        for name, width, height in [("desktop-1440", 1440, 900), ("tablet-768", 768, 1024), ("mobile-390", 390, 844)]:
+            await screenshot(page, name, width, height)
+            overflow = await page.evaluate(
+                "({ body: document.body.scrollWidth, view: window.innerWidth })"
+            )
+            check(
+                overflow["body"] <= overflow["view"] + 1,
+                f"no horizontal overflow at {width}px",
+                f"body {overflow['body']} > viewport {overflow['view']}",
+            )
+
+            # Regression guard for a bug this pass found: PaletteHint carried
+            # a base `inline-flex`, and Tailwind emits `.inline-flex` AFTER
+            # `.hidden`, so the caller's `hidden sm:inline-flex` lost the
+            # cascade and a keyboard shortcut was advertised on a phone.
+            visible_hints = await page.evaluate(
+                """Array.from(document.querySelectorAll('[aria-label="Open command palette"]'))
+                   .filter((el) => el.getClientRects().length > 0).length"""
+            )
+            expected_hints = 0 if width < 640 else 2
+            check(
+                visible_hints == expected_hints,
+                f"palette hint visibility correct at {width}px",
+                f"{visible_hints} visible, expected {expected_hints}",
+            )
+
+        await screenshot(page, "desktop-1440-full", 1440, 900, full=True)
+
+        # One frame per section. A full-page capture of a site this tall is
+        # unreadable; this is what makes the build reviewable without opening
+        # a browser.
+        print('\n  sections')
+        await page.send(
+            "Emulation.setDeviceMetricsOverride",
+            width=1440,
+            height=900,
+            deviceScaleFactor=1,
+            mobile=False,
+        )
+        for index, section in enumerate(expected):
+            await page.evaluate(
+                f"document.getElementById('{section}')"
+                f".scrollIntoView({{ block: 'start', behavior: 'instant' }})"
+            )
+            # Sections reveal on scroll; give the in-view animations time to
+            # finish or every frame is a half-faded one.
+            await asyncio.sleep(1.4)
+            await screenshot(page, f"section-{index}-{section}", 1440, 900)
+        await page.evaluate("window.scrollTo(0, 0)")
+        await asyncio.sleep(0.5)
+
+        # ------------------------------------------- keyboard: palette
+        print("\ncommand palette, driven from the keyboard")
+        await page.send(
+            "Emulation.setDeviceMetricsOverride",
+            width=1440,
+            height=900,
+            deviceScaleFactor=1,
+            mobile=False,
+        )
+        for event_type in ("rawKeyDown", "char", "keyUp"):
+            payload = {
+                "type": event_type,
+                "modifiers": 2,  # Ctrl
+                "key": "k",
+                "code": "KeyK",
+                "windowsVirtualKeyCode": 75,
+            }
+            if event_type == "char":
+                payload = {"type": "char", "modifiers": 2, "text": "k"}
+            await page.send("Input.dispatchKeyEvent", **payload)
+        await asyncio.sleep(0.9)
+
+        palette = await page.evaluate(
+            """(() => {
+              const dialog = document.querySelector('[role="dialog"][aria-label="Command palette"]');
+              if (!dialog) return { open: false };
+              const input = dialog.querySelector('input[role="combobox"]');
+              const active = input?.getAttribute('aria-activedescendant');
+              return {
+                open: true,
+                focused: document.activeElement === input,
+                options: dialog.querySelectorAll('[role="option"]').length,
+                activeDescendant: active,
+                activeResolves: !!(active && document.getElementById(active)),
+                listbox: !!dialog.querySelector('[role="listbox"]'),
+              };
+            })()"""
+        )
+        check(palette["open"], "Ctrl+K opens the palette")
+        if palette["open"]:
+            check(palette["focused"], "focus is in the combobox input")
+            check(palette["listbox"], "listbox present")
+            check(palette["options"] > 0, "options rendered", f"{palette['options']} options")
+            check(
+                palette["activeResolves"],
+                "aria-activedescendant points at a real element",
+                str(palette["activeDescendant"]),
+            )
+            await screenshot(page, "palette-open", 1440, 900)
+
+        # ------------------------------------------------ reduced motion
+        print("\nreduced motion")
+        await page.send(
+            "Emulation.setEmulatedMedia",
+            features=[{"name": "prefers-reduced-motion", "value": "reduce"}],
+        )
+        await goto(page, f"{ORIGIN}/", settle=2000)
+        reduced_problems = console_problems(page)
+        check(not reduced_problems, "no console errors under reduced motion", "; ".join(reduced_problems[:3]))
+        motion_state = await page.evaluate("document.documentElement.dataset.motion")
+        check(motion_state == "off", "data-motion flips to off", str(motion_state))
+
+        # This replaces an assertion that queried `[data-boot]` — an attribute
+        # that never existed, so it could never fail. A check that cannot fail
+        # is worse than no check: it reports confidence it has not earned.
+        # `getAnimations()` is the real question, and it is answerable.
+        running = await page.evaluate(
+            "document.getAnimations().filter((a) => a.playState === 'running').length"
+        )
+        check(running == 0, "no animation is still running", f"{running} running")
+
+        transcript = await page.evaluate(
+            "document.querySelectorAll('.sr-only p, [class*=\"sr-only\"] p').length"
+        )
+        check(transcript >= 6, "terminal transcript complete on arrival", f"{transcript} lines")
+        await screenshot(page, "reduced-motion-1440", 1440, 900)
+        await page.send("Emulation.setEmulatedMedia", features=[])
+
+        # ---------------------------------------------------- 404 page
+        print("\n404 page")
+        await goto(page, f"{ORIGIN}/404.html", settle=800)
+        four_oh_four = console_problems(page)
+        check(not four_oh_four, "404 page is clean", "; ".join(four_oh_four[:3]))
+        code = await page.evaluate("document.querySelector('.code')?.textContent")
+        check(code == "404", "404 renders without the app bundle", str(code))
+        await screenshot(page, "404-1440", 1440, 900)
+
+        await page_ws.close()
+    finally:
+        process.terminate()
+        shutil.rmtree(profile, ignore_errors=True)
+
+    print("\n" + "=" * 68)
+    for note in notes:
+        print(f"  {note}")
+    print("=" * 68)
+    if failures:
+        print(f"  {len(failures)} FAILED")
+        for failure in failures:
+            print(f"    - {failure}")
+        sys.exit(1)
+    print("  all checks passed")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

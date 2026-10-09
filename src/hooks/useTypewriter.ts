@@ -14,7 +14,7 @@ export type TypewriterState = {
 /** Human typing isn't metronomic; a little jitter is what sells it. */
 const JITTER = 16;
 /** Beat before the first character, so the window reads as "opening". */
-const LEAD_IN = 260;
+const LEAD_IN = 150;
 const DEFAULT_SPEED = 26;
 const DEFAULT_PAUSE = 240;
 

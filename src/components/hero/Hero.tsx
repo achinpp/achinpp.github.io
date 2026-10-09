@@ -1,13 +1,11 @@
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 import { ArrowDown, Download } from 'lucide-react';
 import { PROFILE, TERMINAL_SCRIPT } from '@/data/profile';
-import { BootOverlay } from '@/components/hero/BootOverlay';
 import { RoleRotator } from '@/components/hero/RoleRotator';
 import { ScrollHint } from '@/components/hero/ScrollHint';
 import { TerminalWindow } from '@/components/hero/TerminalWindow';
 import { GlowButton } from '@/components/ui/GlowButton';
 import { ScrambleText } from '@/components/ui/ScrambleText';
-import { useBootSequence } from '@/hooks/useBootSequence';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useScrollTo } from '@/hooks/useScrollTo';
 import { useTypewriter } from '@/hooks/useTypewriter';
@@ -25,24 +23,24 @@ const NAME_LINES = [PROFILE.firstName, PROFILE.name.slice(PROFILE.firstName.leng
 
 export function Hero() {
   const reduced = useReducedMotion();
-  const { booting } = useBootSequence();
   const scrollTo = useScrollTo();
 
-  const typing = useTypewriter(TERMINAL_SCRIPT, {
-    // Hold the script back until the boot overlay is gone, or it finishes
-    // behind a screen nobody can see.
-    enabled: !booting,
-    instant: reduced,
-  });
+  const typing = useTypewriter(TERMINAL_SCRIPT, { enabled: true, instant: reduced });
 
   /**
    * The name appears once `whoami` has finished executing — line 0 of the
    * script — rather than after the whole transcript.
    *
    * That ordering is the point: the brief asked for the terminal to run
-   * `whoami` and *then* render the name. Waiting for all six lines would also
-   * put Largest Contentful Paint at ~2.5s, since the name is by far the
-   * biggest text on the page. This way the beat still lands and LCP is ~1s.
+   * `whoami` and *then* render the name. Waiting for all six lines would put
+   * Largest Contentful Paint even later, since the hero grid keeps growing as
+   * each piece of it lands.
+   *
+   * Stage 10 measured this properly for the first time. The Stage 2 figure
+   * (~1654ms) was arithmetic, and it was measuring the wrong moment: LCP
+   * tracks the hero *grid*, which keeps being re-reported as larger content
+   * paints inside it, so the real number is when the CTAs finish — not when
+   * the name starts revealing.
    */
   const revealName = typing.lineIndex >= 1;
 
@@ -51,8 +49,6 @@ export function Hero() {
       id="hero"
       className="relative flex min-h-svh flex-col justify-center px-5 py-28 sm:px-10"
     >
-      <AnimatePresence>{booting && <BootOverlay />}</AnimatePresence>
-
       <div className="mx-auto w-full max-w-6xl">
         <div className="grid gap-y-12 lg:grid-cols-12 lg:gap-x-8">
           {/* ------------------------------------------------- terminal */}
@@ -137,7 +133,11 @@ export function Hero() {
                 opacity: revealName || reduced ? 1 : 0,
                 y: revealName || reduced ? 0 : 12,
               }}
-              transition={{ duration: duration.slow, ease: easeOutExpo, delay: 0.45 }}
+              // Stage 10: delay 0.45 -> 0.22, which brings the résumé button
+              // forward without changing the fade itself. Shortening the fade
+              // as well was tried and measured at zero benefit, so it was
+              // reverted — see the Stage 10 notes on what actually moved LCP.
+              transition={{ duration: duration.slow, ease: easeOutExpo, delay: 0.22 }}
               className="mt-11 flex flex-wrap items-center gap-4"
             >
               <GlowButton

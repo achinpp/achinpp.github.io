@@ -221,15 +221,24 @@ LCP < 2.0s.
 
 > NOTE: **The name reveals after script line 0, not after the whole transcript.** The brief wants
 > `whoami` to run and _then_ the name to render, and that beat is preserved — but gating on all
-> six lines would put LCP at ~3.5s, since the name is by far the largest text on the page. Cold
-> load budget now: 900ms boot + 260ms lead-in + ~494ms for line 0 = **~1654ms**, 346ms inside the
-> 2.0s target. A returning visitor in the same session skips the boot: ~754ms.
+> six lines would put LCP far later, since the name is by far the largest text on the page.
+>
+> **↳ THE ~1654ms FIGURE BELOW WAS WRONG. CORRECTED IN STAGE 10.** It was arithmetic, and it was
+> arithmetic about the wrong moment: it added up `900ms boot + 260ms lead-in + ~494ms for line 0`
+> and called that LCP. LCP is not "when the name starts revealing" — it is the last contentful
+> paint in the hero grid, which keeps being re-reported as more of the grid becomes visible.
+> Measured, the real figure was **2944ms**, not 1654ms. After removing the boot overlay it is
+> **1776–1964ms across runs**. See Stage 10.
 
 > NOTE: **The boot overlay is the main LCP cost and the one thing here nobody asked for.** It was
 > my own addition in the Stage 2 plan. 900ms, dismissed by _any_ key, click or wheel, never
 > shown under reduced motion, once per session (`sessionStorage`, not `localStorage` — a visit
 > tomorrow should get it again, a reload in five seconds shouldn't). Deleting it buys ~900ms of
 > LCP; say so and it goes.
+>
+> **↳ CORRECTED IN STAGE 10.** Measured in a real browser, it cost **1072ms**, not 900 — and it
+> was the difference between failing and passing the 2.0s target. It is gone; `BootOverlay.tsx`
+> and `useBootSequence.ts` are deleted. One `git revert` brings it back if you want it.
 
 > NOTE: **Scramble went on the mono text, not the display name.** Random glyphs have random
 > widths in a proportional font, so a scrambling `<h1>` at 6.5rem reflows on every tick and reads
@@ -1122,6 +1131,98 @@ all five PNGs validate at their declared sizes · `favicon.svg` parses as well-f
 
 ---
 
+## STAGE 10 — Browser Verification Pass ✅
+
+**Not in the original plan.** Stages 0–9 all shipped with the same caveat — _"not verified by me:
+anything visual, and no real LCP number"_ — because I had no browser. Chrome and Edge turned out
+to be installed, and Python's `websockets` can drive the DevTools Protocol with no npm packages
+at all. This stage closes that gap and turns it into a repeatable check.
+
+**Goal:** stop claiming and start measuring.
+
+- [x] `scripts/browser-check.py` — drives real Chromium over CDP, `npm run check:browser`
+- [x] **Console**: zero errors, warnings or exceptions (Stage 7's criterion, never checked)
+- [x] **LCP measured** (Stage 2's criterion, previously arithmetic)
+- [x] **CLS measured** (Stage 6's criterion — the idle drift)
+- [x] Screenshots at 1440 / 768 / 390, per section, palette open, reduced motion, 404
+- [x] Keyboard-driven palette test, including that `aria-activedescendant` resolves
+- [x] DOM assertions: landmarks, heading order, duplicate ids, accessible names
+- [x] Reduced-motion verified by `getAnimations()`, with a positive counterpart
+- [x] Four real defects found and fixed
+
+**Accept when:** the check passes and its findings are fixed. ✅
+
+### What it found
+
+> ⚠ **1. LCP was 2944ms — it had never passed.** Stage 2 claimed ~1654ms from arithmetic, and
+> the arithmetic was about the wrong moment: it measured when the name _starts_ revealing. LCP
+> is the last contentful paint in the hero grid, and the grid keeps being re-reported as more of
+> it becomes visible. **Fix: the boot overlay is gone** — measured at 1072ms of pure delay, and
+> it was my own addition that nobody asked for. Now **1776–1964ms across runs** (±~90ms of
+> measurement noise). It passes, but see the caveat below.
+
+> ⚠ **2. The ⌘K chip was showing at 390px.** `PaletteHint` set a base `inline-flex`, and
+> Tailwind emits `.inline-flex` _after_ `.hidden` — so the caller's `hidden sm:inline-flex` lost
+> the cascade and the site advertised a keyboard shortcut on a phone. Display is now the
+> caller's to set, and the check asserts the visibility at all three widths so it cannot come
+> back.
+
+> ⚠ **3. One of my own reduced-motion assertions was vacuous.** It queried `[data-boot]` — an
+> attribute that never existed — so it passed unconditionally. **A check that cannot fail is
+> worse than no check**: it reports confidence it has not earned. Replaced with
+> `getAnimations().filter(playState === 'running')`, which is the real question, plus the
+> positive counterpart with motion _on_ — because if that one reports zero, the kill switch is
+> stuck and the reduced-motion pass proves nothing.
+
+> ⚠ **4. The badge wall wrapped.** At `lg:col-span-7` the column is 655px and the four hexagons
+> need 656px, so `SLOT_04` dropped onto a row of its own and read as broken rather than as a
+> second row. Now 8/4 instead of 7/5, which leaves ~100px of slack.
+
+### Stage 10 notes
+
+> NOTE: **Three of four LCP "optimisations" were reverted, because they did nothing.** After
+> removing the boot overlay I trimmed the lead-in, the CTA delay, the CTA fade duration and the
+> name's reveal duration. Measuring each: the boot overlay was worth ~1100ms, the lead-in and CTA
+> delay together ~100ms, and **the other two were worth nothing at all** — the number moved less
+> than the ±90ms noise floor. They were reverted. A change that does not move the metric should
+> not cost design quality, and the whole point of measuring is to be able to tell the difference.
+
+> NOTE: **Chrome 155 rejects `Host: 127.0.0.1` on the DevTools endpoint.** DNS-rebinding
+> hardening: it closes the connection with no response, which reads exactly like "the port never
+> opened" and cost a debugging detour. Only `localhost` works. Noted in the script.
+
+> NOTE: **The check is not Lighthouse and does not pretend to be.** It measures the three things
+> that were actually written into the stage acceptance criteria and never checked, and it exits
+> non-zero, so it can gate a deploy. Lighthouse is still worth running — it covers throttling,
+> TBT and the audit catalogue, none of which this touches.
+
+> NOTE: **Per-section screenshots are the point, not a bonus.** A full-page capture of a site
+> this tall is unreadable. One frame per section, after a 1.4s settle so the in-view reveals have
+> finished, is what makes the build reviewable without opening a browser — and it is how defect
+> 4 was found.
+
+> NOTE: **Measurements are localhost and headless.** They carry no network latency and no CPU
+> throttling, so they are a floor, not a forecast.
+
+**⚠ THE LCP CAVEAT, STATED PLAINLY.** The worst of three consecutive runs was **1964ms** against
+a 2000ms target — 36ms of headroom, on localhost, with no throttling. **On a real connection
+this will exceed 2s.** The remaining time is almost entirely the hero's own choreography: lead-in,
+then line 0 of the terminal typing, then the name's mask reveal. The decisive fix is to stop
+gating the name on the typing at all, which would put LCP near first paint — but it costs the
+brief's `whoami` → name beat, so it is a design call rather than a bug, and it is yours.
+Lighthouse on the deployed site is the real number.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+`npm run test` 8/8 · `npm run check:browser` **all checks pass** · production build
+370.6 kB JS (118.8 kB gzip) / 60.9 kB CSS (11.3 kB gzip) · LCP 1776–1964ms · CLS 0.0152 ·
+console clean on the site, under reduced motion, and on the 404 page.
+
+**Still needs a human:** Lighthouse on the deployed site, Safari and Firefox (this pass is
+Chromium only), and a screen reader on the palette combobox. Everything else that was open at
+the end of Stage 9 is content you supply — see the Stage 9 checklist.
+
+---
+
 ## Working Agreement
 
 1. One stage at a time. I build it, you review it, we iterate, then we advance.
@@ -1151,6 +1252,6 @@ all five PNGs validate at their declared sizes · `favicon.svg` parses as well-f
 
 ---
 
-**Current status:** `STAGE 9 — engineering complete` → remaining: **content you supply**, a
-**browser pass** (Lighthouse, responsive, cross-browser, screen reader), and the **deploy**.
-See the three grouped checklists in Stage 9.
+**Current status:** `STAGE 10 — browser pass complete, 4 defects fixed` → remaining:
+**content you supply** (Stage 9 checklist), **Lighthouse on the deployed site**, **Safari and
+Firefox**, a **screen-reader pass**, and the **deploy**.

@@ -117,7 +117,7 @@ export function FloatingNav() {
               affordance on a phone, and the mobile pill has no room. */}
           <div className="hidden items-center sm:flex">
             <span aria-hidden className="mx-1 h-3 w-px bg-hairline" />
-            <PaletteHint className="rounded-full px-3 py-2.5 text-[0.625rem] text-obsidian-500 hover:text-mint-300" />
+            <PaletteHint className="inline-flex rounded-full px-3 py-2.5 text-[0.625rem] text-obsidian-500 hover:text-mint-300" />
           </div>
 
           {/* -------------------------------------------------- mobile pill */}
