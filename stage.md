@@ -596,18 +596,114 @@ from the production bundle · all 6 new modules transform in dev.
 
 ---
 
-## STAGE 6 — Arsenal (Tech Stack)
+## STAGE 6 — Arsenal (Tech Stack) ✅
 
 **Goal:** Skills, without the tired progress-bar cliché.
 
-- [ ] Floating pill tags with idle drift, glow-on-hover, category filtering
-- [ ] Categories: Offensive Security · Development · Cloud & Infra · AI/ML
-- [ ] Tags: Penetration Testing, Node.js, Java, Python, FastAPI, Cloud Security, Threat Modeling
-      (+ room to extend)
-- [ ] Filter chips re-layout the cloud with Framer layout animations
-- [ ] **No percentage bars** — nobody is 87% at Python
+- [x] Floating pill tags with idle drift, glow-on-hover, category filtering
+- [x] Categories: Offensive Security · **AppSec & DevSecOps** · Development · **Cloud & Network**
+      · AI / ML — five, not four (see note)
+- [x] Tags: all seven from the brief, plus 13 derived from its own project descriptions,
+      each marked
+- [x] Filter chips re-layout the cloud with Framer layout animations
+- [x] **No percentage bars** — nobody is 87% at Python
 
 **Accept when:** filter transitions are fluid; drift animation doesn't cause CLS.
+
+### Stage 6 notes
+
+> ⚠ **TWO PROVENANCES, and the difference is marked in `src/data/skills.ts`.** `'stated'` is the
+> seven skills the brief listed outright. `'derived'` is tools the brief names inside its
+> _project_ descriptions — Semgrep/Trivy/Gitleaks from the DevSecOps pipeline, VLANs and extended
+> ACLs and segmentation from Northbridge, VGG19/YOLO/adversarial ML from the surveillance system,
+> Google ADK and the Gemini API from Study Coach. Listing something you built a project with is a
+> derivation, not an invention, but it is still my call rather than a stated one. A dev-only
+> legend under the cloud counts both and names every derived pill. **Prune anything you would not
+> want to be asked about in an interview.**
+
+> NOTE: **Five categories, not the four in my plan.** "Cloud & Infra" had no home for Semgrep,
+> Trivy or Gitleaks, and filing SAST tooling under "Offensive Security" is wrong — those are
+> defensive. The split is now Offensive Security · AppSec & DevSecOps · Development ·
+> Cloud & Network · AI / ML, which also happens to mirror the brief's own three pillars
+> (cybersecurity, DevSecOps, AI research) rather than cutting across them.
+
+> NOTE: **The drift and the layout animation are on different elements, and have to be.**
+> Framer's `layout` writes to `transform`, and so does the `drift` keyframe — and a running CSS
+> animation beats an inline style in the cascade, so on a single element the re-layout would be
+> silently overwritten every frame and the filter would simply not animate. The `<li>` moves;
+> the `<span>` inside it floats.
+
+> NOTE: **`layout="position"`, not `layout`, and entry/exit are opacity-only.** Pills never
+> change size, so there is nothing to measure — and Framer's own guidance is that size
+> measurement and `scale` interfere. A `scale` on an element that is also being laid out is the
+> documented route to morphing from the wrong rectangle (same reason the project cards reveal
+> with `fadeUp`, Stage 4).
+
+> NOTE: **`mode="popLayout"` is what makes it read as a re-layout rather than a redraw.** An
+> exiting pill is pulled out of flow immediately — Framer absolutely positions it — so the pills
+> that remain start sliding on the same frame instead of waiting for a gap to collapse. The
+> container carries `layout` so its height animates with them rather than snapping.
+
+> NOTE: **Drift seeds are deterministic, from the pill's index in the full `SKILLS` array.**
+> `Math.random()` would re-roll on every render, so a pill would jump to a new point in its
+> cycle whenever the filter changed. Seeding from the _full_ list rather than the filtered one
+> keeps it stable while pills come and go. The animation delay is **negative**, which starts each
+> pill partway through its own cycle — otherwise all twenty begin at keyframe zero and the cloud
+> pulses in unison.
+
+> NOTE: **No CLS from the drift**, which is this stage's acceptance criterion: `@keyframes drift`
+> only ever writes `transform`, which is not a layout property.
+
+> NOTE: **Found while verifying — the CSS minifier rewrites `translate3d(x, y, 0)` as
+> `translate(x, y)`.** That drops the 3D hint which, on legacy engines, was what forced
+> compositor promotion. Current Chrome, Firefox and Safari promote any animated transform
+> regardless, so behaviour is unchanged — but it means Stage 1's `translate3d only` phrasing
+> describes the source, not the shipped CSS. The scanline is unaffected either way because it
+> also carries an explicit `will-change: transform`. The pills deliberately **do not**: twenty
+> `will-change` elements is twenty compositor layers of GPU memory to composite a ±5px wobble,
+> which is the wrong trade.
+
+> NOTE: **Pills are all the same size.** Varying them by implied strength is a proficiency claim
+> with no number attached to argue with — the same thing a percentage bar does, just harder to
+> pin down. The only visual differentiation is a category dot.
+
+> NOTE: **Category dots are five steps of the mint ramp plus one neutral, not five hues.**
+> `--color-breach-*` and `--color-signal-*` are reserved for danger and status semantics
+> (Stage 0); spending them on "this one is an ML tool" would quietly break that contract
+> everywhere else on the site.
+
+> NOTE: **Clicking the active chip clears the filter.** Without it the only way back to the full
+> cloud is to find the `All` chip again, which is a dead end people hit constantly in filter UIs.
+
+> NOTE: **An `aria-live` region reports the count.** Filtering changes the list without moving
+> focus, so a screen reader otherwise gets no indication that anything happened at all.
+
+> NOTE: **`source` still ships to production, unlike Stage 5's `STAT_SOURCES`** — deliberately.
+> It is a one-word enum that is part of the content model (it could legitimately drive production
+> UI later), and it costs 13 copies of an interned string, against Stage 5's four full
+> explanatory sentences. The lesson from Stage 5 stands; this is a judged exception, not an
+> oversight.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+production build 2.8s / 55.7 kB CSS (10.6 kB gzip) / 376 kB JS (118.6 kB gzip) ·
+`@keyframes drift`, `animate-drift`, `shadow-glow-xs` and the composite
+`transition-property: color, border-color, box-shadow` all confirmed in the compiled CSS ·
+all seven stated skills, every derived skill, all five category names, `arsenal-filter` and
+`popLayout` confirmed in the JS bundle · **the whole `<ProvenanceLegend />` confirmed absent**
+from the production bundle · all 4 new modules transform in dev.
+
+**Not yet verified by me:** no browser here. Worth checking by hand:
+
+- **the filter transition** — this stage's acceptance criterion. Click through all six chips and
+  watch for pills teleporting instead of sliding, or the container height snapping
+- **click the active chip** to clear, and check the indicator slides back to `All`
+- the idle drift: is ±5px over 7–12s too much, too little, or distracting? It is the one thing
+  here running continuously
+- **no layout shift** while the drift runs — nothing below the cloud should twitch
+- **390px**: the chip row wraps into a rounded block rather than a pill, and the cloud wraps
+  without a pill overflowing
+- **Motion off**: pills completely still, filter snaps with no slide, hover glow still works
+- the dev-only provenance legend at the bottom of the section — that is your prune list
 
 ---
 
@@ -654,6 +750,8 @@ from the production bundle · all 6 new modules transform in dev.
 - [ ] **Supply real achievements for `src/data/achievements.ts`** — other CTFs, dates, a writeup
       count, and any named open-source contributions. Until then the badge wall is one badge and
       three locked slots (Stage 5)
+- [ ] **Prune `src/data/skills.ts`** — 13 of the 20 pills are `source: 'derived'`, taken from the
+      brief's project descriptions rather than stated outright (Stage 6)
 - [ ] Lighthouse: Performance ≥ 95, A11y ≥ 95, Best Practices 100, SEO 100 — measure LCP for real
 - [ ] Route-level code splitting, lazy-load below-fold heavy components
 - [ ] OG image + Twitter card, full meta, JSON-LD `Person` schema
@@ -691,4 +789,4 @@ from the production bundle · all 6 new modules transform in dev.
 
 ---
 
-**Current status:** `STAGE 5 — complete, awaiting review` → next: `STAGE 6 — Arsenal (Tech Stack)`
+**Current status:** `STAGE 6 — complete, awaiting review` → next: `STAGE 7 — Secure Channel (Contact + Footer)`

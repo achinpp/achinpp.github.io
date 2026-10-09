@@ -1,5 +1,6 @@
 import { GridBackdrop } from '@/components/backdrop/GridBackdrop';
 import { ScanlineSweep } from '@/components/backdrop/ScanlineSweep';
+import { Arsenal } from '@/components/arsenal/Arsenal';
 import { BattleStation } from '@/components/battlestation/BattleStation';
 import { CustomCursor } from '@/components/chrome/CustomCursor';
 import { FloatingNav } from '@/components/chrome/FloatingNav';
@@ -49,6 +50,7 @@ export function App() {
                 <Experience />
                 <Projects />
                 <BattleStation />
+                <Arsenal />
                 <SectionScaffold />
               </main>
               <StatusHUD />
