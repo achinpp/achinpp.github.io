@@ -2,9 +2,14 @@ import { motion } from 'motion/react';
 import { SECTIONS } from '@/data/sections';
 import { fadeUp, maskReveal, maskRevealGroup, revealViewport } from '@/lib/motion/variants';
 
-/** Which stage replaces each placeholder. */
+/**
+ * Sections that have shipped and no longer need a placeholder. Each stage
+ * adds its own id here; the file is deleted once the list is complete.
+ */
+const BUILT = new Set(['hero', 'experience']);
+
+/** Which stage replaces each remaining placeholder. */
 const FILLED_BY: Record<string, string> = {
-  experience: 'STAGE 3 — Experience & Leadership timeline',
   projects: 'STAGE 4 — Mission Briefings grid',
   battlestation: 'STAGE 5 — Battle Station (CTF & achievements)',
   arsenal: 'STAGE 6 — Arsenal (tech stack)',
@@ -16,8 +21,9 @@ const FILLED_BY: Record<string, string> = {
  * something real to navigate. The nav indicator, the active-section detection
  * band and the HUD readout can't be judged against a single blank page.
  *
- * `hero` is gone — Stage 2 replaced it with the real <Hero />. Each remaining
- * section drops off this list as its own stage lands.
+ * `hero` and `experience` are gone — Stages 2 and 3 replaced them with the
+ * real sections. Each remaining section drops off this list as its own stage
+ * lands.
  *
  * Each section is replaced wholesale by its own stage; this file is deleted
  * once Stage 7 lands.
@@ -25,7 +31,7 @@ const FILLED_BY: Record<string, string> = {
 export function SectionScaffold() {
   return (
     <>
-      {SECTIONS.filter((s) => s.id !== 'hero').map((section) => (
+      {SECTIONS.filter((s) => !BUILT.has(s.id)).map((section) => (
         <section
           key={section.id}
           id={section.id}

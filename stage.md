@@ -11,14 +11,14 @@ to the next stage until the current one is approved.
 The brief asked for "dark + neon + glassmorphism". That's 2021. Here's the upgrade — same
 soul (edgy, secure, tech-thriller), modern execution:
 
-| Brief said | We're doing instead |
-|---|---|
-| Pitch-black bg | **Layered obsidian** — `oklch(0.14 0.01 265)` base with elevation tiers, not `#000`. True black crushes depth on OLED. |
-| Neon cyan + red + green | **One signature accent** (`#5EF6C9` toxic mint) + **one alert accent** (`#FF3B47` breach red) used *only* for danger/status semantics. Restraint reads expensive; three neons read gamer-RGB. |
-| Glassmorphism cards | **Bento grid** with 1px hairline borders, inner top-highlight, and *selective* backdrop blur only where content sits over motion. Blur everywhere = mush. |
-| Glitch on hover | **Scramble-decrypt text** (character cycling on reveal), **magnetic cursor pull**, **spotlight gradient follow**. Glitch reserved for 1–2 deliberate moments. |
-| Grid background | **Animated dot-matrix + noise grain overlay + conic scanline sweep**, parallaxed on scroll. |
-| Scroll reveals | **Scroll-driven animations** (`useScroll`/`useTransform`) with staggered masked reveals — text clipped by overflow, sliding up. No generic fade-in-up. |
+| Brief said              | We're doing instead                                                                                                                                                                           |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pitch-black bg          | **Layered obsidian** — `oklch(0.14 0.01 265)` base with elevation tiers, not `#000`. True black crushes depth on OLED.                                                                        |
+| Neon cyan + red + green | **One signature accent** (`#5EF6C9` toxic mint) + **one alert accent** (`#FF3B47` breach red) used _only_ for danger/status semantics. Restraint reads expensive; three neons read gamer-RGB. |
+| Glassmorphism cards     | **Bento grid** with 1px hairline borders, inner top-highlight, and _selective_ backdrop blur only where content sits over motion. Blur everywhere = mush.                                     |
+| Glitch on hover         | **Scramble-decrypt text** (character cycling on reveal), **magnetic cursor pull**, **spotlight gradient follow**. Glitch reserved for 1–2 deliberate moments.                                 |
+| Grid background         | **Animated dot-matrix + noise grain overlay + conic scanline sweep**, parallaxed on scroll.                                                                                                   |
+| Scroll reveals          | **Scroll-driven animations** (`useScroll`/`useTransform`) with staggered masked reveals — text clipped by overflow, sliding up. No generic fade-in-up.                                        |
 
 ### Additional modern layers (not in the original brief)
 
@@ -34,17 +34,20 @@ soul (edgy, secure, tech-thriller), modern execution:
   keyboard-navigable palette, semantic landmarks.
 
 ### Typography
+
 - Display / headings: **Space Grotesk** (geometric, slightly odd — not another Inter site)
 - Body: **Inter Variable**
 - Mono / terminal / labels: **JetBrains Mono** (ligatures on)
 
 ### Tech Stack
+
 `Vite` · `React 18 + TypeScript` · `Tailwind CSS v4` · `Framer Motion (motion)` · `Lenis` ·
 `lucide-react` · `cmdk`. No UI kit — every component hand-built.
 
 ---
 
 ## STAGE 0 — Foundation & Design System ✅
+
 **Goal:** Scaffold + tokens. Zero content. Proves the visual language before any section exists.
 
 - [x] Vite + React + TS scaffold, path aliases (`@/`), ESLint/Prettier
@@ -80,7 +83,7 @@ soul (edgy, secure, tech-thriller), modern execution:
 > lands.
 
 > NOTE: **The dot matrix and grain live on `body::before` / `body::after`**, not in a component,
-> so nothing can intercept the pointer and no section has to own them. The *interactive*
+> so nothing can intercept the pointer and no section has to own them. The _interactive_
 > mouse-reactive canvas backdrop is still Stage 1.
 
 > NOTE: **`frame`-driven Lenis.** Lenis runs with `autoRaf: false` inside Framer Motion's frame
@@ -97,6 +100,7 @@ browser. Open http://localhost:5173 and check the three toggles in section `00`.
 ---
 
 ## STAGE 1 — Shell: Background, Nav, HUD ✅
+
 **Goal:** The frame everything else lives inside.
 
 - [x] `<GridBackdrop />` — dot matrix, mouse-reactive spotlight, scroll parallax, canvas-based
@@ -116,7 +120,7 @@ browser. Open http://localhost:5173 and check the three toggles in section `00`.
 
 > NOTE: **The backdrop is split across three technologies, by cost.** The base dot matrix is a
 > tiled CSS background on a transformed div — dots that never change shouldn't cost anything per
-> frame, and parallax is a compositor transform. Canvas paints *only* the ~130 cursor-lit dots
+> frame, and parallax is a compositor transform. Canvas paints _only_ the ~130 cursor-lit dots
 > inside the light radius, not the ~2000 on screen; per-dot brightness is the one thing CSS
 > can't express. The 760px glow is a CSS radial gradient moved by a spring, because painting a
 > gradient that size into canvas every frame costs far more than translating one static layer.
@@ -173,6 +177,7 @@ safely to `undefined` with no provider (the reduced-motion path).
 
 **Not yet verified by me:** the 60fps claim, and anything about how it actually looks — no
 browser here. Worth checking by hand:
+
 - scroll down / up repeatedly and watch the nav for flicker at the hide/reveal boundary
 - the nav indicator's `layoutId` slide between sections
 - cursor light on the grid, and the ring opening over buttons
@@ -183,6 +188,7 @@ browser here. Worth checking by hand:
 ---
 
 ## STAGE 2 — Hero + Resume CTA ✅
+
 **Goal:** The first 3 seconds. Highest-stakes stage.
 
 - [x] Terminal window: traffic-light chrome, path prompt, blinking block caret
@@ -213,13 +219,13 @@ LCP < 2.0s.
 > deploying.** Added to the Stage 9 checklist.
 
 > NOTE: **The name reveals after script line 0, not after the whole transcript.** The brief wants
-> `whoami` to run and *then* the name to render, and that beat is preserved — but gating on all
+> `whoami` to run and _then_ the name to render, and that beat is preserved — but gating on all
 > six lines would put LCP at ~3.5s, since the name is by far the largest text on the page. Cold
 > load budget now: 900ms boot + 260ms lead-in + ~494ms for line 0 = **~1654ms**, 346ms inside the
 > 2.0s target. A returning visitor in the same session skips the boot: ~754ms.
 
 > NOTE: **The boot overlay is the main LCP cost and the one thing here nobody asked for.** It was
-> my own addition in the Stage 2 plan. 900ms, dismissed by *any* key, click or wheel, never
+> my own addition in the Stage 2 plan. 900ms, dismissed by _any_ key, click or wheel, never
 > shown under reduced motion, once per session (`sessionStorage`, not `localStorage` — a visit
 > tomorrow should get it again, a reload in five seconds shouldn't). Deleting it buys ~900ms of
 > LCP; say so and it goes.
@@ -261,6 +267,7 @@ in dev.
 
 **Not yet verified by me:** no browser here, so nothing visual and no real LCP number — the
 1654ms above is arithmetic, not a measurement. Worth checking by hand:
+
 - the whoami → name beat, and whether 900ms of boot earns its place
 - **skip** button in the terminal chrome mid-type
 - resume button: hover (magnetic pull + glow doubling), press, and that the PDF downloads
@@ -271,22 +278,99 @@ in dev.
 
 ---
 
-## STAGE 3 — Experience & Leadership Timeline
+## STAGE 3 — Experience & Leadership Timeline ✅
+
 **Goal:** Credibility.
 
-- [ ] Vertical timeline, animated draw-on connector line tied to scroll progress
-- [ ] Node markers that "arm" (pulse + fill) as they enter viewport
-- [ ] Entries:
+- [x] Vertical timeline, animated draw-on connector line tied to scroll progress
+- [x] Node markers that "arm" (one-shot ring + fill) as they enter viewport
+- [x] Entries:
   - **Webmaster** — IEEE SIGHT Nenasa, Sri Lanka
   - **Vice Chair** — LeadSpring of IEEE IAS, SLIIT
-- [ ] Each card: role, org, period, 2–3 impact bullets, org tag
-- [ ] Alternating desktop layout → single rail on mobile
+- [x] Each card: role, org, period, 3 impact bullets, org tag
+- [x] Alternating desktop layout → single rail on mobile
+- [x] Reusable `<Section />`, `<SectionHeading />`, `<Tag />` — Stages 4–7 open the same way
 
 **Accept when:** line draw syncs to scroll without jitter; mobile rail is clean.
+
+### Stage 3 notes
+
+> ⚠ **CONTENT TO CONFIRM — two kinds, both flagged in `src/data/experience.ts`.**
+> **Dates:** no period was given for either role, so `period` is `null` and the card renders a
+> visible `[ dates tbc ]` tag. A wrong date on a CV-shaped page is worse than a blank one.
+> **Bullets:** the three bullets per role are _my wording_ for what each role ordinarily covers —
+> not supplied achievements. No numbers, no claimed outcomes. **Order is also a guess**: Vice
+> Chair is first as the more senior role, not because it is known to be more recent.
+
+> NOTE: **Draft copy carries a dev-only marker.** Each card with `draftBullets: true` renders
+> `⚠ draft copy` under its bullets behind `import.meta.env.DEV`, so unconfirmed wording is
+> impossible to miss while reviewing. Verified absent from the production bundle (`grep` for
+> "draft copy" in `dist` → 0). Setting `draftBullets: false` removes it.
+
+> NOTE: **The rail is three layers, and the static one carries the layout.** A hairline track
+> that is always present (so nothing about the layout depends on scroll position), a mint
+> progress line scaled from the top, and a glowing head riding its end. The track means an
+> unscrolled or JS-failed page still shows a complete timeline.
+
+> NOTE: **No spring on the scroll progress.** Lenis already smooths the scroll position the
+> rail reads from, so a spring on top would only add lag. The one case with no Lenis is reduced
+> motion — where the line is drawn in full and never animates at all.
+
+> NOTE: **The head is translated, not positioned.** Animating `top` in percent would put a
+> layout pass in the scroll path every frame. Transform needs a pixel height, hence the
+> ResizeObserver in `<TimelineRail />` — the rail spans the whole list, so its height changes
+> whenever a card reflows.
+
+> NOTE: **Known limitation of `useScroll({ target })`:** Framer measures the target on mount and
+> on resize, but a late font swap shifts layout without firing either. Fonts are `font-display:
+swap` and self-hosted, so the window is small; if the draw start ever looks off by a few dozen
+> pixels on a cold load, this is why. Revisit in Stage 9.
+
+> NOTE: **Nodes arm once, with a one-shot ring — not a permanent pulse.** The brief's plan said
+> "pulse + fill"; a pulse that never stops turns the rail into a string of blinking lights. The
+> ring expands and fades once at `-30% 0px -30% 0px` (a 40% band — tighter risks never firing on
+> a short viewport) and the node stays filled. The ring is gated on `reduced` directly rather
+> than left to `<MotionConfig>`, which would drop the scale and animate only the opacity.
+
+> NOTE: **Cards keep left-aligned text on both sides of the rail.** Mirroring the alignment for
+> the left column is the usual move and it reads worse — right-aligned bullet lists with leading
+> markers fight themselves. The zigzag comes from the column alternation alone.
+
+> NOTE: **Card hover is deliberately restrained** — border brighten, glow, a 2px lift and a
+> lighting top edge. The mouse-tracking glow border is Stage 4's signature; spending it here
+> would leave the projects grid with nothing of its own.
+
+> NOTE: **`<Section />` owns `min-h-svh`**, not its callers. `useActiveSection` detects the
+> active section with a 1px band through the middle of the viewport (Stage 1 note), so a short
+> section can never activate and the nav indicator would skip it. Putting the height in the
+> shell makes that invariant unbreakable per-stage.
+
+> NOTE: **The `01 / SERVICE RECORD` eyebrow is `aria-hidden`.** It's in-fiction dressing; read
+> aloud ahead of the real heading it is noise, and the `<h2>` already names the section.
+
+> NOTE: **`<SectionScaffold />` now keys off a `BUILT` set** rather than an `!== 'hero'` check,
+> so each stage removes its placeholder with a one-word edit.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+production build 5.7s / 49.1 kB CSS (9.7 kB gzip) / 345 kB JS (108.9 kB gzip) · every new
+utility confirmed in the compiled CSS (`duration-400`, `inset-[0.3125rem]`,
+`lg:w-[calc(50%-3rem)]` → `width:calc(50% - 3rem)`, `lg:right-1/2`, `lg:left-auto`,
+`lg:ml-auto`, `-left-px`, `left-[7px]`, `top-[1.1rem]`, `top-[1.6rem]`) · the dev-only draft
+marker confirmed **stripped** from the production bundle · all 7 new modules transform in dev.
+
+**Not yet verified by me:** no browser here. Worth checking by hand:
+
+- the line drawing in step with the scroll — start point, finish point, and no jitter
+- both nodes arming as they reach the middle of the viewport, ring firing exactly once
+- the alternation at `lg` and above: spur lengths, and that neither card touches the rail
+- **390px**: single left rail, 16px node centred on it, cards not overflowing
+- **Motion off**: rail fully drawn on arrival, no head dot, no ring, nodes filled
+- that `[ dates tbc ]` and the `⚠ draft copy` marker are both as loud as they should be
 
 ---
 
 ## STAGE 4 — Mission Briefings (Projects Grid)
+
 **Goal:** The depth section. Bento layout, not a uniform 3-column grid.
 
 - [ ] Bento: 1 feature tile (2×2) + 3 standard tiles, responsive reflow
@@ -296,7 +380,7 @@ in dev.
 - [ ] Projects:
   1. **Study Coach AI Agent** — Google ADK + Gemini API exam-prep assistant, FastAPI backend,
      custom UI. Dynamic schedule generation, topic prioritization, session logging,
-     interactive AI tutoring/quizzing. *(feature tile)*
+     interactive AI tutoring/quizzing. _(feature tile)_
   2. **Northbridge Finance Security Upgrade** — enterprise network security redesign;
      L2 + segmentation threat modeling, VLAN/inter-VLAN extended ACLs, switchport port
      security, cost analysis driving a three-phase rollout
@@ -312,6 +396,7 @@ body scroll locks correctly when open.
 ---
 
 ## STAGE 5 — Battle Station (CTF & Achievements)
+
 **Goal:** Proof of competition pedigree.
 
 - [ ] Achievement badges: hexagonal/shield frames, rarity-tier glow, unlock animation on reveal
@@ -325,6 +410,7 @@ body scroll locks correctly when open.
 ---
 
 ## STAGE 6 — Arsenal (Tech Stack)
+
 **Goal:** Skills, without the tired progress-bar cliché.
 
 - [ ] Floating pill tags with idle drift, glow-on-hover, category filtering
@@ -339,6 +425,7 @@ body scroll locks correctly when open.
 ---
 
 ## STAGE 7 — Secure Channel (Contact + Footer)
+
 **Goal:** Close the loop.
 
 - [ ] Contact form styled as an encrypted comms terminal: monospace labels, prefixed fields,
@@ -353,6 +440,7 @@ body scroll locks correctly when open.
 ---
 
 ## STAGE 8 — Command Palette (⌘K)
+
 **Goal:** The signature interaction. Built last so it can index everything.
 
 - [ ] `cmdk`-powered overlay, `⌘K` / `Ctrl+K` / `/` to open
@@ -366,10 +454,13 @@ body scroll locks correctly when open.
 ---
 
 ## STAGE 9 — Polish, Performance, Ship
+
 **Goal:** Make it fast and make it real.
 
 - [ ] **Replace `public/resume.pdf`** — currently a placeholder file (Stage 2)
 - [ ] **Confirm every `inferred` field in `src/data/profile.ts`** (name, location)
+- [ ] **Confirm `src/data/experience.ts`** — periods (currently `[ dates tbc ]`), the bullet
+      wording (`draftBullets: true`), and the entry order (Stage 3)
 - [ ] Lighthouse: Performance ≥ 95, A11y ≥ 95, Best Practices 100, SEO 100 — measure LCP for real
 - [ ] Route-level code splitting, lazy-load below-fold heavy components
 - [ ] OG image + Twitter card, full meta, JSON-LD `Person` schema
@@ -407,4 +498,4 @@ body scroll locks correctly when open.
 
 ---
 
-**Current status:** `STAGE 2 — complete, awaiting review` → next: `STAGE 3 — Experience & Leadership`
+**Current status:** `STAGE 3 — complete, awaiting review` → next: `STAGE 4 — Mission Briefings (Projects Grid)`
