@@ -1,5 +1,6 @@
 import { GridBackdrop } from '@/components/backdrop/GridBackdrop';
 import { ScanlineSweep } from '@/components/backdrop/ScanlineSweep';
+import { BattleStation } from '@/components/battlestation/BattleStation';
 import { CustomCursor } from '@/components/chrome/CustomCursor';
 import { FloatingNav } from '@/components/chrome/FloatingNav';
 import { StatusHUD } from '@/components/chrome/StatusHUD';
@@ -47,6 +48,7 @@ export function App() {
                 <Hero />
                 <Experience />
                 <Projects />
+                <BattleStation />
                 <SectionScaffold />
               </main>
               <StatusHUD />

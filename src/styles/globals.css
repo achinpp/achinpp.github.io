@@ -178,6 +178,7 @@
   --animate-scan: scan 11s linear infinite;
   --animate-conic: conic-spin 5.5s linear infinite;
   --animate-hint: hint 2.4s var(--ease-in-out-circ) infinite;
+  --animate-trace: trace 3.4s linear infinite;
 
   /* Ultrawide tier beyond Tailwind's defaults. */
   --breakpoint-3xl: 120rem;
@@ -238,6 +239,16 @@
   50% {
     transform: translateY(7px);
     opacity: 0.95;
+  }
+}
+
+/* Legendary badge: a light running the hexagon outline.
+   The dash sum (340) is the path perimeter, so the offset wraps seamlessly.
+   This one DOES repaint its path every frame - unavoidable for a stroke that
+   travels an outline - which is why it is reserved for a single element. */
+@keyframes trace {
+  to {
+    stroke-dashoffset: -340;
   }
 }
 

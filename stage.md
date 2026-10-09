@@ -496,17 +496,103 @@ live. Worth checking by hand:
 
 ---
 
-## STAGE 5 — Battle Station (CTF & Achievements)
+## STAGE 5 — Battle Station (CTF & Achievements) ✅
 
 **Goal:** Proof of competition pedigree.
 
-- [ ] Achievement badges: hexagonal/shield frames, rarity-tier glow, unlock animation on reveal
-- [ ] **RED CYPHER 3.0 — Finalist** as the hero badge
-- [ ] Compact milestone timeline beside the badge wall
-- [ ] Open-source contributions strip
-- [ ] Animated stat counters (CTFs entered, writeups, contributions) — count-up on in-view
+- [x] Achievement badges: hexagonal frames, rarity-tier glow, unlock animation on reveal
+- [x] **RED CYPHER 3.0 — Finalist** as the hero badge
+- [x] ~~Compact milestone timeline beside the badge wall~~ → the counters take that column
+      instead, and the date lives under its own badge (see note)
+- [x] Open-source contributions strip
+- [x] Animated stat counters — count-up on in-view, once
+- [x] **Locked slots** for the achievements that weren't supplied, instead of invented ones
 
 **Accept when:** badges feel earned, not clip-art. Counters fire once, not on every scroll pass.
+
+### Stage 5 notes
+
+> ⚠ **THIS IS THE THINNEST SECTION IN THE BUILD, and the brief is why.** It named exactly one
+> achievement — **RED CYPHER 3.0 — Finalist** — with no date, no other competitions, no writeup
+> count and no specific open-source contributions. Nothing has been invented to fill the gap.
+> **Send a real list and this section gets substantially better**; the machinery is already
+> there and each entry takes the next slot.
+
+> NOTE: **Unfilled frames are locked slots, and that is the design.** A rarity system needs more
+> than one tier on screen to be legible, and a wall with a single badge reads as an accident. A
+> dashed, padlocked frame labelled `SLOT_02 / UNASSIGNED` is the normal visual language of an
+> achievement system — honest, on-theme, and it makes the gap self-evident rather than hiding it.
+> `BADGE_SLOTS` in `src/data/achievements.ts` controls the count.
+
+> NOTE: **Every counter is derived or absent — none is a guess.** `Missions logged` counts
+> `PROJECTS`, `Leadership roles` counts `EXPERIENCE`, `Finals reached` counts achievements with
+> `reachedFinal`. `Writeups published` was never supplied, so it prints `--` with a `[ tbc ]`
+> marker rather than counting up to a figure nobody gave me. In dev each tile also shows where
+> its number came from.
+
+> NOTE: **The milestone timeline was dropped, deliberately.** With one confirmed achievement it
+> would be a line with a single dot on it, which looks broken rather than compact. The counters
+> fill that column properly and the date sits under its own badge. If more achievements arrive
+> this is still the right shape — the wall grows, not a parallel list.
+
+> NOTE: **The badge frame is an SVG path, not a `clip-path` hexagon.** A clipped `<div>` can't
+> carry a visible border — the border box is what gets clipped, so the edge is cut at the
+> diagonals — and it can't carry a dashed one at all, which the locked slots need. A stroked
+> path gives both, crisp at any DPR.
+
+> NOTE: **The rarity glow is `filter: drop-shadow()`, not `box-shadow`.** `drop-shadow` follows
+> the rendered silhouette; a `box-shadow` on a hexagon traces the rectangle around it, which is
+> immediately obvious and looks like a mistake.
+
+> NOTE: **The travelling light on the legendary badge is the one knowingly expensive animation
+> on the site.** An animated `stroke-dashoffset` repaints its path every frame — it can't be
+> composited, unlike every other animation here. One small path on one badge is a fair price;
+> the dash sum (340) equals the hexagon's perimeter so the loop is seamless. It is the deliberate
+> exception to the rule set in Stage 1's scanline note, not an oversight.
+
+> NOTE: **Counters write `textContent`, not state.** A count-up is ~70 frames, and 70 re-renders
+> of a component tree to change two characters is what makes a page feel heavy for no visible
+> reason. Same approach as the scroll percentage in `<StatusHUD />`. `useInView(…, { once: true })`
+> is what satisfies the acceptance note — it fires on the first pass and never again. Under
+> reduced motion the final figure is written immediately: the number is the content, the ticking
+> is not.
+
+> NOTE: **Caught during verification — dev-only strings were shipping.** The stat provenance
+> started as a `source` field on each `Stat`, and a field on a data object ships whether or not
+> anything renders it, because the gate is in the component. Moved to a `STAT_SOURCES` record
+> behind `import.meta.env.DEV`, which the build replaces with the literal `false` so the whole
+> object folds away. Confirmed: `derived from`, `not supplied` and `dev only` are all absent
+> from the production bundle. **Worth remembering for Stages 6–7** — gating the render is not
+> the same as gating the data.
+
+> NOTE: **The open-source strip lists nothing, on purpose.** No individual contributions were
+> named, so rather than an empty list or an invented one it points at the public profile — which
+> is both true and the only source of truth that exists. Production copy says so plainly; the
+> "nothing was supplied" warning is dev-only.
+
+> NOTE: **No rarity labels.** The brief asked for rarity-tier _glow_, and the glow carries it.
+> A `LEGENDARY` chip under the badge tips the whole section from "service record" into game UI.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+production build 7.1s / 54.2 kB CSS (10.5 kB gzip) / 371 kB JS (117.4 kB gzip) ·
+`@keyframes trace`, `stroke-dashoffset:-340`, `animate-trace`, `aspect-ratio:100/116` and
+`tabular-nums` confirmed in the compiled CSS · the hexagon path, the `52 288` dasharray and the
+`drop-shadow` glow confirmed in the JS bundle · `RED CYPHER 3.0`, all four stat labels,
+`[ date tbc ]`, `Slot_` and `unassigned` all present · **every dev-only string confirmed absent**
+from the production bundle · all 6 new modules transform in dev.
+
+**Not yet verified by me:** no browser here. Worth checking by hand:
+
+- **do the badges feel earned?** That's this stage's acceptance criterion and the one thing I
+  genuinely cannot judge without seeing it. The hero badge is 176px, the locked slots 128px.
+- the travelling light on the hero badge — speed, thickness, and whether the loop seam shows
+- the unlock animation (scale from 0.8 with a back-ease) and the event name scrambling in
+- **counters fire once**: scroll past the section, back up, and past again — they must not re-run
+- **390px**: four hexagons wrapping cleanly, the 2×2 counter grid, the strip stacking
+- **Motion off**: badges present with no scale-in, no travelling light, figures written
+  immediately, no magnetic pull on the GitHub link
+- whether the locked slots read as intentional or as something broken — tell me if they don't,
+  and the alternative is a single centred badge with no wall at all
 
 ---
 
@@ -565,6 +651,9 @@ live. Worth checking by hand:
 - [ ] **Confirm `src/data/projects.ts`** — the four status badges (`statusConfirmed: false`),
       the taglines, and add any public `repo` / `demo` links (Stage 4)
 - [ ] Fold `<FloatingNav />`'s inline scroll-lock effect into `useScrollLock` (Stage 4)
+- [ ] **Supply real achievements for `src/data/achievements.ts`** — other CTFs, dates, a writeup
+      count, and any named open-source contributions. Until then the badge wall is one badge and
+      three locked slots (Stage 5)
 - [ ] Lighthouse: Performance ≥ 95, A11y ≥ 95, Best Practices 100, SEO 100 — measure LCP for real
 - [ ] Route-level code splitting, lazy-load below-fold heavy components
 - [ ] OG image + Twitter card, full meta, JSON-LD `Person` schema
@@ -602,4 +691,4 @@ live. Worth checking by hand:
 
 ---
 
-**Current status:** `STAGE 4 — complete, awaiting review` → next: `STAGE 5 — Battle Station (CTF & Achievements)`
+**Current status:** `STAGE 5 — complete, awaiting review` → next: `STAGE 6 — Arsenal (Tech Stack)`
