@@ -1,0 +1,12 @@
+# Normalise to LF in the repository and on checkout.
+#
+# Without this, Git's autocrlf on Windows rewrites every file on checkout and
+# prints a "LF will be replaced by CRLF" warning for each one on every commit.
+# Prettier writes LF, so the repo and the working tree now agree.
+* text=auto eol=lf
+
+# Binary — never touch these.
+*.pdf   binary
+*.png   binary
+*.ico   binary
+*.woff2 binary

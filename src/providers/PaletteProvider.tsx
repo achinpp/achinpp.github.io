@@ -1,7 +1,23 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { AnimatePresence } from 'motion/react';
-import { CommandPalette } from '@/components/palette/CommandPalette';
 import { PaletteContext } from '@/providers/palette-context';
+
+/**
+ * Stage 9: the palette is split out of the main bundle.
+ *
+ * It is the largest thing on the page that most visitors never open, and it
+ * pulls in the command list — which in turn imports the clipboard, scroll and
+ * motion hooks and a dozen icons. Loading it on first ⌘K costs a request of a
+ * few kB from the same origin, by which point the page has long since
+ * finished painting.
+ *
+ * It is NOT prefetched on hover of the hint chip: the chip is in the nav and
+ * the HUD on every screen, so hover is a near-certainty and prefetching on it
+ * would just be eager loading with extra steps.
+ */
+const CommandPalette = lazy(async () => ({
+  default: (await import('@/components/palette/CommandPalette')).CommandPalette,
+}));
 
 /**
  * `/` must not fire while someone is typing. Without this check the slash in
@@ -64,7 +80,15 @@ export function PaletteProvider({ children }: { children: ReactNode }) {
   return (
     <PaletteContext.Provider value={value}>
       {children}
-      <AnimatePresence>{open && <CommandPalette onClose={close} />}</AnimatePresence>
+      {/* `fallback={null}` on purpose: a spinner that flashes for 40ms is
+          worse than the palette simply appearing a frame later. */}
+      <AnimatePresence>
+        {open && (
+          <Suspense fallback={null}>
+            <CommandPalette onClose={close} />
+          </Suspense>
+        )}
+      </AnimatePresence>
     </PaletteContext.Provider>
   );
 }

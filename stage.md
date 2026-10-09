@@ -953,43 +953,170 @@ Worth checking by hand:
 
 ---
 
-## STAGE 9 — Polish, Performance, Ship
+## STAGE 9 — Polish, Performance, Ship 🟡
 
 **Goal:** Make it fast and make it real.
 
-- [ ] **Replace `public/resume.pdf`** — currently a placeholder file (Stage 2)
-- [ ] **Confirm every `inferred` field in `src/data/profile.ts`** (name, location)
-- [ ] **Confirm `src/data/experience.ts`** — periods (currently `[ dates tbc ]`), the bullet
-      wording (`draftBullets: true`), and the entry order (Stage 3)
-- [ ] **Confirm `src/data/projects.ts`** — the four status badges (`statusConfirmed: false`),
-      the taglines, and add any public `repo` / `demo` links (Stage 4)
-- [ ] Fold `<FloatingNav />`'s inline scroll-lock effect into `useScrollLock` (Stage 4)
-- [ ] **Supply real achievements for `src/data/achievements.ts`** — other CTFs, dates, a writeup
-      count, and any named open-source contributions. Until then the badge wall is one badge and
-      three locked slots (Stage 5)
-- [ ] **Prune `src/data/skills.ts`** — 13 of the 20 pills are `source: 'derived'`, taken from the
-      brief's project descriptions rather than stated outright (Stage 6)
-- [ ] **Set `VITE_FORM_ENDPOINT`** to a Formspree endpoint — until then the contact form is
-      disabled in production (Stage 7)
-- [ ] **Supply LinkedIn and TryHackMe/HTB handles** for `src/data/contact.ts`, and a
-      `PGP_FINGERPRINT` if one exists (Stage 7)
-- [ ] **Confirm `PROFILE.email`** — inferred from the commit email on this repo (Stage 7)
-- [ ] Lazy-load or delete `<TokenSheet />` (`?tokens`), which is still in the main bundle
-      (Stage 7)
-- [ ] **Decide on a test runner.** The fuzzy scorer has 18 assertions that found a real bug, but
-      they live in a scratchpad because nothing is configured to run them. Vitest would take
-      ~15 minutes and give `src/lib/fuzzy.test.ts` a home (Stage 8)
-- [ ] **Screen-reader pass on the command palette.** The combobox is hand-rolled to the ARIA 1.2
-      pattern but has never been heard out loud (Stage 8)
-- [ ] Lighthouse: Performance ≥ 95, A11y ≥ 95, Best Practices 100, SEO 100 — measure LCP for real
-- [ ] Route-level code splitting, lazy-load below-fold heavy components
-- [ ] OG image + Twitter card, full meta, JSON-LD `Person` schema
-- [ ] Favicon set, `site.webmanifest`, theme-color
-- [ ] Responsive sweep: 360 / 390 / 768 / 1024 / 1440 / 1920 / ultrawide
-- [ ] Cross-browser: Chrome, Firefox, Safari (check `backdrop-filter` + OKLCH fallbacks)
-- [ ] `prefers-reduced-motion` full audit — every stage re-verified
-- [ ] 404 page in-theme
-- [ ] Deploy (Vercel/Netlify) + custom domain notes in README
+**Status: everything that does not need you, a browser, or a deploy target is done.** The
+remaining boxes are grouped by who can actually tick them.
+
+### Done in Stage 9
+
+- [x] **Code splitting** — `TokenSheet`, `CommandPalette` and `ProjectDetail` lazy-loaded.
+      Main bundle **400.6 → 372.3 kB** (125.8 → **119.2 kB gzip**); four chunks split out
+- [x] **Full `<head>`** — title, description, canonical, Open Graph (absolute URLs), Twitter
+      card, `profile:*`, JSON-LD `Person`
+- [x] **Favicon set** — `favicon.svg` (hand-written, primary), `favicon.ico` (16/32/48),
+      `icon-192`, `icon-512` (maskable padding), `apple-touch-icon`, `site.webmanifest`,
+      corrected `theme-color`
+- [x] **OG card** — a real 1200×630 PNG, generated from the OKLCH tokens
+- [x] **404 page in-theme** — standalone, no React, no bundle, no webfont
+- [x] **`<noscript>` fallback** — name, role, résumé link and GitHub link without JS
+- [x] **Test runner + the scorer's tests moved into the repo** — `npm run test`, 8/8 passing
+- [x] **`prefers-reduced-motion` full audit** — every path re-verified, results below
+- [x] **Fold `<FloatingNav />`'s inline scroll-lock into `useScrollLock`** (carried from Stage 4),
+      and replace its manual focus handling with `useFocusTrap` — which also fixes a real gap:
+      the mobile sheet could be Tabbed out of
+- [x] **`.gitattributes`** — ends the `LF will be replaced by CRLF` warning on every commit
+- [x] **README** — scripts, the pre-deploy checklist, Vercel/Netlify/Pages notes, custom-domain
+      steps, repo layout, the motion contract
+- [x] Lazy-load `<TokenSheet />` (carried from Stage 7)
+
+### Only you can do these
+
+- [ ] **Replace `public/resume.pdf`** — still the placeholder that says it is one (Stage 2)
+- [ ] **Confirm the inferred fields in `src/data/profile.ts`** — name, location, email
+- [ ] **Confirm `src/data/experience.ts`** — periods (`[ dates tbc ]`), bullet wording
+      (`draftBullets: true`), entry order (Stage 3)
+- [ ] **Confirm `src/data/projects.ts`** — the four status badges, the taglines, and any public
+      `repo` / `demo` links (Stage 4)
+- [ ] **Supply real achievements** for `src/data/achievements.ts` — until then the wall is one
+      badge and three locked slots (Stage 5)
+- [ ] **Prune `src/data/skills.ts`** — 13 of 20 pills are `derived`, not stated (Stage 6)
+- [ ] **Set `VITE_FORM_ENDPOINT`** — the contact form is disabled in production without it
+- [ ] **Set `VITE_SITE_URL`** — defaults to the GitHub Pages URL; wrong value silently breaks
+      every link preview
+- [ ] **Supply LinkedIn and TryHackMe/HTB handles**, and a `PGP_FINGERPRINT` if one exists
+- [ ] **Deploy** (Vercel / Netlify / Pages) — see the README
+
+### Needs a browser I don't have
+
+- [ ] **Lighthouse: Performance ≥ 95, A11y ≥ 95, Best Practices 100, SEO 100** — and **measure
+      LCP for real**. Every LCP figure in this document is arithmetic, never a measurement
+- [ ] **Responsive sweep**: 360 / 390 / 768 / 1024 / 1440 / 1920 / ultrawide
+- [ ] **Cross-browser**: Chrome, Firefox, Safari — particularly `backdrop-filter`, OKLCH, and
+      `aspect-ratio` on the hex badges
+- [ ] **Screen-reader pass on the command palette** — the combobox is hand-rolled to the ARIA 1.2
+      pattern and has never been heard out loud (Stage 8)
+- [ ] **No console errors** — Stage 7's acceptance criterion, still unverified
+
+### Stage 9 notes
+
+> NOTE: **Code splitting, with the numbers.** `TokenSheet` (15.6 kB) is dev-only behind
+> `?tokens`; `CommandPalette` (10.3 kB) is opened by a minority of visitors; `ProjectDetail`
+> (4.2 kB) only ever renders after a click. None of the three can affect first paint, and all
+> three were being paid for by everyone. The page sections are deliberately **not** split — they
+> are below the fold but they are also the content, and a section that pops in on scroll is a
+> worse experience than 20 kB.
+
+> NOTE: **`fallback={null}` everywhere.** A spinner that flashes for 40ms on a same-origin chunk
+> is worse than the thing simply appearing a frame later. The palette and the detail panel both
+> animate in anyway, which covers the gap.
+
+> NOTE: **The detail panel's morph survives being lazy.** The shared-layout animation measures
+> the card's live position at click time, so a chunk arriving a frame late changes nothing about
+> where the flight starts from.
+
+> NOTE: **Open Graph needs absolute URLs, so `%SITE_URL%` is substituted at build time** by a
+> small `transformIndexHtml` plugin, with `order: 'pre'` so the placeholders are gone before
+> Vite's own HTML pass walks the document for assets. A relative `og:image` is the classic way to
+> ship a link preview that silently renders blank on half the platforms that read it. The default
+> is this repo's GitHub Pages URL — a working value, not a placeholder.
+
+> NOTE: **The assets are generated from the OKLCH tokens, not from hex I typed in.**
+> `scripts/generate-assets.py` converts OKLab → linear sRGB → gamma, so the icons and the OG card
+> cannot drift from `globals.css`. Worth knowing what that conversion actually produces:
+> `--color-obsidian-900` is **#07090f** — considerably darker than the "not `#000`" framing in
+> the Stage 0 design notes implies, though still not black. `--color-mint-400` is **#65f9c8**,
+> within rounding of the `#5EF6C9` the design direction named.
+
+> NOTE: **⚠ The OG card uses system fonts, not the brand fonts.** The brand faces ship as woff2
+> and decompressing woff2 needs Brotli, which is not installable here (see the npm note below).
+> Consolas stands in for JetBrains Mono and Segoe UI Semibold for Space Grotesk. At the size a
+> link preview is actually rendered the difference is not perceptible, but it is a substitution
+> and the script's header says how to use the real faces.
+
+> NOTE: **The monogram is geometry, not a glyph.** A hand-placed chevron and bar stay identical
+> whatever fonts a machine has, and survive being scaled to 16px in a way a rasterised glyph does
+> not. Drawn at 8× and downsampled, which beats any stroke antialiasing PIL offers. The SVG and
+> the Python script carry the same coordinates.
+
+> NOTE: **⚠ A real bug, caught by validating the favicon instead of trusting it.**
+> `public/favicon.svg` had a comment naming the `--color-*` tokens — and **XML forbids `--`
+> inside a comment**, so the file was not well-formed. Browsers are lenient enough that it may
+> well have rendered anyway, which is exactly why it would have gone unnoticed. The comment now
+> says why it cannot name the tokens.
+
+> NOTE: **The 404 page deliberately shares nothing with the app.** No React, no bundle, no
+> webfont — it is the one page that renders when something has already gone wrong, so it must not
+> depend on the thing that might be broken. It also echoes the failed path with `textContent`,
+> never `innerHTML`: a URL is attacker-controlled, and writing one as markup on a 404 page is a
+> textbook reflected-XSS hole.
+
+> NOTE: **No SPA rewrite, on purpose.** There is no client-side router here, so rewriting unknown
+> paths to `index.html` would turn every typo into a soft 200 and hide the 404 page entirely. The
+> README says this for both Vercel and Netlify.
+
+> NOTE: **⚠ `npm install` cannot reach the registry from this machine** —
+> `UNABLE_TO_VERIFY_LEAF_SIGNATURE`, i.e. TLS interception. **Vitest is therefore not installed**,
+> and the fix for that error is to disable certificate verification, which is not a thing to do
+> to a security portfolio to save a dependency. The tests instead use Node's built-in `node:test`
+> with esbuild (already a Vite dependency) for the TypeScript — no new packages, `npm run test`,
+> 8/8 passing. If `npm i -D vitest` works for you, the assertions port over almost unchanged.
+
+> NOTE: **The JSON-LD block duplicates `src/data/profile.ts`, and cannot not.** `index.html` is
+> static and parsed before any module runs, and moving the block into React would make structured
+> data depend on JS execution. The duplication is called out in a comment at both ends.
+
+#### Reduced-motion audit — the full sweep
+
+Every animated path in the codebase, re-checked rather than assumed:
+
+| Path                                                                    | Covered by                                                                                  | Verdict                                                                     |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| **17 CSS keyframe animations**                                          | all `motion-ok:` gated + the global `[data-motion='off']` rule                              | ✅ zero ungated                                                             |
+| CSS `transition-*`                                                      | global `[data-motion='off']` → `transition-duration: 1ms !important`                        | ✅                                                                          |
+| Framer `animate` / `whileInView` / `whileHover` / `whileTap` / `layout` | `<MotionConfig reducedMotion>`                                                              | ✅                                                                          |
+| `GridBackdrop` rAF canvas + parallax + glow springs                     | canvas and glow render only when `!reduced && isFine`; parallax is `reduced ? 0 : parallax` | ✅                                                                          |
+| `CustomCursor` springs                                                  | component mounts only when `isFine && !reduced`                                             | ✅                                                                          |
+| `useTypewriter` setTimeout chain                                        | `instant` flag starts it complete                                                           | ✅                                                                          |
+| `ScrambleText` setInterval                                              | writes the final text and returns                                                           | ✅                                                                          |
+| `RoleRotator` setInterval                                               | not started; renders all three titles instead                                               | ✅                                                                          |
+| `useBootSequence`                                                       | never shows the overlay at all                                                              | ✅                                                                          |
+| `useCountUp`                                                            | writes the final figure immediately                                                         | ✅                                                                          |
+| `useCardPointer` tilt + spotlight                                       | `rotateX`/`rotateY` are `undefined`, layers not rendered                                    | ✅                                                                          |
+| `useMagnetic`                                                           | `x`/`y` are `undefined`                                                                     | ✅                                                                          |
+| `TimelineRail` draw-on                                                  | `scaleY: reduced ? 1 : progress`, head not rendered                                         | ✅                                                                          |
+| `ProjectDetail` / `ProjectCard` morph                                   | `layoutId` dropped entirely                                                                 | ✅                                                                          |
+| Lenis smooth scroll                                                     | provider mounts no instance                                                                 | ✅                                                                          |
+| `SkillPill` idle drift                                                  | inline `animationDelay`/`Duration` not applied; class is `motion-ok:`                       | ✅                                                                          |
+| **HUD clock** (`setInterval`, 1Hz)                                      | _not gated_                                                                                 | ✅ **correct** — a clock is content; freezing it makes it lie               |
+| **Toast auto-dismiss** (`setTimeout`)                                   | _not gated_                                                                                 | ✅ **correct** — a lifetime, not an animation                               |
+| **HUD scroll meter** (`scaleX` ← `scrollYProgress`)                     | _not gated_                                                                                 | ✅ **correct** — a position readout; it only moves because the user scrolls |
+| **ScrollHint fade** (`opacity` ← `scrollY`)                             | _not gated_                                                                                 | ✅ **correct** — same reason                                                |
+
+Four deliberate non-gates, all of them content or position rather than motion. Nothing else is
+ungated.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean across
+`src`, `index.html`, `vite.config.ts`, `package.json`, `README.md` and this file ·
+`npm run test` **8/8** · production build 5.5s / 60.9 kB CSS (11.3 kB gzip) / **372.3 kB JS
+(119.2 kB gzip)** plus four lazy chunks · `favicon.ico` validates as a 3-icon ICO (16/32/48) ·
+all five PNGs validate at their declared sizes · `favicon.svg` parses as well-formed XML ·
+`site.webmanifest` parses as JSON · the JSON-LD block parses and contains no placeholders ·
+`%SITE_URL%` confirmed fully substituted in `dist/index.html` with absolute `og:url`,
+`og:image` and `canonical` · `dist/` contains `404.html`, both favicons, all icons, `og.png`,
+`site.webmanifest` and `resume.pdf` · the test file confirmed absent from the production bundle.
 
 **Accept when:** all boxes checked and the site is live.
 
@@ -1006,16 +1133,24 @@ Worth checking by hand:
 
 ---
 
-## Open Inputs Needed (gather before Stage 2)
+## Open Inputs Needed
 
-- [ ] Full name + preferred title line
-- [ ] Resume PDF (drop at `public/resume.pdf`)
-- [ ] Email, GitHub, LinkedIn, TryHackMe/HTB handles
-- [ ] Dates/periods for the two IEEE roles
-- [ ] Project repo/demo links (any that are public)
-- [ ] Additional CTFs / achievements beyond RED CYPHER 3.0
-- [ ] Headshot or avatar (optional — design works without one)
+> This list was written before Stage 2 and **none of it ever arrived**, so every item became a
+> marked placeholder in `src/data/` instead of a blocker. The live version is now the
+> **"Only you can do these"** checklist in Stage 9 — this section is kept for the record of what
+> was asked for and when.
+
+- [ ] Full name + preferred title line — _inferred from the repo git identity; Stage 2_
+- [ ] Resume PDF — _placeholder PDF that says so; Stage 2_
+- [ ] Email, GitHub, LinkedIn, TryHackMe/HTB handles — _GitHub known, email inferred, other two
+      render nothing; Stages 2 and 7_
+- [ ] Dates/periods for the two IEEE roles — _render `[ dates tbc ]`; Stage 3_
+- [ ] Project repo/demo links — _`null`, so no button renders; Stage 4_
+- [ ] Additional CTFs / achievements beyond RED CYPHER 3.0 — _three locked slots; Stage 5_
+- [ ] Headshot or avatar — _never needed; the design does not use one_
 
 ---
 
-**Current status:** `STAGE 8 — complete, awaiting review` → next: `STAGE 9 — Polish, Performance, Ship`
+**Current status:** `STAGE 9 — engineering complete` → remaining: **content you supply**, a
+**browser pass** (Lighthouse, responsive, cross-browser, screen reader), and the **deploy**.
+See the three grouped checklists in Stage 9.

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Arsenal } from '@/components/arsenal/Arsenal';
 import { GridBackdrop } from '@/components/backdrop/GridBackdrop';
 import { ScanlineSweep } from '@/components/backdrop/ScanlineSweep';
@@ -10,7 +11,6 @@ import { StatusHUD } from '@/components/chrome/StatusHUD';
 import { Experience } from '@/components/experience/Experience';
 import { Hero } from '@/components/hero/Hero';
 import { Projects } from '@/components/projects/Projects';
-import { TokenSheet } from '@/components/dev/TokenSheet';
 import { MotionProvider } from '@/providers/MotionProvider';
 import { PaletteProvider } from '@/providers/PaletteProvider';
 import { PointerProvider } from '@/providers/PointerProvider';
@@ -23,6 +23,19 @@ import { ToastProvider } from '@/providers/ToastProvider';
  */
 const SHOW_TOKENS =
   typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('tokens');
+
+/**
+ * Stage 9: split out of the main bundle.
+ *
+ * The specimen sheet is a developer tool reachable only at `?tokens`, and it
+ * was costing every visitor bytes they would never execute. Because
+ * `SHOW_TOKENS` is read once at module scope, the branch below is static for
+ * the life of the page — so the chunk is requested on exactly the loads that
+ * need it and never on the others.
+ */
+const TokenSheet = lazy(async () => ({
+  default: (await import('@/components/dev/TokenSheet')).TokenSheet,
+}));
 
 export function App() {
   return (
@@ -44,7 +57,11 @@ export function App() {
 
               {SHOW_TOKENS ? (
                 <main id="main" className="relative z-[var(--z-content)]">
-                  <TokenSheet />
+                  {/* No fallback worth designing: this route is dev-only and
+                      the chunk is a few kB from the same origin. */}
+                  <Suspense fallback={null}>
+                    <TokenSheet />
+                  </Suspense>
                 </main>
               ) : (
                 <>

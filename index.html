@@ -4,12 +4,95 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#151722" />
-    <title>Shadow Command Center</title>
+    <!-- The real canvas colour, converted from --color-obsidian-900. -->
+    <meta name="theme-color" content="#07090f" />
+
+    <title>Achin Chandrasiri — Cybersecurity, DevSecOps, AI Research</title>
     <meta
       name="description"
-      content="Portfolio of a cybersecurity student, DevSecOps engineer and AI researcher."
+      content="Portfolio of Achin Chandrasiri — cybersecurity student, DevSecOps engineer and AI researcher. Projects in adversarial ML, CI/CD security automation and enterprise network defence."
     />
+    <meta name="author" content="Achin Chandrasiri" />
+    <link rel="canonical" href="%SITE_URL%/" />
+
+    <!--
+      %SITE_URL% is replaced at build time by vite.config.ts. It defaults to
+      the GitHub Pages URL for this repo; set VITE_SITE_URL to the real
+      domain before deploying anywhere else. Open Graph needs ABSOLUTE urls —
+      a relative og:image is the classic way to ship a link preview that
+      silently renders blank on half the platforms that read it.
+    -->
+    <meta property="og:type" content="profile" />
+    <meta property="og:site_name" content="Achin Chandrasiri" />
+    <meta
+      property="og:title"
+      content="Achin Chandrasiri — Cybersecurity · DevSecOps · AI Research"
+    />
+    <meta
+      property="og:description"
+      content="Projects in adversarial ML, CI/CD security automation and enterprise network defence."
+    />
+    <meta property="og:url" content="%SITE_URL%/" />
+    <meta property="og:image" content="%SITE_URL%/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Achin Chandrasiri — cybersecurity, DevSecOps, AI research"
+    />
+    <meta property="profile:first_name" content="Achin" />
+    <meta property="profile:last_name" content="Chandrasiri" />
+    <meta property="profile:username" content="achinpp" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Achin Chandrasiri — Cybersecurity · DevSecOps · AI Research"
+    />
+    <meta
+      name="twitter:description"
+      content="Projects in adversarial ML, CI/CD security automation and enterprise network defence."
+    />
+    <meta name="twitter:image" content="%SITE_URL%/og.png" />
+
+    <!-- SVG first: every current browser prefers it, and it stays crisp at
+         any size. The .ico is the fallback for everything else. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!--
+      ⚠ This block duplicates src/data/profile.ts. It cannot import from it —
+      index.html is static and is parsed before any module runs — and putting
+      it in React would make it depend on JS execution, which not every
+      crawler does. If profile.ts changes, change this too.
+    -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Achin Chandrasiri",
+        "alternateName": "achinpp",
+        "url": "%SITE_URL%/",
+        "image": "%SITE_URL%/og.png",
+        "email": "mailto:achinchandrasiri@gmail.com",
+        "jobTitle": "Cybersecurity Student, DevSecOps Engineer, AI Researcher",
+        "address": { "@type": "PostalAddress", "addressCountry": "LK" },
+        "sameAs": ["https://github.com/achinpp"],
+        "knowsAbout": [
+          "Penetration Testing",
+          "Threat Modeling",
+          "DevSecOps",
+          "Cloud Security",
+          "Network Segmentation",
+          "Adversarial Machine Learning",
+          "Python",
+          "Java"
+        ]
+      }
+    </script>
+
     <!--
       Resolve the motion + grain preference before first paint.
       Without this the page renders with animation enabled for a frame or two
@@ -33,6 +116,40 @@
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <div
+        style="
+          max-width: 34rem;
+          margin: 18vh auto;
+          padding: 0 1.5rem;
+          font:
+            400 15px/1.7 ui-sans-serif,
+            system-ui,
+            sans-serif;
+          color: #b9bcc6;
+        "
+      >
+        <p
+          style="
+            font:
+              500 11px/1 ui-monospace,
+              monospace;
+            letter-spacing: 0.18em;
+            color: #65f9c8;
+          "
+        >
+          // JAVASCRIPT REQUIRED
+        </p>
+        <h1 style="margin: 1.25rem 0 0; font-size: 1.75rem; color: #f6f7fa">Achin Chandrasiri</h1>
+        <p>Cybersecurity student, DevSecOps engineer and AI researcher.</p>
+        <p>
+          This page is built as a single-page application and needs JavaScript. The
+          <a href="/resume.pdf" download style="color: #65f9c8">résumé</a> and
+          <a href="https://github.com/achinpp" style="color: #65f9c8">github.com/achinpp</a>
+          work without it.
+        </p>
+      </div>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

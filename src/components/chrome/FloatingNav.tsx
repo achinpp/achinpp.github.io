@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useLenis } from 'lenis/react';
 import { Menu, X } from 'lucide-react';
 import { PaletteHint } from '@/components/palette/PaletteHint';
 import { NAV_SECTIONS, SECTION_IDS, getSection } from '@/data/sections';
 import { useActiveSection } from '@/hooks/useActiveSection';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { useScrollLock } from '@/hooks/useScrollLock';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
 import { useScrollTo } from '@/hooks/useScrollTo';
 import { duration, easeOutExpo, spring, stagger } from '@/lib/motion/easings';
@@ -13,11 +14,10 @@ export function FloatingNav() {
   const { hidden, atTop } = useScrollDirection();
   const active = useActiveSection(SECTION_IDS);
   const scrollTo = useScrollTo();
-  const lenis = useLenis();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const firstItemRef = useRef<HTMLButtonElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
 
   const activeSection = getSection(active);
 
@@ -29,33 +29,25 @@ export function FloatingNav() {
     [scrollTo],
   );
 
-  // Freeze the page behind the mobile sheet. Lenis owns the scroll position,
-  // so `overflow: hidden` on <body> alone wouldn't stop a wheel event.
+  // Freeze the page behind the sheet. Stage 9: this was an inline copy of the
+  // lenis-stop + body-class pair; `useScrollLock` (Stage 4) is the same logic
+  // and now the only copy of it.
+  useScrollLock(menuOpen);
+
+  // Stage 9: replaces a manual "focus the first item, restore on cleanup"
+  // effect. The hook also contains Tab, which the hand-rolled version did not
+  // — a sheet you can Tab out of leaves a keyboard user behind a full-screen
+  // scrim with no way back.
+  useFocusTrap(menuOpen, sheetRef);
+
   useEffect(() => {
     if (!menuOpen) return;
-
-    // Captured now: by cleanup time the button may have re-rendered, and the
-    // ref would point somewhere else (or nowhere).
-    const trigger = triggerRef.current;
-
-    lenis?.stop();
-    document.body.classList.add('scroll-lock');
-    // Move focus into the sheet so keyboard users aren't left behind it.
-    firstItemRef.current?.focus();
-
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setMenuOpen(false);
     };
     document.addEventListener('keydown', onKey);
-
-    return () => {
-      lenis?.start();
-      document.body.classList.remove('scroll-lock');
-      document.removeEventListener('keydown', onKey);
-      // Hand focus back to the button that opened it.
-      trigger?.focus();
-    };
-  }, [menuOpen, lenis]);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [menuOpen]);
 
   return (
     <>
@@ -152,6 +144,7 @@ export function FloatingNav() {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
+            ref={sheetRef}
             id="nav-sheet"
             role="dialog"
             aria-modal="true"
@@ -178,7 +171,7 @@ export function FloatingNav() {
               // The backdrop closes on click; the list shouldn't.
               onClick={(e) => e.stopPropagation()}
             >
-              {NAV_SECTIONS.map((section, i) => {
+              {NAV_SECTIONS.map((section) => {
                 const isActive = section.id === active;
                 return (
                   <motion.li
@@ -189,7 +182,6 @@ export function FloatingNav() {
                     }}
                   >
                     <button
-                      ref={i === 0 ? firstItemRef : undefined}
                       type="button"
                       onClick={() => go(section.id)}
                       aria-current={isActive ? 'true' : undefined}

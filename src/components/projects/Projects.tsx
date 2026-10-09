@@ -1,11 +1,20 @@
-import { useCallback, useState } from 'react';
+import { lazy, Suspense, useCallback, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { PROJECTS } from '@/data/projects';
 import { Section } from '@/components/layout/Section';
 import { SectionHeading } from '@/components/layout/SectionHeading';
 import { ProjectCard } from '@/components/projects/ProjectCard';
-import { ProjectDetail } from '@/components/projects/ProjectDetail';
 import { revealViewport, staggerGroup } from '@/lib/motion/variants';
+
+/**
+ * Stage 9: the detail panel is split out of the main bundle. It only ever
+ * renders after a click, and the shared-layout morph is measured from the
+ * card's live position at that moment — so a chunk arriving a frame late
+ * changes nothing about where the animation starts from.
+ */
+const ProjectDetail = lazy(async () => ({
+  default: (await import('@/components/projects/ProjectDetail')).ProjectDetail,
+}));
 
 /**
  * Mission Briefings.
@@ -59,7 +68,11 @@ export function Projects() {
       </motion.div>
 
       <AnimatePresence>
-        {open && <ProjectDetail key={open.id} project={open} onClose={close} />}
+        {open && (
+          <Suspense fallback={null}>
+            <ProjectDetail key={open.id} project={open} onClose={close} />
+          </Suspense>
+        )}
       </AnimatePresence>
     </Section>
   );

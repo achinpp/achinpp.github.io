@@ -1,6 +1,6 @@
 import { execSync } from 'node:child_process';
 import { fileURLToPath, URL } from 'node:url';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -23,19 +23,49 @@ function git(command: string, fallback: string) {
   }
 }
 
-export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  define: {
-    __COMMIT_SHA__: JSON.stringify(git('rev-parse --short HEAD', 'unknown')),
-    __COMMIT_DATE__: JSON.stringify(git('log -1 --format=%cI', new Date().toISOString())),
-  },
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+/** The repo's GitHub Pages URL — a working default, not a placeholder. */
+const DEFAULT_SITE_URL = 'https://achinpp.github.io/APC';
+
+export default defineConfig(({ mode }) => {
+  // `loadEnv` with an empty prefix reads .env files the way the client does.
+  // `process.env` alone would miss them: Vite does not load .env into the
+  // Node process for the config file itself.
+  const env = loadEnv(mode, process.cwd(), '');
+
+  /**
+   * Open Graph requires ABSOLUTE urls. A relative `og:image` is the classic
+   * way to ship a link preview that renders blank on half the platforms that
+   * read it, so the canonical origin is substituted into index.html at build
+   * time rather than left to the crawler to resolve.
+   */
+  const siteUrl = (env.VITE_SITE_URL || DEFAULT_SITE_URL).replace(/\/+$/, '');
+
+  return {
+    plugins: [
+      react(),
+      tailwindcss(),
+      {
+        name: 'inject-site-url',
+        // `order: 'pre'` so the placeholders are gone before Vite's own HTML
+        // handling walks the document looking for assets to rewrite.
+        transformIndexHtml: {
+          order: 'pre' as const,
+          handler: (html: string) => html.replaceAll('%SITE_URL%', siteUrl),
+        },
+      },
+    ],
+    define: {
+      __COMMIT_SHA__: JSON.stringify(git('rev-parse --short HEAD', 'unknown')),
+      __COMMIT_DATE__: JSON.stringify(git('log -1 --format=%cI', new Date().toISOString())),
     },
-  },
-  server: {
-    port: 5173,
-    open: false,
-  },
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+      },
+    },
+    server: {
+      port: 5173,
+      open: false,
+    },
+  };
 });

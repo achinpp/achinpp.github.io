@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#07090f" />
+    <meta name="robots" content="noindex" />
+    <title>404 — No such route</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+
+    <!--
+      Deliberately standalone: no React, no bundle, no fonts.
+
+      A 404 is the one page that renders when something has already gone
+      wrong, so it must not depend on the thing that might be broken. It uses
+      system fonts and inline CSS, which also means it paints in one round
+      trip. Colours are the compiled sRGB values of the obsidian and mint
+      tokens; if the palette changes, these four hex values change with it.
+    -->
+    <style>
+      :root {
+        --canvas: #07090f;
+        --ink: #f6f7fa;
+        --muted: #a7aab4;
+        --faint: #585c68;
+        --mint: #65f9c8;
+        --hairline: rgba(255, 255, 255, 0.08);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        display: grid;
+        place-items: center;
+        padding: 2rem 1.25rem;
+        background-color: var(--canvas);
+        background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.07) 1px, transparent 0);
+        background-size: 32px 32px;
+        color: var(--ink);
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      main {
+        width: 100%;
+        max-width: 34rem;
+      }
+      .mono {
+        font-family: ui-monospace, "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+      }
+      .eyebrow {
+        margin: 0;
+        font-size: 0.6875rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--mint);
+      }
+      .code {
+        margin: 1.5rem 0 0;
+        font-size: clamp(4rem, 18vw, 8rem);
+        line-height: 0.9;
+        letter-spacing: -0.04em;
+        font-weight: 700;
+        color: var(--ink);
+      }
+      .terminal {
+        margin: 2rem 0 0;
+        padding: 1rem 1.125rem;
+        border: 1px solid var(--hairline);
+        border-radius: 0.75rem;
+        background: rgba(255, 255, 255, 0.02);
+        font-size: 0.8125rem;
+        line-height: 1.8;
+        color: var(--muted);
+        overflow-x: auto;
+      }
+      .terminal .prompt {
+        color: #3f7f6b;
+        user-select: none;
+      }
+      .terminal .err {
+        color: #ff6b6b;
+      }
+      .links {
+        margin: 2rem 0 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+      a.button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.8rem 1.4rem;
+        border: 1px solid var(--hairline);
+        border-radius: 999px;
+        font-family: ui-monospace, Consolas, monospace;
+        font-size: 0.6875rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: var(--muted);
+        transition:
+          border-color 0.2s,
+          color 0.2s;
+      }
+      a.button:hover,
+      a.button:focus-visible {
+        border-color: rgba(101, 249, 200, 0.45);
+        color: var(--mint);
+      }
+      a.button.primary {
+        border-color: rgba(101, 249, 200, 0.4);
+        color: var(--mint);
+        box-shadow: 0 0 24px -6px rgba(101, 249, 200, 0.45);
+      }
+      :focus-visible {
+        outline: 2px solid var(--mint);
+        outline-offset: 2px;
+      }
+      footer {
+        margin: 3rem 0 0;
+        font-family: ui-monospace, Consolas, monospace;
+        font-size: 0.625rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      /* No animation to disable here, but the caret is the one moving thing. */
+      .caret {
+        display: inline-block;
+        width: 0.5em;
+        height: 0.95em;
+        vertical-align: -0.1em;
+        background: var(--mint);
+        animation: blink 1.05s steps(1, end) infinite;
+      }
+      @keyframes blink {
+        0%,
+        49% {
+          opacity: 1;
+        }
+        50%,
+        100% {
+          opacity: 0;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .caret {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow mono">// route not found</p>
+      <h1 class="code">404</h1>
+
+      <div class="terminal mono">
+        <div><span class="prompt">$ </span>cat .<span id="path"></span></div>
+        <div class="err">cat: no such file or directory</div>
+        <div><span class="prompt">$ </span><span class="caret"></span></div>
+      </div>
+
+      <div class="links">
+        <a class="button primary" href="/">Return to base</a>
+        <a class="button" href="/resume.pdf" download>Download résumé</a>
+        <a class="button" href="https://github.com/achinpp" rel="noreferrer noopener">GitHub</a>
+      </div>
+
+      <footer>Achin Chandrasiri · Shadow Command Center</footer>
+    </main>
+
+    <script>
+      // Echo the path that failed. textContent, never innerHTML: the path is
+      // attacker-controlled (anyone can put anything in a URL) and writing it
+      // as markup on a 404 page is a textbook reflected-XSS hole.
+      document.getElementById('path').textContent = location.pathname + location.search;
+    </script>
+  </body>
+</html>
