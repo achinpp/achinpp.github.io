@@ -16,6 +16,13 @@ export const PROFILE = {
   /** Lowercase, for terminal output. */
   handle: 'achinpp',
 
+  /**
+   * inferred — the commit email on this repository. Same evidence as the
+   * name above, and the only contact address I have. The contact form,
+   * the mailto link and copy-to-clipboard all point here.
+   */
+  email: 'achinchandrasiri@gmail.com',
+
   /** From the brief, verbatim. Order drives the rotator. */
   titles: ['Cybersecurity Student', 'DevSecOps Engineer', 'AI Researcher'],
 

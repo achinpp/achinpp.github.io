@@ -1,11 +1,12 @@
+import { Arsenal } from '@/components/arsenal/Arsenal';
 import { GridBackdrop } from '@/components/backdrop/GridBackdrop';
 import { ScanlineSweep } from '@/components/backdrop/ScanlineSweep';
-import { Arsenal } from '@/components/arsenal/Arsenal';
 import { BattleStation } from '@/components/battlestation/BattleStation';
+import { Contact } from '@/components/contact/Contact';
 import { CustomCursor } from '@/components/chrome/CustomCursor';
 import { FloatingNav } from '@/components/chrome/FloatingNav';
+import { Footer } from '@/components/chrome/Footer';
 import { StatusHUD } from '@/components/chrome/StatusHUD';
-import { SectionScaffold } from '@/components/dev/SectionScaffold';
 import { Experience } from '@/components/experience/Experience';
 import { Hero } from '@/components/hero/Hero';
 import { Projects } from '@/components/projects/Projects';
@@ -13,6 +14,7 @@ import { TokenSheet } from '@/components/dev/TokenSheet';
 import { MotionProvider } from '@/providers/MotionProvider';
 import { PointerProvider } from '@/providers/PointerProvider';
 import { SmoothScrollProvider } from '@/providers/SmoothScrollProvider';
+import { ToastProvider } from '@/providers/ToastProvider';
 
 /**
  * `?tokens` keeps the Stage 0 specimen sheet reachable without it being in
@@ -26,38 +28,42 @@ export function App() {
     <MotionProvider>
       <PointerProvider>
         <SmoothScrollProvider>
-          {/* Ambience, behind everything, never interactive. */}
-          <GridBackdrop />
-          <ScanlineSweep />
+          <ToastProvider>
+            {/* Ambience, behind everything, never interactive. */}
+            <GridBackdrop />
+            <ScanlineSweep />
 
-          <a
-            href="#main"
-            className="sr-only pane px-4 py-2 font-mono text-label uppercase focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-[var(--z-toast)] focus-visible:text-mint-300"
-          >
-            Skip to content
-          </a>
+            <a
+              href="#main"
+              className="sr-only pane px-4 py-2 font-mono text-label uppercase focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-[var(--z-toast)] focus-visible:text-mint-300"
+            >
+              Skip to content
+            </a>
 
-          {SHOW_TOKENS ? (
-            <main id="main" className="relative z-[var(--z-content)]">
-              <TokenSheet />
-            </main>
-          ) : (
-            <>
-              <FloatingNav />
-              {/* pb clears the fixed HUD so the last section isn't cut off. */}
-              <main id="main" className="relative z-[var(--z-content)] pb-7">
-                <Hero />
-                <Experience />
-                <Projects />
-                <BattleStation />
-                <Arsenal />
-                <SectionScaffold />
+            {SHOW_TOKENS ? (
+              <main id="main" className="relative z-[var(--z-content)]">
+                <TokenSheet />
               </main>
-              <StatusHUD />
-            </>
-          )}
+            ) : (
+              <>
+                <FloatingNav />
+                <main id="main" className="relative z-[var(--z-content)]">
+                  <Hero />
+                  <Experience />
+                  <Projects />
+                  <BattleStation />
+                  <Arsenal />
+                  <Contact />
+                </main>
+                {/* The footer's own bottom padding clears the fixed HUD, which
+                    is why <main> no longer carries any. */}
+                <Footer />
+                <StatusHUD />
+              </>
+            )}
 
-          <CustomCursor />
+            <CustomCursor />
+          </ToastProvider>
         </SmoothScrollProvider>
       </PointerProvider>
     </MotionProvider>

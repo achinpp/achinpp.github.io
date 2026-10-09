@@ -79,8 +79,9 @@ soul (edgy, secure, tech-thriller), modern execution:
 
 > NOTE: **The swatch strip became `src/components/dev/TokenSheet.tsx`** — a real specimen
 > sheet (ramps, semantic table, type scale, radii, elevation, glow, blur tiers, easing lab,
-> keyframe demos) rather than a strip. It is dev-only scaffolding and gets deleted once Stage 7
-> lands.
+> keyframe demos) rather than a strip. ~~Deleted once Stage 7 lands~~ — **kept**: it is still the
+> only way to reach the motion and grain toggles until Stage 8 puts them in the palette. Now on
+> the Stage 9 list to lazy-load or delete.
 
 > NOTE: **The dot matrix and grain live on `body::before` / `body::after`**, not in a component,
 > so nothing can intercept the pointer and no section has to own them. The _interactive_
@@ -707,18 +708,127 @@ from the production bundle · all 4 new modules transform in dev.
 
 ---
 
-## STAGE 7 — Secure Channel (Contact + Footer)
+## STAGE 7 — Secure Channel (Contact + Footer) ✅
 
 **Goal:** Close the loop.
 
-- [ ] Contact form styled as an encrypted comms terminal: monospace labels, prefixed fields,
+- [x] Contact form styled as an encrypted comms terminal: monospace labels, `>`-prefixed fields,
       inline validation, `TRANSMITTING... → ✓ MESSAGE ENCRYPTED & SENT` success state
-- [ ] Form handler (Formspree or Resend — decide at this stage), honeypot + rate guard
-- [ ] Social links: GitHub, LinkedIn, TryHackMe/HTB, Email — icon buttons with magnetic hover
-- [ ] Footer: PGP-key line, `LAST_BUILD: <commit-date>`, back-to-top
-- [ ] Copy-email-to-clipboard with toast
+- [x] Form handler — **Formspree** chosen (reasoning below), honeypot + two rate guards
+- [x] Social links with magnetic hover — GitHub and Email live; LinkedIn and TryHackMe/HTB
+      render nothing because no handle exists
+- [x] Footer: `LAST_BUILD` (real commit sha + date), back-to-top. **PGP line omitted** — see note
+- [x] Copy-email-to-clipboard with toast
+- [x] `<ToastProvider />`, `useToast`, `useCopy` — Stage 8's palette needs all three
+- [x] `<SectionScaffold />` deleted — every section is now real
 
 **Accept when:** form submits end-to-end, validation + error states all styled, no console errors.
+
+### Stage 7 notes
+
+> ⚠ **THE FORM HAS NO ENDPOINT, AND THIS IS THE ONE ITEM I COULD NOT FINISH.** It needs a
+> Formspree form id, which only you can create. Until `VITE_FORM_ENDPOINT` is set:
+> **in dev** the submit runs the real validation and then _simulates_ the round-trip so the
+> TRANSMITTING → SENT states are reviewable, with a banner saying so in as many words;
+> **in production** the submit button is disabled with a `CHANNEL NOT PROVISIONED` notice and
+> the email address beside it is the working path. The form never tells a real visitor a message
+> was delivered when it wasn't. See `.env.example`.
+
+> NOTE: **Formspree over Resend, and the reason is architectural.** This is a static SPA — there
+> is no server to put an API key on. Resend needs a secret, which means a serverless function,
+> which means a backend to deploy and maintain for one contact form. Formspree takes a POST
+> straight from the browser, filters spam server-side, and its endpoint is not a secret, so it
+> lives in deploy config with no function wrapper.
+
+> NOTE: **The honeypot is deliberately not checked client-side.** `_gotcha` is Formspree's own
+> convention and is dropped on their side. Branching on it here would be worse than useless:
+> password managers do sometimes fill hidden fields, and a client-side honeypot check would show
+> a real person a false "sent". The two local guards — a 3s minimum fill time and a 30s minimum
+> gap, both in `sessionStorage` — only stop the trivial case of a script that fills every field
+> and posts instantly. The real filtering is Formspree's.
+
+> NOTE: **`MESSAGE ENCRYPTED & SENT` is the brief's wording and it is true in exactly one
+> sense:** the POST is TLS-encrypted in transit. It is not end-to-end encrypted and nothing here
+> claims a key exchange. Flagging it because it is the kind of phrase a security reviewer will
+> read literally.
+
+> NOTE: **No PGP fingerprint, and none invented.** The plan called for a PGP line in the footer.
+> A fabricated fingerprint is not decoration — it is a string somebody could try to verify a
+> signature against, so a wrong one is actively worse than none. Set `PGP_FINGERPRINT` in
+> `src/data/contact.ts` and the line appears; leave it `null` and it is omitted entirely.
+
+> NOTE: **`LAST_BUILD` is real.** `vite.config.ts` injects the short commit sha and committer
+> date through `define` at build time. Both calls are wrapped in try/catch — a deploy may run
+> from a tarball with no `.git`, and a build that dies because it couldn't find a hash for a
+> footer label would be an absurd way to fail. Shallow clones (the CI default) still answer
+> `rev-parse` and `log -1`, so it works on Vercel and Netlify as-is. Verified: `1b0e2b3` and the
+> ISO date are both literally present in the production bundle.
+
+> NOTE: **Inputs have `outline: none` and the _wrapper_ shows focus** — border to mint plus a
+> glow. Removing an input's outline without replacing the indicator leaves keyboard users with
+> no idea where they are; the default ring also draws inside a border it doesn't match, which is
+> what tempts people to remove it and stop there.
+
+> NOTE: **Errors appear on blur or on submit, never while first typing.** Validating mid-keystroke
+> means the message "needs at least 10 characters" is on screen for everyone who has typed four,
+> which reads as the form arguing with you.
+
+> NOTE: **The email pattern is deliberately loose** (`/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/`). Strict
+> patterns reject valid addresses — plus-tags, long new TLDs, quoted locals — and the only check
+> that proves an address works is sending to it.
+
+> NOTE: **This is the first real use of `--color-breach-*`.** Stage 0 reserved it for danger
+> semantics only; field errors and the transmission-failure alert are exactly that, and it has
+> been unused on the site until now. That was the point of reserving it.
+
+> NOTE: **Social links are rows, not icon buttons** — a deviation from the plan. With only two
+> live channels, two bare icons is a worse answer than two rows showing the label and the actual
+> handle. If LinkedIn and TryHackMe/HTB arrive, the icon-grid version becomes the right call
+> again.
+
+> NOTE: **One toast at a time, replaced rather than queued.** Everything that raises one is a
+> single deliberate act, so two can only overlap if someone clicks twice — and then the second
+> message is the one they want. The `key` is a counter, not the message: `AnimatePresence` keys
+> off identity, so with the message as the key a second click on the same copy button would be a
+> silent no-op.
+
+> NOTE: **The form sits beside the channel list, not above it.** The form is the thing that may
+> not be wired to an inbox, and when it isn't the working alternative has to be visible at the
+> same moment as the notice saying so — not a scroll away.
+
+> NOTE: **`<main>` lost its `pb-7`.** The footer is now the last thing in the flow and its own
+> `pb-16` clears the fixed HUD strip.
+
+> NOTE: **`?tokens` still ships the Stage 0 specimen sheet in the main bundle.** It is the only
+> way to reach the motion and grain toggles until Stage 8 puts them in the palette. Added to the
+> Stage 9 list to lazy-load or delete.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+production build 3.4s / 59.3 kB CSS (11.0 kB gzip) / 389 kB JS (122.2 kB gzip) · all four
+breach-colour error classes confirmed in the compiled CSS · the injected commit sha `1b0e2b3`
+and ISO date confirmed in the JS bundle · `Secure Channel`, `Message encrypted`, `Transmitting`,
+`Channel not provisioned`, `_gotcha`, `scc.lastSend` and the email address all present ·
+**every dev-only string and the entire simulate-mode branch confirmed stripped** from
+production · `motion.output` / `motion.form` / `motion.dl` confirmed to resolve through Framer's
+tag proxy · all 9 new modules transform in dev · no references to the deleted
+`<SectionScaffold />` remain.
+
+**Not yet verified by me:** no browser, and this stage is the one where that matters most —
+"no console errors" is in the acceptance criteria and I cannot open a console.
+
+Worth checking by hand:
+
+- **submit the form in dev.** Empty submit → three inline errors. Fill it badly → errors on
+  blur. Fill it properly and submit → `TRANSMITTING...` then the success panel, then
+  `Send another`
+- **both rate guards**: submit within 3s of load (should refuse), then send twice in 30s
+- **Copy address** → toast appears above the HUD, and click it twice in a row to confirm the
+  toast restarts rather than ignoring the second click
+- **back-to-top** from the footer, and that `LAST_BUILD` shows a sane date and `1b0e2b3`
+- **keyboard only**: Tab through the whole form — focus must be visible on every field via the
+  wrapper border, and the honeypot must never receive focus
+- **390px**: form, channel rows and footer all stacking without overflow
+- **Motion off**: no magnetic pull on the channel rows, toast appears with no slide
 
 ---
 
@@ -752,6 +862,13 @@ from the production bundle · all 4 new modules transform in dev.
       three locked slots (Stage 5)
 - [ ] **Prune `src/data/skills.ts`** — 13 of the 20 pills are `source: 'derived'`, taken from the
       brief's project descriptions rather than stated outright (Stage 6)
+- [ ] **Set `VITE_FORM_ENDPOINT`** to a Formspree endpoint — until then the contact form is
+      disabled in production (Stage 7)
+- [ ] **Supply LinkedIn and TryHackMe/HTB handles** for `src/data/contact.ts`, and a
+      `PGP_FINGERPRINT` if one exists (Stage 7)
+- [ ] **Confirm `PROFILE.email`** — inferred from the commit email on this repo (Stage 7)
+- [ ] Lazy-load or delete `<TokenSheet />` (`?tokens`), which is still in the main bundle
+      (Stage 7)
 - [ ] Lighthouse: Performance ≥ 95, A11y ≥ 95, Best Practices 100, SEO 100 — measure LCP for real
 - [ ] Route-level code splitting, lazy-load below-fold heavy components
 - [ ] OG image + Twitter card, full meta, JSON-LD `Person` schema
@@ -789,4 +906,4 @@ from the production bundle · all 4 new modules transform in dev.
 
 ---
 
-**Current status:** `STAGE 6 — complete, awaiting review` → next: `STAGE 7 — Secure Channel (Contact + Footer)`
+**Current status:** `STAGE 7 — complete, awaiting review` → next: `STAGE 8 — Command Palette (⌘K)`
