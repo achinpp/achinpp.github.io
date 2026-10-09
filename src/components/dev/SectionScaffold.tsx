@@ -6,11 +6,10 @@ import { fadeUp, maskReveal, maskRevealGroup, revealViewport } from '@/lib/motio
  * Sections that have shipped and no longer need a placeholder. Each stage
  * adds its own id here; the file is deleted once the list is complete.
  */
-const BUILT = new Set(['hero', 'experience']);
+const BUILT = new Set(['hero', 'experience', 'projects']);
 
 /** Which stage replaces each remaining placeholder. */
 const FILLED_BY: Record<string, string> = {
-  projects: 'STAGE 4 — Mission Briefings grid',
   battlestation: 'STAGE 5 — Battle Station (CTF & achievements)',
   arsenal: 'STAGE 6 — Arsenal (tech stack)',
   contact: 'STAGE 7 — Secure Channel (contact + footer)',
@@ -21,9 +20,9 @@ const FILLED_BY: Record<string, string> = {
  * something real to navigate. The nav indicator, the active-section detection
  * band and the HUD readout can't be judged against a single blank page.
  *
- * `hero` and `experience` are gone — Stages 2 and 3 replaced them with the
- * real sections. Each remaining section drops off this list as its own stage
- * lands.
+ * `hero`, `experience` and `projects` are gone — Stages 2 to 4 replaced them
+ * with the real sections. Each remaining section drops off this list as its
+ * own stage lands.
  *
  * Each section is replaced wholesale by its own stage; this file is deleted
  * once Stage 7 lands.

@@ -369,15 +369,16 @@ marker confirmed **stripped** from the production bundle · all 7 new modules tr
 
 ---
 
-## STAGE 4 — Mission Briefings (Projects Grid)
+## STAGE 4 — Mission Briefings (Projects Grid) ✅
 
 **Goal:** The depth section. Bento layout, not a uniform 3-column grid.
 
-- [ ] Bento: 1 feature tile (2×2) + 3 standard tiles, responsive reflow
-- [ ] Card treatment: hairline border → **mouse-tracking glow border** on hover, inner
+- [x] Bento: 1 feature tile (2×2) + 1 wide (2×1) + 2 standard tiles, responsive reflow
+- [x] Card treatment: hairline border → **mouse-tracking glow border** on hover, inner
       highlight, subtle 3D tilt, classification stamp (`// BRIEFING_01`)
-- [ ] Tech-stack chips per card, status badge (`DEPLOYED` / `ACTIVE` / `ARCHIVED`)
-- [ ] Projects:
+- [x] Tech-stack chips per card, status badge (`DEPLOYED` / `ACTIVE` / `DELIVERED` /
+      `RESEARCH` / `ARCHIVED`)
+- [x] Projects:
   1. **Study Coach AI Agent** — Google ADK + Gemini API exam-prep assistant, FastAPI backend,
      custom UI. Dynamic schedule generation, topic prioritization, session logging,
      interactive AI tutoring/quizzing. _(feature tile)_
@@ -388,10 +389,110 @@ marker confirmed **stripped** from the production bundle · all 7 new modules tr
      mitigating physical adversarial-patch attacks
   4. **DevSecOps CI/CD Pipeline** — OWASP WebGoat deployment with Semgrep SAST,
      Trivy dependency scanning, Gitleaks secret detection
-- [ ] Click → expanded detail panel (shared-layout morph, not a jarring modal), Esc + scrim close
+- [x] Click → expanded detail panel (shared-layout morph, not a jarring modal), Esc + scrim close
+- [x] Reusable `useCardPointer`, `useFocusTrap`, `useScrollLock` — Stage 8's palette needs the
+      last two
 
 **Accept when:** glow-border tracking is smooth, detail morph has no layout flash,
 body scroll locks correctly when open.
+
+### Stage 4 notes
+
+> ⚠ **CONTENT TO CONFIRM — far less than Stage 3.** Titles, every capability bullet and every
+> named tool come straight from the brief. Three things don't, and all three are flagged in
+> `src/data/projects.ts`: the **status badges** (the brief asked for them but never said which
+> applies to what — `statusConfirmed: false` on all four, with a dev-only marker on the card and
+> in the panel), the **repo/demo links** (none supplied, so `null` renders no button rather than
+> a dead one), and the **taglines** (my one-line framing of each project).
+
+> NOTE: **`DELIVERED` is a fourth status beyond the brief's three.** A costed network redesign is
+> handed over, not deployed and not archived, and either of those would be wrong.
+
+> NOTE: **The morph animates a bare frame; the content cross-fades.** The `layoutId` element is
+> an empty background span, and the text is a _sibling_ of it, not a child. A layout animation
+> scales its whole subtree, so content inside the morphing element would be squashed from card
+> width to panel width and stretched back on the way across — the classic distorted-modal look.
+
+> NOTE: **The content fades in on a 160ms delay, and that is what removes the layout flash.**
+> The panel's text is at its final size from the first frame while the frame is still growing, so
+> showing it immediately means a paragraph overflowing a card-sized box. The delay holds it at
+> `opacity: 0` until the frame is most of the way there.
+
+> NOTE: **The detail panel is portalled to `<body>`, and it has to be.** `<main>` is positioned
+> with `z-index: var(--z-content)`, which makes it a stacking context — a descendant asking for
+> `--z-overlay` (60) still paints under the nav at `--z-nav` (40), because the nav is a _sibling_
+> of `<main>` and the whole of `<main>` is at 10. `layoutId` is unaffected: Framer measures in
+> viewport coordinates, and React context carries the shared-layout registry through a portal.
+
+> NOTE: **The spotlight is CSS custom properties written imperatively, collapsed to one write
+> per frame.** `--mx` / `--my` go straight onto the card element and are read by a
+> `radial-gradient`; React state would re-render the card on every mouse move, and mouse events
+> outpace frames. Setting a custom property invalidates style and repaints the gradient, so a
+> fast drag would otherwise queue several of those inside one frame for a single visible result.
+> `useCardPointer` also serves the tilt from the same handler — two hooks would read
+> `getBoundingClientRect()` twice per event for the same number.
+
+> NOTE: **The glow really is the border, not a halo behind one.** The frame carries
+> `background-clip: padding-box`, so its surface colour stops at the padding edge and the
+> gradient one pixel outside shows _through_ the 1px border. With the default `border-box` clip
+> the opaque background paints under the border and the effect is a faint outer bloom instead.
+
+> NOTE: **Cards reveal with `fadeUp`, not `scaleIn`.** Framer cannot measure a layout animation
+> correctly through an ancestor that is mid-`scale`, so a click during the entrance stagger would
+> morph from the wrong rectangle. Opacity and translate are safe.
+
+> NOTE: **Grid rows are `minmax(17rem, auto)`, not `grid-rows-2`.** Tailwind's `grid-rows-2`
+> compiles to `repeat(2, minmax(0, 1fr))`, and a `1fr` row with a `0` floor does not grow for
+> content that overflows it — a standard tile with a long title would spill out of its own frame,
+> because the frame is absolutely positioned to the tile while the content is in flow.
+
+> NOTE: **The hit target is a full-cover `<button>`, not a wrapper.** A `<button>` may only
+> contain phrasing content and the card has an `<h3>` in it. The visible `open briefing →` line
+> is `aria-hidden` decoration; the button carries the accessible name.
+
+> NOTE: **`useFocusTrap` listens on `document` in the capture phase and re-reads the focusable
+> list on every Tab.** A container-bound listener is silently dead the moment focus has already
+> escaped, and a list cached on open traps against stale first/last elements in a panel whose
+> content appears conditionally.
+
+> NOTE: **`useScrollLock` stops Lenis as well as `<body>`.** `overflow: hidden` stops native
+> scrolling, but Lenis drives the scroll position itself and would keep consuming wheel events
+> behind the panel.
+
+> NOTE: **Under reduced motion `layoutId` is dropped entirely** — no flight path, no tilt, no
+> tracked glow. The panel opens centred and the cards keep a plain CSS border brighten on hover,
+> which is also the touch and coarse-pointer behaviour.
+
+> NOTE: **`<FloatingNav />` still has its own inline copy of the scroll-lock effect** from
+> Stage 1 rather than using `useScrollLock`. The duplication is deliberate for now: the refactor
+> is trivial but it would mean re-verifying the mobile sheet in a browser, which I can't do.
+> Worth folding in during Stage 9.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+production build 3.7s / 52.2 kB CSS (10.2 kB gzip) / 359 kB JS (112.9 kB gzip) · bento spans,
+`repeat(2,minmax(17rem,auto))`, `border-radius:1.0625rem` and `group-hover:border-mint-900` all
+confirmed in the compiled CSS · `background-clip:padding-box`, `perspective:1400px`, both
+`radial-gradient`s, `--mx`/`--my`, `createPortal` and `aria-modal` confirmed in the JS bundle
+(inline React styles, correctly absent from the CSS) · all four project titles and every named
+tool (Semgrep, Trivy, Gitleaks, VGG19, YOLO, Gemini API, Google ADK) present · **all three
+dev-only markers confirmed stripped** from the production bundle · all 7 new modules transform
+in dev.
+
+**Not yet verified by me:** no browser here, and this stage has the most that can only be judged
+live. Worth checking by hand:
+
+- **the glow border tracking** — does it read as a lit edge following the cursor, or as a blob?
+- the tilt: 5° maximum, which should be felt rather than seen. Too much? Say so.
+- **the morph, both ways.** Open and close each of the four tiles and watch for: text at the
+  wrong size during the flight, the frame arriving before/after the content, and the retraction
+  after the scrim has faded
+- **Esc** closes · **scrim click** closes · **Tab** stays inside the panel and wraps · focus
+  returns to the card you opened
+- the page behind must not scroll while a briefing is open — wheel, trackpad and touch
+- **390px**: single column, four tiles, no overflow; panel at `max-h-[82svh]` scrolls internally
+- **md (768px)**: first two tiles full-width, last two side by side
+- **Motion off**: no tilt, no tracked glow, panel opens centred with no flight, border still
+  brightens on hover
 
 ---
 
@@ -461,6 +562,9 @@ body scroll locks correctly when open.
 - [ ] **Confirm every `inferred` field in `src/data/profile.ts`** (name, location)
 - [ ] **Confirm `src/data/experience.ts`** — periods (currently `[ dates tbc ]`), the bullet
       wording (`draftBullets: true`), and the entry order (Stage 3)
+- [ ] **Confirm `src/data/projects.ts`** — the four status badges (`statusConfirmed: false`),
+      the taglines, and add any public `repo` / `demo` links (Stage 4)
+- [ ] Fold `<FloatingNav />`'s inline scroll-lock effect into `useScrollLock` (Stage 4)
 - [ ] Lighthouse: Performance ≥ 95, A11y ≥ 95, Best Practices 100, SEO 100 — measure LCP for real
 - [ ] Route-level code splitting, lazy-load below-fold heavy components
 - [ ] OG image + Twitter card, full meta, JSON-LD `Person` schema
@@ -498,4 +602,4 @@ body scroll locks correctly when open.
 
 ---
 
-**Current status:** `STAGE 3 — complete, awaiting review` → next: `STAGE 4 — Mission Briefings (Projects Grid)`
+**Current status:** `STAGE 4 — complete, awaiting review` → next: `STAGE 5 — Battle Station (CTF & Achievements)`

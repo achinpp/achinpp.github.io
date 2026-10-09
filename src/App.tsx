@@ -6,6 +6,7 @@ import { StatusHUD } from '@/components/chrome/StatusHUD';
 import { SectionScaffold } from '@/components/dev/SectionScaffold';
 import { Experience } from '@/components/experience/Experience';
 import { Hero } from '@/components/hero/Hero';
+import { Projects } from '@/components/projects/Projects';
 import { TokenSheet } from '@/components/dev/TokenSheet';
 import { MotionProvider } from '@/providers/MotionProvider';
 import { PointerProvider } from '@/providers/PointerProvider';
@@ -45,6 +46,7 @@ export function App() {
               <main id="main" className="relative z-[var(--z-content)] pb-7">
                 <Hero />
                 <Experience />
+                <Projects />
                 <SectionScaffold />
               </main>
               <StatusHUD />
