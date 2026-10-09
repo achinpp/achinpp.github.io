@@ -12,6 +12,7 @@ import { Hero } from '@/components/hero/Hero';
 import { Projects } from '@/components/projects/Projects';
 import { TokenSheet } from '@/components/dev/TokenSheet';
 import { MotionProvider } from '@/providers/MotionProvider';
+import { PaletteProvider } from '@/providers/PaletteProvider';
 import { PointerProvider } from '@/providers/PointerProvider';
 import { SmoothScrollProvider } from '@/providers/SmoothScrollProvider';
 import { ToastProvider } from '@/providers/ToastProvider';
@@ -29,40 +30,42 @@ export function App() {
       <PointerProvider>
         <SmoothScrollProvider>
           <ToastProvider>
-            {/* Ambience, behind everything, never interactive. */}
-            <GridBackdrop />
-            <ScanlineSweep />
+            <PaletteProvider>
+              {/* Ambience, behind everything, never interactive. */}
+              <GridBackdrop />
+              <ScanlineSweep />
 
-            <a
-              href="#main"
-              className="sr-only pane px-4 py-2 font-mono text-label uppercase focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-[var(--z-toast)] focus-visible:text-mint-300"
-            >
-              Skip to content
-            </a>
+              <a
+                href="#main"
+                className="sr-only pane px-4 py-2 font-mono text-label uppercase focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-[var(--z-toast)] focus-visible:text-mint-300"
+              >
+                Skip to content
+              </a>
 
-            {SHOW_TOKENS ? (
-              <main id="main" className="relative z-[var(--z-content)]">
-                <TokenSheet />
-              </main>
-            ) : (
-              <>
-                <FloatingNav />
+              {SHOW_TOKENS ? (
                 <main id="main" className="relative z-[var(--z-content)]">
-                  <Hero />
-                  <Experience />
-                  <Projects />
-                  <BattleStation />
-                  <Arsenal />
-                  <Contact />
+                  <TokenSheet />
                 </main>
-                {/* The footer's own bottom padding clears the fixed HUD, which
+              ) : (
+                <>
+                  <FloatingNav />
+                  <main id="main" className="relative z-[var(--z-content)]">
+                    <Hero />
+                    <Experience />
+                    <Projects />
+                    <BattleStation />
+                    <Arsenal />
+                    <Contact />
+                  </main>
+                  {/* The footer's own bottom padding clears the fixed HUD, which
                     is why <main> no longer carries any. */}
-                <Footer />
-                <StatusHUD />
-              </>
-            )}
+                  <Footer />
+                  <StatusHUD />
+                </>
+              )}
 
-            <CustomCursor />
+              <CustomCursor />
+            </PaletteProvider>
           </ToastProvider>
         </SmoothScrollProvider>
       </PointerProvider>

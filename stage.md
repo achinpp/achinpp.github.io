@@ -832,17 +832,124 @@ Worth checking by hand:
 
 ---
 
-## STAGE 8 — Command Palette (⌘K)
+## STAGE 8 — Command Palette (⌘K) ✅
 
 **Goal:** The signature interaction. Built last so it can index everything.
 
-- [ ] `cmdk`-powered overlay, `⌘K` / `Ctrl+K` / `/` to open
-- [ ] Commands: jump to section, download resume, copy email, open socials, toggle motion,
-      toggle grain, easter-egg `sudo` command
-- [ ] Fuzzy search, keyboard-only navigable, recent-commands memory
-- [ ] Discoverable hint chip in nav + HUD
+- [x] Overlay with `⌘K` / `Ctrl+K` / `/` to open — **hand-rolled, not `cmdk`** (see note)
+- [x] Commands: jump to each of the 5 nav sections, download résumé, copy email, compose email,
+      open GitHub, toggle motion, toggle grain, open the token sheet, and `sudo`
+- [x] Fuzzy search, keyboard-only navigable, recent-commands memory
+- [x] Discoverable hint chip in nav + HUD
 
 **Accept when:** fully keyboard-driven, focus trap correct, Esc restores focus to trigger.
+
+### Stage 8 notes
+
+> NOTE: **Hand-rolled instead of `cmdk` — the one plan deviation worth arguing about.** `cmdk`'s
+> entry point pulls in `@radix-ui/react-dialog` and its transitive tree, and what it would have
+> provided beyond that is a fuzzy scorer and a keydown handler. The overlay, scrim, focus trap
+> and scroll lock already exist here from Stage 4 — `useFocusTrap` and `useScrollLock` were
+> written partly for this stage. Confirmed: zero occurrences of `cmdk`, `command-score` or
+> `radix` in the production bundle, and no Radix package in `node_modules`. **The real thing
+> cmdk would have bought is a correct combobox**, so that part is implemented to the ARIA 1.2
+> pattern rather than approximated.
+
+> NOTE: **Focus never leaves the input, and the rows are deliberately not focusable.** The arrow
+> keys move `aria-activedescendant`, not focus — that is what lets someone keep typing while the
+> selection moves. The input is the `combobox` with `aria-controls` pointing at the `listbox`;
+> each row is an `option` with `aria-selected`. A focusable option inside a combobox is the
+> single most common way this pattern is got wrong, and it is why the rows are `<div>`s with a
+> click handler rather than `<button>`s.
+
+> NOTE: **Selection is tracked by command id, not list index.** The two toggles keep the palette
+> open _and_ change their own label, and running any command promotes it into `Recent` — so the
+> list reorders underneath the selection. An index would silently end up pointing at a different
+> command; an id follows the command through the reorder.
+
+> NOTE: **Both `Meta+K` and `Ctrl+K` are accepted on every platform.** Detecting the OS to decide
+> which to honour means being wrong for anyone on a Mac with a PC keyboard, on Linux, or in a VM,
+> and accepting both costs nothing. Only the chip's _label_ is platform-specific, and it reads
+> the user agent because `navigator.platform` is deprecated. `preventDefault` is required:
+> Ctrl+K is "focus the search bar" in Chrome and Firefox.
+
+> NOTE: **`/` is ignored while typing.** Without the editable-target check, the slash in an email
+> address, a URL or any sentence in the contact form opens the palette mid-word. The palette's
+> own input is caught by the same test, so a slash typed into a search stays a slash.
+
+> NOTE: **⚠ A real bug, found by testing the scorer rather than by reading it.** The résumé
+> command is labelled `Download résumé`, and nobody types the accents — so `resume` scored 0 and
+> the single most important command in the palette was unreachable by its own name. Fixed by
+> folding diacritics (`NFD` + stripping the combining-marks block) on both sides. Prettier then
+> rewrote the escape sequence into _literal_ invisible combining characters in the source, which
+> works but renders as garbage in an editor and would break silently on any encoding mishap — so
+> that was put back to `\u0300-\u036f` explicitly.
+
+> NOTE: **The scorer has a test, and it is the only thing in this build I have actually been able
+> to run.** 18 assertions over the real command labels: ranking (`proj` → Projects, `resume` →
+> Download résumé, `bs` → Battle Station, `dfg` → Disable film grain), the score bands, case
+> insensitivity, and that a label match always beats a keyword match. The bands are deliberately
+> far apart so a prefix hit can never lose to a scattered subsequence hit no matter how many
+> bonuses the latter collects. The test lives in the scratchpad, not the repo — there is no test
+> runner configured, and adding one is a Stage 9 decision, not something to smuggle in here.
+
+> NOTE: **`Recent` is `localStorage`; the boot overlay is `sessionStorage`.** Opposite intents:
+> the point of a recents list is that it survives until tomorrow, and the point of the boot
+> overlay is that tomorrow counts as a new visit. The stored value is also validated on read
+> rather than trusted — anything could be under that key, from another tab, an older version, or
+> someone with devtools open.
+
+> NOTE: **The toggles use `keepOpen`.** Flipping grain or motion and watching the palette vanish
+> means reopening it to undo it; staying open lets the effect be seen and reversed in place. The
+> label and the `on`/`off` hint both flip immediately.
+
+> NOTE: **`sudo` is hidden until the query is at least 3 characters and prefixes it.** A single
+> `s` revealing an easter egg makes it furniture; `sud` is a deliberate request. It raises a
+> toast with the real sudo refusal rather than doing anything.
+
+> NOTE: **The hint chips are desktop-only (`sm:` and up), in both the nav and the HUD.** A
+> keyboard shortcut is not an affordance on a phone, and the mobile nav pill has no room. Mobile
+> keeps the nav sheet for navigation, and the résumé button, email link and GitHub link are all
+> present in the page itself — so nothing is only reachable through the palette.
+
+> NOTE: **Downloading uses a detached `<a download>` click, not `window.location`.** A navigation
+> to a PDF is a navigation, and some browsers render it in place and lose the page.
+
+> NOTE: **The palette sits at `--z-palette` (70), above the overlay tier (60)** — so the project
+> detail panel can be open behind it without a stacking fight. Portalled to `<body>` for the same
+> reason as that panel: `<main>` is a stacking context at `--z-content`.
+
+> NOTE: **`HOTKEY_LABEL` lives in `src/lib/hotkey.ts`, not beside the chip.** A module that
+> exports both a component and a constant breaks React Fast Refresh — every edit would full-reload
+> instead of hot-swapping. ESLint caught this one.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+production build 4.3s / 60.9 kB CSS (11.3 kB gzip) / 401 kB JS (125.8 kB gzip) ·
+**18/18 scorer assertions pass** (run against the real command labels via esbuild + node) ·
+`palette-list`, `palette-opt-`, `combobox`, `listbox`, `aria-activedescendant`, every command
+label, `scc.recent` and the `sudoers` string all confirmed in the JS bundle ·
+`var(--z-palette)` confirmed wired · **`cmdk` / `command-score` / `radix` all confirmed absent**
+from both the bundle and `node_modules` · all 9 new modules transform in dev.
+
+**Not yet verified by me:** no browser and no screen reader. The ARIA wiring is written to the
+spec and reasoned through attribute by attribute, but **I cannot confirm how NVDA or VoiceOver
+actually announces it** — that is the one claim in this stage I am not able to stand behind from
+here, and it matters more than usual because I chose to hand-roll the combobox.
+
+Worth checking by hand:
+
+- **⌘K / Ctrl+K** opens from anywhere, and again to close. **`/`** opens — then confirm it does
+  _not_ while the caret is in a contact-form field
+- **arrows wrap** top-to-bottom, `Home` / `End` jump, `↵` runs, `Esc` closes
+- **Esc restores focus to whatever opened it** — this stage's acceptance criterion. Test from
+  the nav chip, the HUD chip, and from the keyboard with focus somewhere in the page
+- **Tab must stay inside the palette** and never reach the page behind it
+- **fuzzy search**: try `resume`, `dfg`, `bs`, `cem`, `zzz` (should show "no matching command")
+- **recents**: run two commands, close, reopen — they should be at the top, and still there
+  after a full reload
+- **the toggles stay open** and their `on`/`off` hint flips in place
+- **`sud`** reveals `sudo`; `s` alone must not
+- **Motion off**: palette appears with no slide or scale, and the motion toggle reads `off`
 
 ---
 
@@ -869,6 +976,11 @@ Worth checking by hand:
 - [ ] **Confirm `PROFILE.email`** — inferred from the commit email on this repo (Stage 7)
 - [ ] Lazy-load or delete `<TokenSheet />` (`?tokens`), which is still in the main bundle
       (Stage 7)
+- [ ] **Decide on a test runner.** The fuzzy scorer has 18 assertions that found a real bug, but
+      they live in a scratchpad because nothing is configured to run them. Vitest would take
+      ~15 minutes and give `src/lib/fuzzy.test.ts` a home (Stage 8)
+- [ ] **Screen-reader pass on the command palette.** The combobox is hand-rolled to the ARIA 1.2
+      pattern but has never been heard out loud (Stage 8)
 - [ ] Lighthouse: Performance ≥ 95, A11y ≥ 95, Best Practices 100, SEO 100 — measure LCP for real
 - [ ] Route-level code splitting, lazy-load below-fold heavy components
 - [ ] OG image + Twitter card, full meta, JSON-LD `Person` schema
@@ -906,4 +1018,4 @@ Worth checking by hand:
 
 ---
 
-**Current status:** `STAGE 7 — complete, awaiting review` → next: `STAGE 8 — Command Palette (⌘K)`
+**Current status:** `STAGE 8 — complete, awaiting review` → next: `STAGE 9 — Polish, Performance, Ship`

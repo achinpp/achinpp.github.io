@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useLenis } from 'lenis/react';
 import { Menu, X } from 'lucide-react';
+import { PaletteHint } from '@/components/palette/PaletteHint';
 import { NAV_SECTIONS, SECTION_IDS, getSection } from '@/data/sections';
 import { useActiveSection } from '@/hooks/useActiveSection';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
@@ -119,6 +120,13 @@ export function FloatingNav() {
               );
             })}
           </ul>
+
+          {/* ⌘K chip. Desktop only — a keyboard shortcut is not an
+              affordance on a phone, and the mobile pill has no room. */}
+          <div className="hidden items-center sm:flex">
+            <span aria-hidden className="mx-1 h-3 w-px bg-hairline" />
+            <PaletteHint className="rounded-full px-3 py-2.5 text-[0.625rem] text-obsidian-500 hover:text-mint-300" />
+          </div>
 
           {/* -------------------------------------------------- mobile pill */}
           <div className="flex min-w-0 flex-1 items-center gap-2 sm:hidden">

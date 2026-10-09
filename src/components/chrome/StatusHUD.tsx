@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useMotionValueEvent, useScroll } from 'motion/react';
+import { PaletteHint } from '@/components/palette/PaletteHint';
 import { SECTION_IDS, getSection } from '@/data/sections';
 import { useActiveSection } from '@/hooks/useActiveSection';
 
@@ -71,8 +72,12 @@ function ScrollMeter() {
  *
  * Fixed, 28px tall, and never animates on scroll — it's the one element that
  * stays put while everything else moves, which is what sells the "instrument
- * panel" framing. Information only; nothing here is interactive, so it needs
- * no focus management.
+ * panel" framing.
+ *
+ * Almost everything here is a readout. The one exception is the ⌘K chip added
+ * in Stage 8 — a second, more discoverable home for the palette shortcut than
+ * the nav alone. It is an ordinary button, so it needs no focus management of
+ * its own.
  */
 export function StatusHUD() {
   const active = useActiveSection(SECTION_IDS);
@@ -103,6 +108,10 @@ export function StatusHUD() {
         </span>
 
         <ScrollMeter />
+
+        <span className="hidden h-3 w-px bg-hairline sm:block" />
+
+        <PaletteHint className="hidden shrink-0 text-obsidian-500 hover:text-mint-300 sm:inline-flex" />
 
         <span className="hidden h-3 w-px bg-hairline sm:block" />
 
