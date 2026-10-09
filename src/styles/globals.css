@@ -176,6 +176,8 @@
   --animate-drift: drift 9s ease-in-out infinite;
   --animate-spin-slow: spin 9s linear infinite;
   --animate-scan: scan 11s linear infinite;
+  --animate-conic: conic-spin 5.5s linear infinite;
+  --animate-hint: hint 2.4s var(--ease-in-out-circ) infinite;
 
   /* Ultrawide tier beyond Tailwind's defaults. */
   --breakpoint-3xl: 120rem;
@@ -210,6 +212,32 @@
   }
   100% {
     transform: translateX(220%);
+  }
+}
+
+/* Animated border ring for the primary CTA.
+   The centring translate is baked into the keyframes on purpose: a Tailwind
+   `-translate-x-1/2` would write to the same `transform` property and the
+   animation would overwrite it, snapping the gradient off-centre. */
+@keyframes conic-spin {
+  from {
+    transform: translate(-50%, -50%) rotate(0turn);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(1turn);
+  }
+}
+
+/* Scroll hint. Drifts down and brightens, like something waiting to be read. */
+@keyframes hint {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(7px);
+    opacity: 0.95;
   }
 }
 

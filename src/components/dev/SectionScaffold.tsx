@@ -4,7 +4,6 @@ import { fadeUp, maskReveal, maskRevealGroup, revealViewport } from '@/lib/motio
 
 /** Which stage replaces each placeholder. */
 const FILLED_BY: Record<string, string> = {
-  hero: 'STAGE 2 — Hero + Resume CTA',
   experience: 'STAGE 3 — Experience & Leadership timeline',
   projects: 'STAGE 4 — Mission Briefings grid',
   battlestation: 'STAGE 5 — Battle Station (CTF & achievements)',
@@ -13,9 +12,12 @@ const FILLED_BY: Record<string, string> = {
 };
 
 /**
- * Stage 1 scaffolding: six full-height anchors so the shell has something
- * real to navigate. The nav indicator, the active-section detection band and
- * the HUD readout can't be judged against a single blank page.
+ * Placeholder anchors for the sections that don't exist yet, so the shell has
+ * something real to navigate. The nav indicator, the active-section detection
+ * band and the HUD readout can't be judged against a single blank page.
+ *
+ * `hero` is gone — Stage 2 replaced it with the real <Hero />. Each remaining
+ * section drops off this list as its own stage lands.
  *
  * Each section is replaced wholesale by its own stage; this file is deleted
  * once Stage 7 lands.
@@ -23,7 +25,7 @@ const FILLED_BY: Record<string, string> = {
 export function SectionScaffold() {
   return (
     <>
-      {SECTIONS.map((section) => (
+      {SECTIONS.filter((s) => s.id !== 'hero').map((section) => (
         <section
           key={section.id}
           id={section.id}

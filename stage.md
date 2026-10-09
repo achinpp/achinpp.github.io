@@ -182,21 +182,92 @@ browser here. Worth checking by hand:
 
 ---
 
-## STAGE 2 — Hero + Resume CTA
+## STAGE 2 — Hero + Resume CTA ✅
 **Goal:** The first 3 seconds. Highest-stakes stage.
 
-- [ ] Terminal window: traffic-light chrome, path prompt, blinking block caret
-- [ ] Typing sequence: `> executing whoami...` → stream output → resolve to **name + title**
-- [ ] Name renders with scramble-decrypt + mask-reveal, massive fluid display type
-- [ ] Rotating role sub-line: `Cybersecurity Student / DevSecOps Engineer / AI Researcher`
-- [ ] **Download Resume** — primary glowing button, impossible to miss:
+- [x] Terminal window: traffic-light chrome, path prompt, blinking block caret
+- [x] Typing sequence: `> executing whoami...` → stream output → resolve to **name + title**
+- [x] Name renders with mask-reveal, massive fluid display type (scramble applies to the
+      mono eyebrow and role line — see note)
+- [x] Rotating role sub-line: `Cybersecurity Student / DevSecOps Engineer / AI Researcher`
+- [x] **Download Resume** — primary glowing button, impossible to miss:
       conic-gradient animated border, magnetic hover, shimmer sweep, haptic-feel press
-- [ ] Secondary ghost CTA: `View Projects ↓`
-- [ ] Scroll hint indicator
-- [ ] Boot overlay (first visit only, `sessionStorage`, Esc to skip)
+- [x] Secondary ghost CTA: `View Projects ↓`
+- [x] Scroll hint indicator
+- [x] Boot overlay (first visit only, `sessionStorage`, any key to skip)
+- [x] `src/data/profile.ts` — all personal detail in one file
+- [x] Reusable `<ScrambleText />`, `<GlowButton />`, `useTypewriter`, `useMagnetic`
 
 **Accept when:** typing sequence is skippable, resume button passes "grandma can find it" test,
 LCP < 2.0s.
+
+### Stage 2 notes
+
+> ⚠ **CONTENT TO CONFIRM.** `src/data/profile.ts` marks every inferred field. The name
+> **Achin Chandrasiri** was derived from this repo's git identity
+> (`AchinP <achinchandrasiri@gmail.com>`, github.com/achinpp) — it was never stated. Location is
+> `Sri Lanka`, inferred from SLIIT/IEEE Sri Lanka in the brief. Both are one-line edits.
+
+> ⚠ **`public/resume.pdf` is a placeholder** — a real, valid, 1-page PDF that says "PLACEHOLDER —
+> this is not a resume" so the download path is testable end to end. **Replace it before
+> deploying.** Added to the Stage 9 checklist.
+
+> NOTE: **The name reveals after script line 0, not after the whole transcript.** The brief wants
+> `whoami` to run and *then* the name to render, and that beat is preserved — but gating on all
+> six lines would put LCP at ~3.5s, since the name is by far the largest text on the page. Cold
+> load budget now: 900ms boot + 260ms lead-in + ~494ms for line 0 = **~1654ms**, 346ms inside the
+> 2.0s target. A returning visitor in the same session skips the boot: ~754ms.
+
+> NOTE: **The boot overlay is the main LCP cost and the one thing here nobody asked for.** It was
+> my own addition in the Stage 2 plan. 900ms, dismissed by *any* key, click or wheel, never
+> shown under reduced motion, once per session (`sessionStorage`, not `localStorage` — a visit
+> tomorrow should get it again, a reload in five seconds shouldn't). Deleting it buys ~900ms of
+> LCP; say so and it goes.
+
+> NOTE: **Scramble went on the mono text, not the display name.** Random glyphs have random
+> widths in a proportional font, so a scrambling `<h1>` at 6.5rem reflows on every tick and reads
+> as broken rather than encrypted. The name gets the mask-reveal (per-line, staggered); the
+> `identity confirmed` eyebrow and the role rotator — both monospace, both stable-width — get
+> the decrypt. `<ScrambleText />` is general (`mount` / `hover` / `manual`) for Stage 4 and 6.
+
+> NOTE: **`<ScrambleText />` is hidden from assistive tech.** A screen reader walking `!<>-_\/[]`
+> is being handed garbage, thirty times a second. The animated span is `aria-hidden` and the real
+> string ships beside it in `sr-only`, so the accessible name is always the final text. Same
+> pattern in the terminal: the animated transcript is `aria-hidden`, with the finished transcript
+> in an `sr-only` block read once.
+
+> NOTE: **The CTA's rotating border is a `transform: rotate()` on an oversized conic-gradient
+> square**, clipped by the parent — not an animated gradient angle. Animating the gradient forces
+> a re-rasterise every frame; rotating a static layer is compositor-only. Same reasoning as
+> ScanlineSweep in Stage 1, at button scale. With motion off the gradient stops rotating but the
+> ring, glow and hover all still read, so the affordance never depends on animation.
+
+> NOTE: **The role rotator reserves width from its longest title** via an invisible sizer, so
+> swapping titles can't reflow the line. Under reduced motion it renders all three joined by
+> separators instead — no auto-advancing carousel.
+
+> NOTE: **`useTypewriter` is a `setTimeout` chain, not rAF.** Characters land 14–34ms apart,
+> which is slower than a frame, so rAF would mean waking 60×/s to act on a third of those wakeups.
+
+> NOTE: **The role line is `min-h`-free but the hero is `min-h-svh`** — required by
+> `useActiveSection`'s 1px detection band (Stage 1 note).
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+production build 3.4s / 43.6 kB CSS (9.0 kB gzip) / 337 kB JS (107 kB gzip) · `animate-conic`,
+`@keyframes conic-spin`, `animate-hint`, `@keyframes hint` all in the compiled CSS ·
+`conic-gradient` present in the JS bundle · `public/resume.pdf` validates as
+`PDF document, version 1.4, 1 page(s)` and serves as `application/pdf` · every module transforms
+in dev.
+
+**Not yet verified by me:** no browser here, so nothing visual and no real LCP number — the
+1654ms above is arithmetic, not a measurement. Worth checking by hand:
+- the whoami → name beat, and whether 900ms of boot earns its place
+- **skip** button in the terminal chrome mid-type
+- resume button: hover (magnetic pull + glow doubling), press, and that the PDF downloads
+- role rotator cycling at 3.2s with no horizontal shift
+- **Motion off**: no boot, transcript complete on arrival, all three titles listed statically,
+  ring static, native cursor
+- 390px width: terminal, two-line name and both CTAs without overflow
 
 ---
 
@@ -297,7 +368,9 @@ body scroll locks correctly when open.
 ## STAGE 9 — Polish, Performance, Ship
 **Goal:** Make it fast and make it real.
 
-- [ ] Lighthouse: Performance ≥ 95, A11y ≥ 95, Best Practices 100, SEO 100
+- [ ] **Replace `public/resume.pdf`** — currently a placeholder file (Stage 2)
+- [ ] **Confirm every `inferred` field in `src/data/profile.ts`** (name, location)
+- [ ] Lighthouse: Performance ≥ 95, A11y ≥ 95, Best Practices 100, SEO 100 — measure LCP for real
 - [ ] Route-level code splitting, lazy-load below-fold heavy components
 - [ ] OG image + Twitter card, full meta, JSON-LD `Person` schema
 - [ ] Favicon set, `site.webmanifest`, theme-color
@@ -334,4 +407,4 @@ body scroll locks correctly when open.
 
 ---
 
-**Current status:** `STAGE 1 — complete, awaiting review` → next: `STAGE 2 — Hero + Resume CTA`
+**Current status:** `STAGE 2 — complete, awaiting review` → next: `STAGE 3 — Experience & Leadership`

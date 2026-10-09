@@ -4,6 +4,7 @@ import { CustomCursor } from '@/components/chrome/CustomCursor';
 import { FloatingNav } from '@/components/chrome/FloatingNav';
 import { StatusHUD } from '@/components/chrome/StatusHUD';
 import { SectionScaffold } from '@/components/dev/SectionScaffold';
+import { Hero } from '@/components/hero/Hero';
 import { TokenSheet } from '@/components/dev/TokenSheet';
 import { MotionProvider } from '@/providers/MotionProvider';
 import { PointerProvider } from '@/providers/PointerProvider';
@@ -41,6 +42,7 @@ export function App() {
               <FloatingNav />
               {/* pb clears the fixed HUD so the last section isn't cut off. */}
               <main id="main" className="relative z-[var(--z-content)] pb-7">
+                <Hero />
                 <SectionScaffold />
               </main>
               <StatusHUD />
