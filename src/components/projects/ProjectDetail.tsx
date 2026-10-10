@@ -120,6 +120,7 @@ export function ProjectDetail({ project, onClose }: Props) {
           </header>
 
           <div className="mt-6 flex flex-wrap items-center gap-2">
+            <Tag tone={project.kind === 'RESEARCH' ? 'accent' : 'neutral'}>{project.kind}</Tag>
             <Tag tone="accent">{project.status}</Tag>
             <span className="font-mono text-[0.625rem] tracking-[0.12em] text-ink-faint">
               {project.tagline}
@@ -187,7 +188,7 @@ export function ProjectDetail({ project, onClose }: Props) {
 
           {import.meta.env.DEV && (
             <p className="mt-9 font-mono text-[0.5625rem] leading-relaxed tracking-[0.16em] text-signal-400 uppercase">
-              ⚠ dev only — status badge unconfirmed
+              ⚠ dev only: status badge unconfirmed
               {!project.repo && !project.demo && ' · no repo or demo link supplied'}
             </p>
           )}

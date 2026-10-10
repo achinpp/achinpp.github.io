@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Copy, Github, Linkedin, Mail, ShieldHalf, type LucideIcon } from 'lucide-react';
+import { Copy, Crosshair, Github, Linkedin, Mail, ShieldHalf, type LucideIcon } from 'lucide-react';
 import { SOCIALS, type Social } from '@/data/contact';
 import { PROFILE } from '@/data/profile';
 import { useCopy } from '@/hooks/useCopy';
@@ -11,6 +11,7 @@ const ICON: Record<Social['icon'], LucideIcon> = {
   linkedin: Linkedin,
   mail: Mail,
   shield: ShieldHalf,
+  target: Crosshair,
 };
 
 /**
@@ -79,7 +80,7 @@ export function SocialLinks() {
           ones, during review only. */}
       {import.meta.env.DEV && missing.length > 0 && (
         <p className="mt-6 font-mono text-[0.5625rem] leading-relaxed tracking-[0.16em] text-signal-400 uppercase">
-          ⚠ dev only — no handle supplied for {missing.map((s) => s.label).join(' · ')}
+          ⚠ dev only: no handle supplied for {missing.map((s) => s.label).join(' · ')}
         </p>
       )}
     </motion.div>

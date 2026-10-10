@@ -45,7 +45,7 @@ const RAMPS: Ramp[] = [
     name: 'Signal',
     prefix: '--color-signal',
     steps: [400, 900],
-    note: 'Warning / in-progress status badges.',
+    note: 'Warning and in progress status badges.',
   },
 ];
 
@@ -174,7 +174,7 @@ export function TokenSheet() {
           </h1>
           <span className="mask-line mt-6 max-w-xl">
             <motion.span variants={maskReveal} className="block text-ink-muted">
-              Design system proof. No content, no sections — just the tokens, the type scale and the
+              Design system proof. No content, no sections, just the tokens, the type scale and the
               motion vocabulary everything after this is built from.
             </motion.span>
           </span>
@@ -242,7 +242,7 @@ export function TokenSheet() {
         <Caption>
           One toggle drives three channels: data-motion on &lt;html&gt; for CSS, MotionConfig for
           Framer, and React context for hand-rolled loops. Flip it and every animation on this page
-          stops — including the pulsing dot above.
+          stops, including the pulsing dot above.
         </Caption>
       </Section>
 
@@ -304,7 +304,7 @@ export function TokenSheet() {
             <div>
               <div className="font-mono text-label text-mint-700">font-display</div>
               <p className="mt-2 font-display text-xl text-ink">Space Grotesk Variable</p>
-              <Caption>Headings. Geometric, slightly odd — not another Inter site.</Caption>
+              <Caption>Headings. Geometric, slightly odd, not another Inter site.</Caption>
             </div>
             <div>
               <div className="font-mono text-label text-mint-700">font-sans</div>
@@ -325,8 +325,8 @@ export function TokenSheet() {
             <div className="font-mono text-label text-mint-400 uppercase">text-label</div>
             <p className="mt-3 max-w-prose text-ink-muted">
               Body copy sits at <code className="text-mint-400">--color-ink-muted</code>, never full
-              white — pure white on obsidian is roughly 18:1 and reads as glare across a paragraph.
-              Headings get the full <code className="text-mint-400">--color-ink</code>.
+              white, because pure white on obsidian is roughly 18:1 and reads as glare across a
+              paragraph. Headings get the full <code className="text-mint-400">--color-ink</code>.
             </p>
           </div>
         </div>

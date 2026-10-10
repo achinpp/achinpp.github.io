@@ -12,8 +12,8 @@ import { spring } from '@/lib/motion/easings';
  * stable while pills come and go.
  *
  * The delay is **negative**, which starts each animation partway through its
- * own cycle — otherwise all twenty pills begin at keyframe zero and the cloud
- * pulses in unison like a heartbeat.
+ * own cycle. Otherwise all sixty four pills begin at keyframe zero and the
+ * cloud pulses in unison like a heartbeat.
  */
 function driftStyle(seed: number) {
   const duration = 7 + ((seed * 1.37) % 5);
@@ -29,18 +29,18 @@ function driftStyle(seed: number) {
  *
  * **The drift and the layout animation are on different elements, and have to
  * be.** Framer's `layout` writes to `transform`, and so does the `drift`
- * keyframe — and a running CSS animation beats an inline style in the
+ * keyframe, and a running CSS animation beats an inline style in the
  * cascade, so a single element would have its re-layout silently overwritten
  * every frame. The `<li>` moves; the `<span>` inside it floats.
  *
  * `layout="position"` rather than plain `layout`: pills never change size, so
  * there is nothing to measure, and Framer's own guidance is that size
  * measurement and `scale` interfere. For the same reason entry and exit are
- * opacity-only — a `scale` on an element that is also being laid out is the
+ * opacity only: a `scale` on an element that is also being laid out is the
  * documented way to get the wrong rectangle.
  *
  * The drift is `translate3d` only (see `@keyframes drift`), so it can never
- * contribute layout shift — which is this stage's acceptance criterion.
+ * contribute layout shift, which is this stage's acceptance criterion.
  */
 export function SkillPill({ skill, seed }: { skill: Skill; seed: number }) {
   const reduced = useReducedMotion();
@@ -55,8 +55,16 @@ export function SkillPill({ skill, seed }: { skill: Skill; seed: number }) {
       className="inline-flex"
     >
       <span
+        // `full` is the expanded form of an abbreviated name. It is a title
+        // and not visible text because the pill has to stay pill sized, and
+        // because the abbreviations here (SOAR, EDR, MCP) are the forms
+        // people actually use.
+        title={skill.full}
         style={reduced ? undefined : driftStyle(seed)}
-        className="group inline-flex items-center gap-2.5 rounded-full border border-hairline bg-obsidian-850/60 px-4 py-2.5 font-mono text-[0.75rem] tracking-[0.04em] text-ink-muted transition-[color,border-color,box-shadow] duration-300 ease-out-expo hover:border-mint-800 hover:text-mint-200 hover:shadow-glow-xs motion-ok:animate-drift"
+        // Tighter below `sm`. Sixty four pills at desktop padding come to one
+        // per row on a 390px screen and roughly 3000px of scrolling; at this
+        // size the short names pair up and the section halves.
+        className="group inline-flex items-center gap-2 rounded-full border border-hairline bg-obsidian-850/60 px-3 py-2 font-mono text-[0.6875rem] tracking-[0.04em] text-ink-muted transition-[color,border-color,box-shadow] duration-300 ease-out-expo hover:border-mint-800 hover:text-mint-200 hover:shadow-glow-xs sm:gap-2.5 sm:px-4 sm:py-2.5 sm:text-[0.75rem] motion-ok:animate-drift"
       >
         <span
           aria-hidden

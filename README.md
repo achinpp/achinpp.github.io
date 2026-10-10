@@ -1,11 +1,11 @@
 # Shadow Command Center
 
 Single-page portfolio for a cybersecurity student, DevSecOps engineer and AI researcher.
-Hand-built — no UI kit, no component library.
+Hand built. No UI kit, no component library.
 
 **Vite 6 · React 18 · TypeScript · Tailwind CSS v4 · Motion (Framer) · Lenis**
 
-The build was done in eleven reviewable stages. [`stage.md`](./stage.md) is the single source of
+The build was done in twelve reviewable stages. [`stage.md`](./stage.md) is the single source of
 truth: every stage records what shipped, every deviation from the plan with its reasoning, and
 what was verified versus what still needs a human with a browser.
 
@@ -29,7 +29,7 @@ npm run dev        # http://localhost:5173
 | `npm run format`        | Prettier                                                |
 | `npm run typecheck`     | `tsc --noEmit`                                          |
 
-Requires **Node 20.15+**. Vite is pinned to 6.x — Vite 7 needs Node `^20.19 || >=22.12`.
+Requires **Node 20.15+**. Vite is pinned to 6.x, because Vite 7 needs Node `^20.19 || >=22.12`.
 
 `?tokens` (e.g. `localhost:5173/?tokens`) opens the design-system specimen sheet: colour ramps,
 type scale, elevation, easing curves, and the motion and grain toggles.
@@ -43,33 +43,35 @@ tracked in the Stage 9 checklist in [`stage.md`](./stage.md).
 
 ### Required
 
-| What                                                                            | Where                 |
-| ------------------------------------------------------------------------------- | --------------------- |
-| **Real résumé PDF** (currently a placeholder that says so)                      | `public/resume.pdf`   |
-| **Confirm the name and location** — both inferred from this repo's git identity | `src/data/profile.ts` |
-| **Confirm the email address** — same inference                                  | `src/data/profile.ts` |
-| **Contact form endpoint** — without it the form is disabled in production       | `VITE_FORM_ENDPOINT`  |
-| **Canonical site URL** — Open Graph needs absolute URLs                         | `VITE_SITE_URL`       |
+| What                                                                           | Where                 |
+| ------------------------------------------------------------------------------ | --------------------- |
+| **Real résumé PDF** (currently a placeholder that says so)                     | `public/resume.pdf`   |
+| **Confirm the name and location**, both inferred from this repo's git identity | `src/data/profile.ts` |
+| **Confirm the email address**, same inference                                  | `src/data/profile.ts` |
+| **Contact form endpoint**. Without it the form is disabled in production       | `VITE_FORM_ENDPOINT`  |
+| **Canonical site URL**, because Open Graph needs absolute URLs                 | `VITE_SITE_URL`       |
 
 Copy `.env.example` to `.env` and fill both variables in.
 
 ### Worth doing
 
-| What                                                                         | Where                      |
-| ---------------------------------------------------------------------------- | -------------------------- |
-| Dates for the two IEEE roles (currently render `[ dates tbc ]`)              | `src/data/experience.ts`   |
-| Replace the draft role bullets with your own wording                         | `src/data/experience.ts`   |
-| Confirm the four project status badges                                       | `src/data/projects.ts`     |
-| Add public repo / demo links per project                                     | `src/data/projects.ts`     |
-| More achievements — the badge wall has one real badge and three locked slots | `src/data/achievements.ts` |
-| Prune the 13 `derived` skills down to what you want to be asked about        | `src/data/skills.ts`       |
-| LinkedIn and TryHackMe/HTB handles                                           | `src/data/contact.ts`      |
-| A PGP fingerprint, if you have one (the footer line is omitted without it)   | `src/data/contact.ts`      |
-| Confirm the hero portrait's caption, or clear it                             | `src/data/profile.ts`      |
+| What                                                                       | Where                      |
+| -------------------------------------------------------------------------- | -------------------------- |
+| Dates for all five roles (they currently render `[ dates tbc ]`)           | `src/data/experience.ts`   |
+| Replace the draft role bullets with your own wording                       | `src/data/experience.ts`   |
+| Expand `SKU`, if it stands for something                                   | `src/data/experience.ts`   |
+| Confirm the four project status badges                                     | `src/data/projects.ts`     |
+| Add public repo and demo links per briefing                                | `src/data/projects.ts`     |
+| Dates for the two competition results                                      | `src/data/achievements.ts` |
+| More achievements: the wall has two badges and two locked slots            | `src/data/achievements.ts` |
+| Decide what to do about the `OSCP` pill (see the file header)              | `src/data/skills.ts`       |
+| A PGP fingerprint, if you have one (the footer line is omitted without it) | `src/data/contact.ts`      |
+| A HackTheBox handle, if you have one (the row shows the numeric id)        | `src/data/contact.ts`      |
+| Confirm the hero portrait's caption, or clear it                           | `src/data/profile.ts`      |
 
-Anything the brief did not state is marked in its data file, and most of it also shows a
-**dev-only warning in the UI** — those markers are compiled out of production builds, so they
-are visible while you review and invisible once you ship.
+Anything you did not state is marked in its data file, and most of it also shows a **dev only
+warning in the UI**. Those markers are compiled out of production builds, so they are visible
+while you review and invisible once you ship.
 
 ---
 
@@ -85,7 +87,7 @@ npm i -g vercel && vercel
 
 Framework preset **Vite** (auto-detected). Build `npm run build`, output `dist`. Add
 `VITE_SITE_URL` and `VITE_FORM_ENDPOINT` under _Settings → Environment Variables_, then redeploy
-— Vite inlines them at build time, so changing them needs a new build, not just a restart.
+Vite inlines them at build time, so changing them needs a new build, not just a restart.
 
 Vercel serves `public/404.html` for unknown paths automatically. **Do not add an SPA rewrite to
 `index.html`**: there is no client-side router here, so a rewrite would turn every typo into a
@@ -99,14 +101,14 @@ deploy_. `404.html` is picked up automatically. Same warning about SPA rewrites.
 ### GitHub Pages
 
 The default `VITE_SITE_URL` already points at `https://achinpp.github.io/APC`. Because the site
-is served from a sub-path there, set Vite's `base` to `'/APC/'` in `vite.config.ts` first —
-without it every asset URL resolves to the domain root and nothing loads. Deploying to a custom
+is served from a sub path there, set Vite's `base` to `'/APC/'` in `vite.config.ts` first.
+Without it every asset URL resolves to the domain root and nothing loads. Deploying to a custom
 domain or to `achinpp.github.io` (no sub-path) needs no `base`.
 
 ### Custom domain
 
 1. Point an `A`/`CNAME` record at the host, per their docs.
-2. Set `VITE_SITE_URL=https://yourdomain.tld` and rebuild — otherwise `og:image`,
+2. Set `VITE_SITE_URL=https://yourdomain.tld` and rebuild. Otherwise `og:image`,
    `og:url` and `<link rel="canonical">` keep pointing at the old origin, which silently breaks
    every link preview.
 3. Re-run the OG card if the name changed: `python scripts/generate-assets.py`.
@@ -123,7 +125,7 @@ Writes `favicon.ico`, `icon-192.png`, `icon-512.png`, `apple-touch-icon.png` and
 `public/`. Colours are converted from the OKLCH tokens in `src/styles/globals.css`, so the
 assets cannot drift from the design system.
 
-`public/favicon.svg` is hand-written and not generated — it is the primary favicon for every
+`public/favicon.svg` is hand written and not generated. It is the primary favicon for every
 current browser, and its geometry is matched 1:1 to the script.
 
 The hero portrait is a separate script, because it has a separate source:
@@ -132,7 +134,7 @@ The hero portrait is a separate script, because it has a separate source:
 python scripts/process-portrait.py
 ```
 
-Reads `assets/portrait-source.png` — the cut-out with a transparent background — trims it to its
+Reads `assets/portrait-source.png`, the cut out with a transparent background, trims it to its
 alpha bounding box and writes `public/portrait.webp` (24 kB). `assets/` is the source cupboard:
 nothing in it is served or bundled. Replacing the photograph means dropping a new cut-out in
 there, re-running the script, and updating `width`/`height` on `PORTRAIT` in `src/data/profile.ts`
@@ -154,8 +156,8 @@ npm run check:browser              # terminal 2
 `scripts/browser-check.py` drives an installed Chrome or Edge over the DevTools Protocol. It
 needs **Python with `websockets`** and no npm packages at all. It measures LCP and CLS for real,
 fails on any console error, asserts the DOM once React has mounted, drives the command palette
-from the keyboard, and writes screenshots into `.browser-check/` — one per section, plus 1440 /
-768 / 390, the palette open, reduced motion, and the 404 page.
+from the keyboard, and writes screenshots into `.browser-check/`: one per section, plus 1440,
+768 and 390, the palette open, reduced motion, and the 404 page.
 
 LCP is the **best of three cold loads** (HTTP cache off for all three), and the script prints
 all three. A single measurement is not a number: the same commit measured 1776ms one day and
@@ -169,7 +171,7 @@ TBT, no audit catalogue. Run Lighthouse on the deployed site as well.
 
 ## Accessibility and motion
 
-`prefers-reduced-motion` is honoured, and there is an in-page override (⌘K → _Disable
+`prefers-reduced-motion` is honoured, and there is an in page override (⌘K, then _Disable
 animation_, or the toggle on `?tokens`). The switch publishes through three channels because no
 single one covers everything:
 
@@ -182,7 +184,7 @@ single one covers everything:
 The preference is resolved by an inline script **before first paint**, so the page never renders
 animated for a frame and then snaps still.
 
-Scroll-linked readouts — the HUD progress meter, the scroll hint's fade — keep tracking under
+Scroll linked readouts, the HUD progress meter and the scroll hint's fade, keep tracking under
 reduced motion. They are position indicators, not animation: freezing them would make them lie.
 
 ---
@@ -190,12 +192,12 @@ reduced motion. They are position indicators, not animation: freezing them would
 ## Repo layout
 
 ```
-assets/            source images — not served, not bundled
+assets/            source images, not served and not bundled
 public/            static assets, icons, 404 page, résumé
 scripts/           asset generation, the browser check
 src/
   components/      one folder per section, plus chrome/ layout/ ui/
-  data/            all content — the only files you need to edit
+  data/            all content, the only files you need to edit
   hooks/           behaviour primitives
   lib/             motion tokens, fuzzy scorer
   providers/       motion, pointer, smooth scroll, toast, palette
@@ -209,4 +211,4 @@ Everything the site says about a person lives in `src/data/`. No component hard-
 
 ## Licence
 
-MIT — see [`LICENSE`](./LICENSE).
+MIT. See [`LICENSE`](./LICENSE).

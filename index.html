@@ -7,10 +7,10 @@
     <!-- The real canvas colour, converted from --color-obsidian-900. -->
     <meta name="theme-color" content="#07090f" />
 
-    <title>Achin Chandrasiri — Cybersecurity, DevSecOps, AI Research</title>
+    <title>Achin Chandrasiri | Cybersecurity, DevSecOps, AI Research</title>
     <meta
       name="description"
-      content="Portfolio of Achin Chandrasiri — cybersecurity student, DevSecOps engineer and AI researcher. Projects in adversarial ML, CI/CD security automation and enterprise network defence."
+      content="Portfolio of Achin Chandrasiri: cybersecurity student, DevSecOps engineer and AI researcher. Projects in adversarial ML, CI/CD security automation and enterprise network defence."
     />
     <meta name="author" content="Achin Chandrasiri" />
     <link rel="canonical" href="%SITE_URL%/" />
@@ -18,7 +18,7 @@
     <!--
       %SITE_URL% is replaced at build time by vite.config.ts. It defaults to
       the GitHub Pages URL for this repo; set VITE_SITE_URL to the real
-      domain before deploying anywhere else. Open Graph needs ABSOLUTE urls —
+      domain before deploying anywhere else. Open Graph needs ABSOLUTE urls:
       a relative og:image is the classic way to ship a link preview that
       silently renders blank on half the platforms that read it.
     -->
@@ -26,7 +26,7 @@
     <meta property="og:site_name" content="Achin Chandrasiri" />
     <meta
       property="og:title"
-      content="Achin Chandrasiri — Cybersecurity · DevSecOps · AI Research"
+      content="Achin Chandrasiri | Cybersecurity · DevSecOps · AI Research"
     />
     <meta
       property="og:description"
@@ -38,7 +38,7 @@
     <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
-      content="Achin Chandrasiri — cybersecurity, DevSecOps, AI research"
+      content="Achin Chandrasiri. Cybersecurity, DevSecOps, AI research."
     />
     <meta property="profile:first_name" content="Achin" />
     <meta property="profile:last_name" content="Chandrasiri" />
@@ -47,7 +47,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
-      content="Achin Chandrasiri — Cybersecurity · DevSecOps · AI Research"
+      content="Achin Chandrasiri | Cybersecurity · DevSecOps · AI Research"
     />
     <meta
       name="twitter:description"
@@ -63,10 +63,11 @@
     <link rel="manifest" href="/site.webmanifest" />
 
     <!--
-      ⚠ This block duplicates src/data/profile.ts. It cannot import from it —
-      index.html is static and is parsed before any module runs — and putting
-      it in React would make it depend on JS execution, which not every
-      crawler does. If profile.ts changes, change this too.
+      ⚠ This block duplicates src/data/profile.ts and the live URLs in
+      src/data/contact.ts. It cannot import from either: index.html is static
+      and is parsed before any module runs, and putting it in React would make
+      structured data depend on JS execution, which not every crawler does. If
+      either file changes, change this too.
     -->
     <script type="application/ld+json">
       {
@@ -79,15 +80,22 @@
         "email": "mailto:achinchandrasiri@gmail.com",
         "jobTitle": "Cybersecurity Student, DevSecOps Engineer, AI Researcher",
         "address": { "@type": "PostalAddress", "addressCountry": "LK" },
-        "sameAs": ["https://github.com/achinpp"],
+        "sameAs": [
+          "https://github.com/achinpp",
+          "https://www.linkedin.com/in/achin-pasindu/",
+          "https://tryhackme.com/p/Archlin",
+          "https://ctf.hackthebox.com/user/profile/1083170"
+        ],
         "knowsAbout": [
           "Penetration Testing",
-          "Threat Modeling",
+          "Ethical Hacking",
           "DevSecOps",
-          "Cloud Security",
-          "Network Segmentation",
-          "Adversarial Machine Learning",
-          "Python",
+          "Application Security",
+          "Digital Forensics",
+          "Generative AI Security",
+          "Large Language Models",
+          "Amazon Web Services",
+          "Network Security",
           "Java"
         ]
       }
@@ -109,7 +117,7 @@
           root.dataset.motion = motionOn ? 'on' : 'off';
           root.dataset.grain = localStorage.getItem('scc.grain') === 'off' ? 'off' : 'on';
         } catch (e) {
-          /* storage blocked — the defaults in the <html> tag stand */
+          /* storage blocked, so the defaults in the <html> tag stand */
         }
       })();
     </script>

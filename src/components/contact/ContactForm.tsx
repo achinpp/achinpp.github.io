@@ -234,7 +234,7 @@ export function ContactForm() {
         </p>
         <p className="mt-4 text-sm leading-relaxed text-ink-muted">
           {SIMULATE_SEND
-            ? 'Nothing was actually transmitted — no endpoint is configured.'
+            ? 'Nothing was actually transmitted. No endpoint is configured.'
             : 'It is in the inbox. Expect a reply from the address above.'}
         </p>
         <button
@@ -323,7 +323,7 @@ export function ContactForm() {
         {/* Honest production state: the form is not wired to an inbox. */}
         {!canSend && (
           <p className="font-mono text-[0.625rem] leading-relaxed tracking-[0.12em] text-signal-400 uppercase">
-            Channel not provisioned — use the address opposite
+            Channel not provisioned. Use the address opposite
           </p>
         )}
       </div>
@@ -340,7 +340,7 @@ export function ContactForm() {
 
       {SIMULATE_SEND && (
         <p className="font-mono text-[0.5625rem] leading-relaxed tracking-[0.16em] text-signal-400 uppercase">
-          ⚠ dev only — no VITE_FORM_ENDPOINT set, so a successful submit is simulated and nothing is
+          ⚠ dev only: no VITE_FORM_ENDPOINT set, so a successful submit is simulated and nothing is
           transmitted
         </p>
       )}

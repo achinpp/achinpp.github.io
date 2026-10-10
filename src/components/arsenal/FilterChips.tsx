@@ -1,5 +1,12 @@
 import { motion } from 'motion/react';
-import { CATEGORIES, CATEGORY_DOT, SKILLS, type Category, countIn } from '@/data/skills';
+import {
+  CATEGORIES,
+  CATEGORY_DOT,
+  CATEGORY_LABEL,
+  SKILLS,
+  type Category,
+  countIn,
+} from '@/data/skills';
 import { spring } from '@/lib/motion/easings';
 
 type Props = {
@@ -14,12 +21,15 @@ type Props = {
  */
 function Chip({
   label,
+  fullLabel,
   count,
   dot,
   isActive,
   onClick,
 }: {
   label: string;
+  /** The unabbreviated name, when the visible label is shortened. */
+  fullLabel?: string;
   count: number;
   dot?: string;
   isActive: boolean;
@@ -31,6 +41,8 @@ function Chip({
         type="button"
         onClick={onClick}
         aria-pressed={isActive}
+        aria-label={fullLabel}
+        title={fullLabel}
         className="relative z-10 inline-flex items-center gap-2 rounded-full px-4 py-2.5 font-mono text-[0.6875rem] tracking-[0.12em] uppercase transition-colors duration-200"
         style={{ color: isActive ? 'var(--color-mint-200)' : 'var(--color-ink-faint)' }}
       >
@@ -68,7 +80,10 @@ export function FilterChips({ active, onChange }: Props) {
     <ul
       role="group"
       aria-label="Filter skills by category"
-      className="flex flex-wrap gap-1 rounded-2xl border border-hairline bg-obsidian-900/40 p-1.5 sm:rounded-full"
+      // `rounded-2xl` at every width, not `sm:rounded-full`. Nine chips wrap
+      // on anything narrower than a desktop, and a pill shaped container with
+      // two rows inside it reads as a mistake.
+      className="flex flex-wrap gap-1 rounded-2xl border border-hairline bg-obsidian-900/40 p-1.5"
     >
       <Chip
         label="All"
@@ -79,11 +94,12 @@ export function FilterChips({ active, onChange }: Props) {
       {CATEGORIES.map((category) => (
         <Chip
           key={category}
-          label={category}
+          label={CATEGORY_LABEL[category]}
+          fullLabel={category}
           count={countIn(category)}
           dot={CATEGORY_DOT[category]}
           isActive={active === category}
-          // Clicking the active chip clears the filter — otherwise the only
+          // Clicking the active chip clears the filter. Otherwise the only
           // way back to everything is to find the "All" chip again.
           onClick={() => onChange(active === category ? null : category)}
         />

@@ -19,7 +19,7 @@ export function useCopy() {
         await navigator.clipboard.writeText(text);
         show(`${label} copied`);
       } catch {
-        show('Copy blocked — select and copy manually');
+        show('Copy blocked. Select and copy manually');
       }
     },
     [show],

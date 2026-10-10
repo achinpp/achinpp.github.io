@@ -47,7 +47,7 @@ export function Projects() {
       <SectionHeading
         id="projects"
         title="Mission Briefings"
-        lede="An AI study agent, an enterprise network redesign, detection that survives adversarial patches, and a pipeline that fails the build on a committed secret."
+        lede="Three projects and one research effort. An AI study agent, an enterprise network redesign, detection that survives adversarial patches, and a pipeline that fails the build on a committed secret."
       />
 
       <motion.div

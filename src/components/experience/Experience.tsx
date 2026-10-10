@@ -29,7 +29,7 @@ export function Experience() {
       <SectionHeading
         id="experience"
         title="Experience & Leadership"
-        lede="Two IEEE student-branch roles: one running the web presence, one running the committee."
+        lede="Five roles across two IEEE chapters, a university IoT club and a school research club: committees, web presence, events, build work and media."
       />
 
       <div ref={listRef} className="relative mt-16 lg:mt-24">

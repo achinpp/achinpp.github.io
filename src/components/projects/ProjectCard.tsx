@@ -26,7 +26,6 @@ const STATUS_TONE: Record<ProjectStatus, TagTone> = {
   ACTIVE: 'signal',
   DEPLOYED: 'accent',
   DELIVERED: 'accent',
-  RESEARCH: 'neutral',
   ARCHIVED: 'neutral',
 };
 
@@ -114,8 +113,24 @@ export function ProjectCard({ project, isOpen, onOpen }: Props) {
           className="relative flex h-full flex-col p-5 sm:p-6"
         >
           <header className="flex items-start justify-between gap-3">
-            <span className="font-mono text-[0.5625rem] tracking-[0.2em] text-obsidian-500 uppercase transition-colors duration-300 group-hover:text-mint-700">
-              // {project.index}
+            {/* The classification stamp carries the kind under the index, on
+                its own line, on every card.
+
+                Both on one line is what this was first, and the two narrow
+                bento tiles are 235px of inner width against a stamp of 180px
+                and a status chip of 60px, so `// BRIEFING_03 · RESEARCH`
+                wrapped mid stamp and read as a bug. Two deliberate lines read
+                as a stamp. A second chip beside the status was the other
+                option and it is worse: `PROJECT` says nothing on three cards
+                out of four, where down here it is quiet enough to ignore
+                until the one that says `RESEARCH` catches the eye. */}
+            <span className="flex flex-col gap-1 font-mono text-[0.5625rem] tracking-[0.2em] uppercase">
+              <span className="text-obsidian-500 transition-colors duration-300 group-hover:text-mint-700">
+                // {project.index}
+              </span>
+              <span className={project.kind === 'RESEARCH' ? 'text-mint-600' : 'text-obsidian-600'}>
+                {project.kind}
+              </span>
             </span>
             <Tag tone={STATUS_TONE[project.status]}>{project.status}</Tag>
           </header>
@@ -157,7 +172,7 @@ export function ProjectCard({ project, isOpen, onOpen }: Props) {
               {hiddenStack > 0 && <Tag>+{hiddenStack}</Tag>}
             </div>
 
-            {/* Visual affordance only — the real control is the overlay
+            {/* Visual affordance only. The real control is the overlay
                 button below, which covers the whole card. */}
             <span
               aria-hidden
@@ -172,7 +187,7 @@ export function ProjectCard({ project, isOpen, onOpen }: Props) {
 
             {import.meta.env.DEV && !project.statusConfirmed && (
               <p className="mt-4 font-mono text-[0.5625rem] tracking-[0.18em] text-signal-400 uppercase">
-                ⚠ status unconfirmed — dev only
+                ⚠ status unconfirmed, dev only
               </p>
             )}
           </div>

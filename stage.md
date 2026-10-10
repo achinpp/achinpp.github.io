@@ -1335,6 +1335,111 @@ the production bundle · figure reviewed in-browser at 1440, 768 and 390 and und
 
 ---
 
+## STAGE 12 — Your Content ✅
+
+The first stage where the content is yours rather than placeholders with warnings attached.
+Skills, two new profiles, a second competition result, an open source contribution, three more
+roles, and a classification on every briefing.
+
+- [x] **64 skills**, all supplied, across 8 categories, replacing the 20 that were half inferred
+- [x] **LinkedIn, TryHackMe and HackTheBox** live in the contact panel and in the structured data
+- [x] **CryptX 2.0 CTF, Top Performer** on the badge wall, with Team Cipher and the organiser
+- [x] **IEEE Sri Lanka Section, Contributor** in the open source strip, deliberately unlinked
+- [x] **Three more roles**: SKU IoT Club, SKU IoT Challenge 26, Research Club at Dharamaraja
+      College. Five entries on the timeline, up from two
+- [x] **`kind` on every briefing**: three `PROJECT`, one `RESEARCH`
+- [x] **No em dashes and no hyphens in prose**, across every string the site renders
+
+**Accept when:** nothing on the page is a guess that you did not ask for. ✅
+
+### Four things that had to change shape, not just content
+
+> NOTE: **`RESEARCH` was a status, and it should never have been.** It sat in the same union as
+> `ACTIVE` and `DEPLOYED`, which made it impossible to say that a piece of research was also
+> active. It is now `kind`, a separate axis, and the surveillance system carries `RESEARCH` and
+> `ACTIVE` at once. The status union lost a member and gained nothing.
+>
+> It renders as a second line under the index stamp rather than beside it. Beside it was the
+> first attempt and the two narrow bento tiles are 235px of inner width against a 180px stamp
+> and a 60px status chip, so `// BRIEFING_03 · RESEARCH` wrapped mid stamp and read as a bug. A
+> second chip next to the status was the other option and it is worse: `PROJECT` says nothing on
+> three cards out of four, where under the index it is quiet enough to ignore until the one that
+> says `RESEARCH` catches the eye.
+
+> NOTE: **`Finals reached` was deleted, because the second achievement broke it.** The counter
+> was backed by a `reachedFinal` flag, which worked while the only entry was a Finalist placing.
+> A Top Performer recognition is an honour and not literally a final, so the flag would have
+> been a small lie either way it was set. The tile now reads `Competition results` and counts
+> the wall, which is a claim that cannot drift away from what the wall shows.
+
+> NOTE: **The organiser moved out of the badge and under the wall.** `note` renders in a 128px
+> badge column, and `Team Cipher. Organised by the ICT Society (ICTS), Faculty of Technology,
+University of Sri Jayewardenepura.` wrapped to six lines and knocked the whole row out of
+> alignment. It is now two fields: `note` for the three words that belong under the badge, and
+> `organiser` for a footnote under the wall. The footnote is the better home anyway, since a
+> competition is worth more with the body that ran it named in full.
+
+> NOTE: **Nine filter chips do not fit on one line.** At full length the category names come to
+> roughly 1700px against a 1152px container, so the control wrapped to three rows and stopped
+> reading as one control. The chips now show short labels (`Offensive`, `AI & LLM`, `Web & Code`)
+> and carry the full category name as the button's accessible name, so nothing is lost to a
+> screen reader. The container also lost `sm:rounded-full`: a pill shaped box with two rows of
+> chips inside it reads as a mistake at every width where it happens.
+
+### Stage 12 notes
+
+> NOTE: **The IEEE Sri Lanka Section row has no link, and that is a choice rather than a gap.**
+> Every other empty URL on this site is something I had nothing to link. This one you asked not
+> to link. `CONTRIBUTIONS[].href` is `null` and the row renders as plain text; give it a URL and
+> it becomes a link with no other change. The distinction is written into the component so it
+> survives someone later "fixing" it.
+
+> NOTE: **⚠ `OSCP` is in the skill list and it is the one entry worth arguing about.** It is a
+> certification, not a technique, and in a cloud of skills it reads as "I hold the OSCP". If you
+> hold it, it belongs on a credential line with a date and a verification link, where it is
+> worth far more. If you do not, it should come out. It is left exactly where you put it, with
+> the question recorded in the file header.
+
+> NOTE: **Ten pills were removed because they are not in your list**, including Python, FastAPI,
+> Node.js, Semgrep, Trivy, Gitleaks, YOLO and VGG19. Several still appear on the project cards.
+> That is not a contradiction: a stack list says what a project used, a skill cloud says what you
+> want to be asked about in an interview. Worth a look all the same.
+
+> NOTE: **Long names are abbreviated on the pill and expanded in a `title`.** SOAR, EDR, MCP,
+> LLMs, UX Design and PCB Design. Nothing is renamed, only shortened, and the abbreviations are
+> the forms people use anyway.
+
+> NOTE: **The pills are smaller below `sm`.** Sixty four of them at desktop padding come to one
+> per row on a 390px screen and roughly 3000px of scrolling. One size down and the short names
+> pair up, which roughly halves the section.
+
+> NOTE: **`sameAs` and `knowsAbout` in the JSON-LD were updated too.** Structured data that
+> claims a different set of skills from the page is worse than none. `sameAs` now carries all
+> four profiles, which is the single highest value thing in that block for an identity query.
+
+> NOTE: **`SKU` is unexpanded and `Dharamaraja College` is spelled as you wrote it.** Neither is
+> something to guess at on a page about you.
+
+### The dash rule
+
+Every string the site renders was swept for `—` and for hyphens used inside sentences, including
+the page title, the meta description, the Open Graph tags, the 404 page, the section ledes, the
+form messages and the dev only warnings. `README.md` was swept as well. The footer's invalid date
+glyph changed from `—` to `--`, which also gives the site one glyph for a missing value instead
+of two, since the stat tiles already used `--`.
+
+Not swept: code comments written before this stage, and Stages 0 to 11 of this document. They are
+full of them. Everything written from here on follows the rule, and the rest is a mechanical pass
+away if you want it.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+`npm run test` 8/8 · `npm run check:browser` **all checks pass**, LCP 1712ms best of 1712–1880ms,
+CLS 0.0214 · production build 380.0 kB JS (121.2 kB gzip) / 65.7 kB CSS · Arsenal, Battle
+Station, Mission Briefings, Experience and Secure Channel all reviewed in browser at 1440, 768
+and 390.
+
+---
+
 ## Working Agreement
 
 1. One stage at a time. I build it, you review it, we iterate, then we advance.
@@ -1364,6 +1469,6 @@ the production bundle · figure reviewed in-browser at 1440, 768 and 390 and und
 
 ---
 
-**Current status:** `STAGE 11 — portrait added to the hero` → remaining:
-**content you supply** (Stage 9 checklist, plus the portrait caption), **Lighthouse on the
-deployed site**, **Safari and Firefox**, a **screen-reader pass**, and the **deploy**.
+**Current status:** `STAGE 12 — your content is in` → remaining: **dates**, the **OSCP
+question**, **project links**, a **PGP fingerprint**, **Lighthouse on the deployed site**,
+**Safari and Firefox**, a **screen reader pass**, and the **deploy**. See the README table.

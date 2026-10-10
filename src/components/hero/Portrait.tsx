@@ -111,7 +111,7 @@ export function Portrait() {
       {/* Review-time marker only — dropped from production builds. */}
       {import.meta.env.DEV && PORTRAIT.caption && !PORTRAIT.captionConfirmed && (
         <p className="mt-2 font-mono text-[0.5625rem] tracking-[0.18em] text-signal-400 uppercase">
-          ⚠ caption inferred from the photo — dev only
+          ⚠ caption inferred from the photo: dev only
         </p>
       )}
     </motion.figure>

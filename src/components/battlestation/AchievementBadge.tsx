@@ -138,13 +138,15 @@ export function AchievementBadge({
           <ScrambleText text={achievement.event} tickMs={28} lockPerTick={0.9} />
         </p>
         <p className="mt-2 font-mono text-[0.5625rem] tracking-[0.16em] text-obsidian-500 uppercase">
-          {/* Honest blank — no dates were supplied. See data/achievements.ts. */}
+          {/* Honest blank: no dates were supplied. See data/achievements.ts. */}
           {achievement.date ?? '[ date tbc ]'}
         </p>
+        {/* No `max-w` wider than the badge column. One did exist, at 14rem
+            against a 7rem column, and the first note long enough to use it
+            wrapped to six lines and knocked the row out of alignment. The
+            long form lives in the footnote under the wall instead. */}
         {achievement.note && (
-          <p className="mt-2 max-w-[14rem] text-[0.75rem] leading-relaxed text-ink-faint">
-            {achievement.note}
-          </p>
+          <p className="mt-2 text-[0.75rem] leading-relaxed text-ink-faint">{achievement.note}</p>
         )}
       </div>
     </motion.li>

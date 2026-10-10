@@ -46,17 +46,20 @@ export const GUARD = {
 
 export type Social = {
   label: string;
-  /** Lucide icon name is resolved in the component — data stays serialisable. */
-  icon: 'github' | 'linkedin' | 'mail' | 'shield';
-  /** null → not rendered. Nothing here is a guessed URL. */
+  /** Lucide icon name is resolved in the component, so data stays serialisable. */
+  icon: 'github' | 'linkedin' | 'mail' | 'shield' | 'target';
+  /** null is not rendered. Nothing here is a guessed URL. */
   href: string | null;
   /** Shown instead of the URL on the copyable row. */
   display: string;
 };
 
 /**
- * ⚠ Two of these four are `null` because no handle was ever supplied.
- * They render nothing rather than a dead link; a dev-only note lists them.
+ * All five channels are live. Every URL here was supplied; none is inferred.
+ *
+ * ⚠ The HackTheBox URL is a CTF platform profile and carries a numeric id
+ * rather than a handle, so the row shows the id. If you have a main HTB
+ * profile name, that reads better and is a one line change.
  */
 export const SOCIALS: Social[] = [
   { label: 'GitHub', icon: 'github', href: PROFILE.github, display: `@${PROFILE.handle}` },
@@ -66,8 +69,24 @@ export const SOCIALS: Social[] = [
     href: `mailto:${PROFILE.email}`,
     display: PROFILE.email,
   },
-  { label: 'LinkedIn', icon: 'linkedin', href: null, display: 'not supplied' },
-  { label: 'TryHackMe / HTB', icon: 'shield', href: null, display: 'not supplied' },
+  {
+    label: 'LinkedIn',
+    icon: 'linkedin',
+    href: 'https://www.linkedin.com/in/achin-pasindu/',
+    display: 'in/achin-pasindu',
+  },
+  {
+    label: 'TryHackMe',
+    icon: 'shield',
+    href: 'https://tryhackme.com/p/Archlin',
+    display: 'Archlin',
+  },
+  {
+    label: 'HackTheBox',
+    icon: 'target',
+    href: 'https://ctf.hackthebox.com/user/profile/1083170',
+    display: 'ctf profile 1083170',
+  },
 ];
 
 /**

@@ -149,7 +149,7 @@ export function TimelineEntry({ entry, index }: { entry: ExperienceEntry; index:
             content while the stage is being reviewed. */}
         {import.meta.env.DEV && entry.draftBullets && (
           <p className="mt-4 font-mono text-[0.5625rem] tracking-[0.18em] text-signal-400 uppercase">
-            ⚠ draft copy — dev only, not supplied content
+            ⚠ draft copy: dev only, not supplied content
           </p>
         )}
       </motion.article>

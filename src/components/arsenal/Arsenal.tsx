@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { SKILLS, type Category } from '@/data/skills';
+import { CATEGORIES, SKILLS, type Category } from '@/data/skills';
 import { Section } from '@/components/layout/Section';
 import { SectionHeading } from '@/components/layout/SectionHeading';
 import { FilterChips } from '@/components/arsenal/FilterChips';
@@ -35,7 +35,7 @@ export function Arsenal() {
       <SectionHeading
         id="arsenal"
         title="Arsenal"
-        lede="Tools and techniques across offensive security, DevSecOps, cloud and networking, and applied ML. No proficiency bars — a percentage is a guess with a number stuck on it."
+        lede="Offensive and defensive security, AppSec, AI systems, AWS, and the things built away from a keyboard. No proficiency bars, because a percentage is a guess with a number stuck on it."
       />
 
       <div className="mt-12 lg:mt-16">
@@ -70,8 +70,12 @@ export function Arsenal() {
 }
 
 /**
- * Review-time only: which pills the brief stated outright and which I derived
- * from its project descriptions. Compiled out of production.
+ * Review time only: which pills you supplied and which were inferred from
+ * something else. Compiled out of production.
+ *
+ * Every pill is currently `stated`, so the second line does not render. The
+ * legend stays because the moment anything is added that you did not list,
+ * it should be visible during review rather than blending in.
  */
 function ProvenanceLegend() {
   const derived = SKILLS.filter((skill) => skill.source === 'derived');
@@ -79,12 +83,14 @@ function ProvenanceLegend() {
   return (
     <div className="mt-12 rounded-lg border border-signal-900 bg-signal-900/10 p-4">
       <p className="font-mono text-[0.5625rem] leading-relaxed tracking-[0.16em] text-signal-400 uppercase">
-        ⚠ dev only — {SKILLS.length - derived.length} stated in the brief · {derived.length} derived
-        from its project descriptions
+        ⚠ dev only: {SKILLS.length - derived.length} supplied by you · {derived.length} inferred ·{' '}
+        {CATEGORIES.length} categories
       </p>
-      <p className="mt-2.5 font-mono text-[0.5625rem] leading-relaxed tracking-[0.1em] text-signal-400/70">
-        derived: {derived.map((skill) => skill.name).join(' · ')}
-      </p>
+      {derived.length > 0 && (
+        <p className="mt-2.5 font-mono text-[0.5625rem] leading-relaxed tracking-[0.1em] text-signal-400/70">
+          inferred: {derived.map((skill) => skill.name).join(' · ')}
+        </p>
+      )}
     </div>
   );
 }

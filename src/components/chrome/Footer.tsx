@@ -12,7 +12,9 @@ import { useScrollTo } from '@/hooks/useScrollTo';
  */
 function buildStamp() {
   const date = new Date(BUILD.date);
-  const day = Number.isNaN(date.getTime()) ? '—' : date.toISOString().slice(0, 10);
+  // `--` and not an em dash, so the site has one glyph for a missing
+  // value: the stat tiles already use it.
+  const day = Number.isNaN(date.getTime()) ? '--' : date.toISOString().slice(0, 10);
   return `${day} · ${BUILD.sha}`;
 }
 

@@ -2,19 +2,15 @@ import { EXPERIENCE } from '@/data/experience';
 import { PROJECTS } from '@/data/projects';
 
 /**
- * Battle Station — competition record and open-source activity.
+ * Battle Station: competition record and open source activity.
  *
- * ⚠ THIS IS THE THINNEST SECTION IN THE BUILD, and deliberately so.
+ * Two results are now on the wall. `BADGE_SLOTS` is still 4, so the rest are
+ * **locked slots** rather than invented entries. That is both honest and the
+ * normal visual language of an achievement system. Add entries below and each
+ * one takes the next slot.
  *
- * The brief named exactly one achievement: **RED CYPHER 3.0 — Finalist**. It
- * gave no other competitions, no dates, no writeup count and no specific
- * open-source contributions. So rather than filling a badge wall with
- * plausible-looking CTF names, the wall has one real badge and the rest are
- * **locked slots** — which is both honest and the normal visual language of an
- * achievement system. Add entries below and each one takes the next slot.
- *
- * Same for the counters: every number here is either derived from data that
- * already exists on this site, or `null`. A `null` renders `--` and a
+ * Same rule for the counters: every number here is either derived from data
+ * that already exists on this site, or `null`. A `null` renders `--` and a
  * `[ tbc ]` label instead of counting up to a figure nobody supplied.
  */
 
@@ -28,12 +24,16 @@ export type Achievement = {
   /** What was won or reached. */
   result: string;
   rarity: Rarity;
-  /** null → renders `[ date tbc ]`. No dates were supplied. */
+  /** null renders `[ date tbc ]`. No dates have been supplied. */
   date: string | null;
-  /** Shown in the detail line under the badge wall. */
+  /**
+   * A few words under the badge, at badge width. Keep it short: the column is
+   * 128px and anything longer than about three words becomes a six line
+   * paragraph that pushes the row out of alignment.
+   */
   note: string | null;
-  /** True once the result reached a final or better — feeds the counters. */
-  reachedFinal: boolean;
+  /** The organising body, rendered as a footnote under the whole wall. */
+  organiser: string | null;
 };
 
 export const ACHIEVEMENTS: Achievement[] = [
@@ -44,7 +44,16 @@ export const ACHIEVEMENTS: Achievement[] = [
     rarity: 'legendary',
     date: null,
     note: null,
-    reachedFinal: true,
+    organiser: null,
+  },
+  {
+    id: 'cryptx-2',
+    event: 'CryptX 2.0 CTF',
+    result: 'Top Performer',
+    rarity: 'rare',
+    date: null,
+    note: 'Team Cipher',
+    organiser: 'ICT Society (ICTS), Faculty of Technology, University of Sri Jayewardenepura',
   },
 ];
 
@@ -55,15 +64,47 @@ export const ACHIEVEMENTS: Achievement[] = [
  */
 export const BADGE_SLOTS = 4;
 
+/**
+ * Open source activity.
+ *
+ * ⚠ `href` is `null` on purpose, because you asked for no link to this one.
+ * The row renders the organisation and the role and nothing clickable. Give a
+ * URL and it becomes a link with no other change.
+ */
+export type Contribution = {
+  id: string;
+  org: string;
+  role: string;
+  href: string | null;
+};
+
+export const CONTRIBUTIONS: Contribution[] = [
+  {
+    id: 'ieee-sri-lanka-section',
+    org: 'IEEE Sri Lanka Section',
+    role: 'Contributor',
+    href: null,
+  },
+];
+
 export type Stat = {
   label: string;
-  /** null → `--`, with a `[ tbc ]` marker. Never a guessed figure. */
+  /** null renders `--`, with a `[ tbc ]` marker. Never a guessed figure. */
   value: number | null;
 };
 
+/**
+ * `Competition results` counts the badge wall rather than filtering it.
+ *
+ * It used to be `Finals reached`, backed by a `reachedFinal` flag. That flag
+ * worked while the only entry was a Finalist placing and broke the moment a
+ * Top Performer recognition arrived, because a top performer result is an
+ * honour and not literally a final. Counting what is on the wall is a claim
+ * that cannot drift away from what the wall shows.
+ */
 export const STATS: Stat[] = [
   { label: 'Missions logged', value: PROJECTS.length },
-  { label: 'Finals reached', value: ACHIEVEMENTS.filter((a) => a.reachedFinal).length },
+  { label: 'Competition results', value: ACHIEVEMENTS.length },
   { label: 'Leadership roles', value: EXPERIENCE.length },
   { label: 'Writeups published', value: null },
 ];
@@ -73,14 +114,14 @@ export const STATS: Stat[] = [
  * on this wall is unexplained.
  *
  * Kept out of `STATS` on purpose: a field on the data object ships whether or
- * not anything renders it, because the gate is in the component. `import.meta.env.DEV`
- * is replaced by the literal `false` at build time, so in production this
- * folds to an empty object and the strings are dropped entirely.
+ * not anything renders it, because the gate is in the component.
+ * `import.meta.env.DEV` is replaced by the literal `false` at build time, so
+ * in production this folds to an empty object and the strings are dropped.
  */
 export const STAT_SOURCES: Record<string, string> = import.meta.env.DEV
   ? {
       'Missions logged': 'derived from src/data/projects.ts',
-      'Finals reached': 'derived from ACHIEVEMENTS above',
+      'Competition results': 'derived from ACHIEVEMENTS above',
       'Leadership roles': 'derived from src/data/experience.ts',
       'Writeups published': 'not supplied',
     }
