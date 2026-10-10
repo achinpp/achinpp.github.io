@@ -1223,6 +1223,118 @@ the end of Stage 9 is content you supply — see the Stage 9 checklist.
 
 ---
 
+## STAGE 11 — The Portrait ✅
+
+**Not in the plan either.** You dropped `devfest_photo.png` into the repo and asked for it near
+the name. It is now the figure standing to the right of the headline, in the one large empty
+area the hero had.
+
+- [x] `assets/portrait-source.png` — the source cut-out, not served and not bundled
+- [x] `scripts/process-portrait.py` — trims to the alpha box, writes `public/portrait.webp`
+- [x] `src/components/hero/Portrait.tsx` — four layers, documented in the file
+- [x] `PORTRAIT` in `src/data/profile.ts`, nullable: set it to `null` and the figure, the
+      caption and the layout slot all disappear with no other edit
+- [x] Measured against a build without it, interleaved, to see what it costs
+- [x] Two regression guards and one harness fix in `scripts/browser-check.py`
+
+**Accept when:** it looks deliberate rather than pasted on, and it does not cost the hero its
+performance budget. ✅
+
+### What it actually is
+
+**236 kB → 24 kB.** Trimmed to its alpha bounding box (the source carried 40px of transparent
+padding across the top, which would have meant the layout box and the subject were different
+shapes) and encoded as WebP with `exact=True` — without that flag the encoder rewrites the RGB
+under fully transparent pixels to whatever compresses best, and those invented colours bleed
+back out through the semi-opaque pixels along the cut-out edge as a halo.
+
+**Desaturated, with the colour on hover.** The palette is obsidian and mint; the shirt is covered
+in primary-coloured shapes. Untouched it reads as a screenshot pasted onto the page.
+
+**The glow follows the person, not a box.** `drop-shadow` respects the alpha silhouette where
+`box-shadow` would trace the rectangle. The mint sheen is masked by the image's own alpha so the
+tint lands on the subject rather than on the transparent air around them — which is also why the
+asset is a single WebP URL and not a `<picture>`: the same file is the image and the mask, so it
+is one fetch and one decode. (WebP with alpha: Chrome 32+, Firefox 65+, Safari 14+.)
+
+**The bottom dissolves.** The source is a hard torso crop. A fade on the wrapper turns the cut
+into a horizon instead of an edge.
+
+### Stage 11 notes
+
+> NOTE: **The figure is last in the DOM, and that is a mobile decision.** Beside the name it
+> wants to come before it; at 390px the grid collapses and putting it before the name pushed the
+> name itself below the fold, which is the one thing the first screen has to contain. It is
+> placed explicitly into row 2 on `lg`, so the desktop layout pays nothing for the source order
+> and the visual order still matches the DOM — no `order` utility, nothing for a screen reader
+> to disagree with.
+
+> NOTE: **The caption is inferred, and flagged as such.** `DevFest Sri Lanka · 2025` is read off
+> the shirt in the photograph and the filename it arrived under. That says where the picture was
+> taken, which is not a claim about what you did there — but it is still not something you told
+> me, so `captionConfirmed: false` puts a dev-only ⚠ under the figure until you say otherwise.
+> Setting `caption: null` renders the figure with no caption at all.
+
+> NOTE: **`<link rel="preload">` was written, measured, and deleted.** It is the textbook move
+> for a hero image, and it is wrong here: the LCP element is the `<h1>`, which is gated on the
+> bundle executing, so a preload spends early bandwidth on something that is not the metric.
+> Twelve cold loads could not separate it from the noise either way, so the tie was broken on the
+> thing that is not a measurement — the preload duplicates `PORTRAIT.src` into `index.html`,
+> where nothing would catch the two drifting apart.
+
+> NOTE: **The JSON-LD `Person.image` now points at the portrait rather than the OG card.** A
+> `Person`'s image should be a picture of the person. The OG tags still use `og.png`, which is
+> the share card and a different job.
+
+### ⚠ What the measurement actually said
+
+The figure was measured against a build without it, **interleaved** — A, B, A, B — because the
+first attempt compared two blocks taken ten minutes apart and the machine drifted more between
+the blocks than the change did within them.
+
+|                       | min    | median | max    |
+| --------------------- | ------ | ------ | ------ |
+| **A** — no portrait   | 1988ms | 2020ms | 2488ms |
+| **B** — with portrait | 1912ms | 2376ms | 2404ms |
+
+Per-pair delta: **+212, +288, +392, −84, −100 ms.** Mean +142ms, and two of five runs negative.
+**That is not a result.** The spread inside the control arm alone is 500ms, so the honest
+statement is that the portrait's LCP cost is somewhere between "nothing" and "a few hundred
+milliseconds" and this machine cannot tell which. CLS went 0.0152 → 0.0157, which is nothing;
+both dimensions ship on the `<img>`, so the box is reserved before the bytes arrive.
+
+> NOTE: **The far more alarming number in that table is the control arm.** Stage 10 recorded
+> 1776–1964ms for code that now measures **1988–2488ms, unchanged**. Nothing regressed; the
+> machine is simply slower today than it was then. Everything Stage 10 said about LCP — including
+> the caveat that it will exceed 2s on a real connection — holds, and this is one more reason the
+> real number is Lighthouse on the deployed site.
+
+### Harness changes
+
+> **LCP is now the best of three cold loads**, with the HTTP cache disabled before the _first_
+> navigation so all three are genuinely cold, and all three are printed. Stage 10 gated on a
+> single measurement; this stage is what that turned out to be worth. The best is the right
+> statistic, because every source of noise on a localhost measurement only ever makes it slower.
+> The spread is printed because hiding it would repeat the mistake the change exists to fix.
+
+> **Two new assertions.** `hero portrait decoded` reads `naturalWidth`, which is the only thing
+> that tells the truth about a broken image: Chrome logs no console error for an `<img>` that
+> 404s, the alt text is still there, and the layout box is still reserved by the width/height
+> attributes — the rest of this script would have passed a hero with a hole in it. And
+> `hero still fits one 900px viewport`, because adding anything to the hero pushes the scroll
+> hint into the HUD strip and nothing else here would notice. That one caught the first version
+> of this figure, at 16.5rem.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+`npm run test` 8/8 · `npm run check:browser` **all checks pass** — LCP **1704ms** best of
+1704–2312ms, CLS 0.0157 · production build 372.7 kB JS (119.4 kB gzip) / 62.3 kB CSS (11.7 kB
+gzip) · `portrait.webp` 24.2 kB in `dist/` · the dev-only caption warning confirmed absent from
+the production bundle · figure reviewed in-browser at 1440, 768 and 390 and under reduced motion.
+
+**Still yours:** confirm or clear the caption. Everything else open is unchanged from Stage 10.
+
+---
+
 ## Working Agreement
 
 1. One stage at a time. I build it, you review it, we iterate, then we advance.
@@ -1252,6 +1364,6 @@ the end of Stage 9 is content you supply — see the Stage 9 checklist.
 
 ---
 
-**Current status:** `STAGE 10 — browser pass complete, 4 defects fixed` → remaining:
-**content you supply** (Stage 9 checklist), **Lighthouse on the deployed site**, **Safari and
-Firefox**, a **screen-reader pass**, and the **deploy**.
+**Current status:** `STAGE 11 — portrait added to the hero` → remaining:
+**content you supply** (Stage 9 checklist, plus the portrait caption), **Lighthouse on the
+deployed site**, **Safari and Firefox**, a **screen-reader pass**, and the **deploy**.

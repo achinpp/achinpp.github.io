@@ -5,7 +5,7 @@ Hand-built — no UI kit, no component library.
 
 **Vite 6 · React 18 · TypeScript · Tailwind CSS v4 · Motion (Framer) · Lenis**
 
-The build was done in ten reviewable stages. [`stage.md`](./stage.md) is the single source of
+The build was done in eleven reviewable stages. [`stage.md`](./stage.md) is the single source of
 truth: every stage records what shipped, every deviation from the plan with its reasoning, and
 what was verified versus what still needs a human with a browser.
 
@@ -65,6 +65,7 @@ Copy `.env.example` to `.env` and fill both variables in.
 | Prune the 13 `derived` skills down to what you want to be asked about        | `src/data/skills.ts`       |
 | LinkedIn and TryHackMe/HTB handles                                           | `src/data/contact.ts`      |
 | A PGP fingerprint, if you have one (the footer line is omitted without it)   | `src/data/contact.ts`      |
+| Confirm the hero portrait's caption, or clear it                             | `src/data/profile.ts`      |
 
 Anything the brief did not state is marked in its data file, and most of it also shows a
 **dev-only warning in the UI** — those markers are compiled out of production builds, so they
@@ -125,6 +126,18 @@ assets cannot drift from the design system.
 `public/favicon.svg` is hand-written and not generated — it is the primary favicon for every
 current browser, and its geometry is matched 1:1 to the script.
 
+The hero portrait is a separate script, because it has a separate source:
+
+```bash
+python scripts/process-portrait.py
+```
+
+Reads `assets/portrait-source.png` — the cut-out with a transparent background — trims it to its
+alpha bounding box and writes `public/portrait.webp` (24 kB). `assets/` is the source cupboard:
+nothing in it is served or bundled. Replacing the photograph means dropping a new cut-out in
+there, re-running the script, and updating `width`/`height` on `PORTRAIT` in `src/data/profile.ts`
+to whatever the script prints.
+
 The script needs **Pillow**. It renders the card with system fonts rather than the brand fonts,
 because those ship as woff2 and decompressing woff2 needs Brotli; the header comment explains
 how to use the real faces if you want them.
@@ -143,6 +156,11 @@ needs **Python with `websockets`** and no npm packages at all. It measures LCP a
 fails on any console error, asserts the DOM once React has mounted, drives the command palette
 from the keyboard, and writes screenshots into `.browser-check/` — one per section, plus 1440 /
 768 / 390, the palette open, reduced motion, and the 404 page.
+
+LCP is the **best of three cold loads** (HTTP cache off for all three), and the script prints
+all three. A single measurement is not a number: the same commit measured 1776ms one day and
+2488ms the next with nothing changed but what else the machine was doing, and a gate that fails
+on untouched code is one you learn to ignore.
 
 It exits non-zero on failure, so it can gate a deploy. It is not Lighthouse: no throttling, no
 TBT, no audit catalogue. Run Lighthouse on the deployed site as well.
@@ -172,8 +190,9 @@ reduced motion. They are position indicators, not animation: freezing them would
 ## Repo layout
 
 ```
+assets/            source images — not served, not bundled
 public/            static assets, icons, 404 page, résumé
-scripts/           asset generation
+scripts/           asset generation, the browser check
 src/
   components/      one folder per section, plus chrome/ layout/ ui/
   data/            all content — the only files you need to edit

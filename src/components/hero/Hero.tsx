@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { ArrowDown, Download } from 'lucide-react';
 import { PROFILE, TERMINAL_SCRIPT } from '@/data/profile';
+import { Portrait } from '@/components/hero/Portrait';
 import { RoleRotator } from '@/components/hero/RoleRotator';
 import { ScrollHint } from '@/components/hero/ScrollHint';
 import { TerminalWindow } from '@/components/hero/TerminalWindow';
@@ -66,7 +67,7 @@ export function Hero() {
             initial={reduced ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: duration.slow, delay: 0.35 }}
-            className="flex flex-col divide-y divide-hairline lg:col-span-4 lg:col-start-9 lg:self-end"
+            className="flex flex-col divide-y divide-hairline lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:self-end"
           >
             {META.map((row) => (
               <div key={row.label} className="flex items-baseline gap-4 py-2.5">
@@ -81,7 +82,7 @@ export function Hero() {
           </motion.dl>
 
           {/* -------------------------------------------- name block */}
-          <div className="lg:col-span-12">
+          <div className="lg:col-span-8 lg:row-start-2">
             {/* Eyebrow — ties the headline back to the whoami that produced it. */}
             <div className="h-4">
               {revealName && (
@@ -160,6 +161,18 @@ export function Hero() {
                 />
               </button>
             </motion.div>
+          </div>
+
+          {/* --------------------------------------------- portrait
+              Last in the DOM, and last on a phone — where the stack is
+              terminal, meta, name, role, CTAs, face. Putting it before the
+              name reads better on a wide screen but pushes the name itself
+              below the fold at 390px, and the name is the one thing the
+              first screen has to contain. On `lg` it is placed explicitly
+              into row 2 beside the name, so source order costs nothing
+              there and the visual order still matches the DOM. */}
+          <div className="lg:col-span-4 lg:col-start-9 lg:row-start-2 lg:self-end">
+            <Portrait />
           </div>
         </div>
       </div>

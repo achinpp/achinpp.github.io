@@ -9,3 +9,6 @@ dist-ssr
 .vite
 *.tsbuildinfo
 .browser-check/
+
+# Python bytecode from the scripts/ helpers.
+__pycache__/

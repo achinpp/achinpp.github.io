@@ -354,6 +354,14 @@ async def main() -> None:
             deviceScaleFactor=1,
             mobile=False,
         )
+        # Off before the FIRST navigation, not after it. The vitals block
+        # below reloads twice and keeps the fastest of the three; if the
+        # cache were live for those two they would be warm loads, the best of
+        # three would always be a warm one, and the 2.0s target — which was
+        # written for a cold visitor — would be measured against the wrong
+        # thing entirely.
+        await page.send("Network.enable")
+        await page.send("Network.setCacheDisabled", cacheDisabled=True)
         await goto(page, f"{ORIGIN}/")
 
         # ------------------------------------------------------- console
@@ -362,13 +370,41 @@ async def main() -> None:
         check(not problems, "no console errors, warnings or exceptions", "; ".join(problems[:4]))
 
         # -------------------------------------------------------- vitals
-        print("\nweb vitals (measured, finally)")
-        vitals = await page.evaluate("window.__vitals")
+        #
+        # Best of three cold loads, not one.
+        #
+        # Stage 10 gated on a single measurement, and Stage 11 found out what
+        # that is worth: the same commit measured 1776ms one afternoon and
+        # 2488ms the next, with nothing changed but what else the machine was
+        # doing. A gate that fails on untouched code is worse than no gate —
+        # it teaches you to ignore it.
+        #
+        # Three loads with the HTTP cache off, and the best one counts. The
+        # best is the right statistic here: every source of noise on a
+        # localhost measurement only ever makes it slower, so the fastest run
+        # is the one least contaminated. All three are printed, because the
+        # spread is the more honest number and hiding it would repeat the
+        # mistake this block exists to fix.
+        print("\nweb vitals (best of three cold loads)")
+        runs = []
+        for attempt in range(3):
+            if attempt:
+                await goto(page, f"{ORIGIN}/")
+            sample = await page.evaluate("window.__vitals")
+            runs.append(sample)
+            print(f"    load {attempt + 1}: LCP {round(sample['lcp'])}ms  "
+                  f"CLS {round(sample['cls'], 4)}")
+
+        vitals = min(runs, key=lambda r: r["lcp"])
         lcp = round(vitals["lcp"])
-        cls = round(vitals["cls"], 4)
-        notes.append(f"LCP {lcp}ms · CLS {cls} · {len(vitals['shifts'])} layout shifts")
+        cls = round(max(r["cls"] for r in runs), 4)
+        spread = f"{round(min(r['lcp'] for r in runs))}-{round(max(r['lcp'] for r in runs))}ms"
+        notes.append(
+            f"LCP {lcp}ms (best of 3, spread {spread}) · CLS {cls} · "
+            f"{len(vitals['shifts'])} layout shifts"
+        )
         check(lcp > 0, "LCP was reported", f"{lcp}ms")
-        check(lcp < 2000, "LCP under the 2.0s target set in Stage 2", f"{lcp}ms")
+        check(lcp < 2000, "LCP under the 2.0s target set in Stage 2", f"best {lcp}ms of {spread}")
         check(cls < 0.1, "CLS under 0.1 (Stage 6: the idle drift must not shift layout)", str(cls))
 
         lcp_element = await page.evaluate(
@@ -402,6 +438,36 @@ async def main() -> None:
             "document.getAnimations().filter((a) => a.playState === 'running').length"
         )
         check(running > 0, "animations are running with motion on", f"{running} running")
+
+        # The hero portrait. A broken <img> is the one asset failure the rest
+        # of this script cannot see: Chrome does not log a console error for
+        # an image that 404s, the alt text is still present, and the layout
+        # box is still reserved by the width/height attributes. Only
+        # naturalWidth tells the truth.
+        portrait = await page.evaluate(
+            "(() => { const i = document.querySelector('#hero figure img'); "
+            "if (!i) return null; return { w: i.naturalWidth, h: i.naturalHeight, "
+            "box: Math.round(i.getBoundingClientRect().width), src: i.currentSrc }; })()"
+        )
+        if portrait is None:
+            check(True, "hero portrait absent (PORTRAIT is null)")
+        else:
+            check(portrait["w"] > 0, "hero portrait decoded", f"{portrait['w']}x{portrait['h']}")
+            # Guard against someone sizing it past its intrinsic width, which
+            # is the point at which the upscale starts to show on a 2x screen.
+            check(
+                portrait["box"] <= portrait["w"],
+                "hero portrait is not upscaled",
+                f"rendered {portrait['box']}px from a {portrait['w']}px source",
+            )
+
+        # The hero is meant to be exactly one viewport at the reference size.
+        # Adding anything to it — the portrait, most recently — pushes the
+        # scroll hint into the HUD strip, and nothing else here would notice.
+        hero_h = await page.evaluate(
+            "Math.round(document.getElementById('hero').getBoundingClientRect().height)"
+        )
+        check(hero_h <= 900, "hero still fits one 900px viewport", f"{hero_h}px")
 
         # ------------------------------------------------- screenshots
         print("\nscreenshots")
