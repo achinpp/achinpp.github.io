@@ -31,6 +31,12 @@ import { duration, easeOutExpo } from '@/lib/motion/easings';
  * child, so nothing here needs `mask-composite` — which is the one part of
  * the masking spec with genuinely divergent prefixed semantics.
  *
+ * **There is no caption.** There was one, inferred from the shirt in the
+ * photograph and the filename it arrived under, and you asked for it gone.
+ * The whole mechanism went with it rather than just the string: a `caption`
+ * field sitting at `null` is an empty slot, and an empty slot is an
+ * invitation to fill it with a guess.
+ *
  * **Nothing here is allowed to delay first paint.** No `loading="lazy"`, both
  * dimensions on the element so the box is reserved before the bytes land (CLS
  * measured at 0.0157 against a 0.0151 baseline — i.e. nothing), and an
@@ -56,11 +62,15 @@ export function Portrait() {
     'linear-gradient(to bottom, #000 0%, #000 60%, rgba(0,0,0,0.3) 87%, transparent 99%)';
 
   return (
-    <motion.figure
+    <motion.div
       initial={reduced ? false : { opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: duration.slow, ease: easeOutExpo, delay: 0.2 }}
-      className="group relative w-full max-w-[13rem] sm:max-w-[14.5rem] lg:max-w-[16rem]"
+      // 16rem -> 18rem now the terminal has vacated the hero. The source is
+      // 451px wide, so 18rem renders at 1.57x on a 2x display, still inside
+      // the band where the photograph is sharp, and the cap is what keeps it
+      // there rather than letting it fill a column that is now much wider.
+      className="group relative w-full max-w-[13rem] sm:max-w-[14.5rem] lg:max-w-[18rem]"
     >
       <div className="relative">
         {/* 1 — ambient bloom, outside the fade so it can spill. */}
@@ -100,20 +110,6 @@ export function Portrait() {
           className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-[linear-gradient(90deg,transparent,var(--color-mint-800),transparent)]"
         />
       </div>
-
-      {PORTRAIT.caption && (
-        <figcaption className="mt-4 flex items-center gap-2.5 font-mono text-[0.5625rem] tracking-[0.18em] text-obsidian-500 uppercase">
-          <span aria-hidden className="h-px w-5 bg-hairline-strong" />
-          {PORTRAIT.caption}
-        </figcaption>
-      )}
-
-      {/* Review-time marker only — dropped from production builds. */}
-      {import.meta.env.DEV && PORTRAIT.caption && !PORTRAIT.captionConfirmed && (
-        <p className="mt-2 font-mono text-[0.5625rem] tracking-[0.18em] text-signal-400 uppercase">
-          ⚠ caption inferred from the photo: dev only
-        </p>
-      )}
-    </motion.figure>
+    </motion.div>
   );
 }

@@ -301,6 +301,9 @@
     --z-overlay: 60;
     --z-palette: 70;
     --z-toast: 80;
+    /* The boot overlay. Above everything it covers, below the custom cursor,
+       which should stay the pointer no matter which layer is on top. */
+    --z-boot: 85;
     --z-cursor: 90;
     --z-grain: 100;
 

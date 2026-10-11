@@ -11,6 +11,7 @@ import { StatusHUD } from '@/components/chrome/StatusHUD';
 import { Experience } from '@/components/experience/Experience';
 import { Hero } from '@/components/hero/Hero';
 import { Projects } from '@/components/projects/Projects';
+import { BootProvider } from '@/providers/BootProvider';
 import { MotionProvider } from '@/providers/MotionProvider';
 import { PaletteProvider } from '@/providers/PaletteProvider';
 import { PointerProvider } from '@/providers/PointerProvider';
@@ -42,48 +43,54 @@ export function App() {
     <MotionProvider>
       <PointerProvider>
         <SmoothScrollProvider>
-          <ToastProvider>
-            <PaletteProvider>
-              {/* Ambience, behind everything, never interactive. */}
-              <GridBackdrop />
-              <ScanlineSweep />
+          {/* Inside <SmoothScrollProvider> because the overlay scroll locks
+              the page, and the lock has to reach Lenis as well as <body>.
+              Outside <PaletteProvider> because nothing should be able to
+              open a command palette underneath glass nobody can see past. */}
+          <BootProvider enabled={!SHOW_TOKENS}>
+            <ToastProvider>
+              <PaletteProvider>
+                {/* Ambience, behind everything, never interactive. */}
+                <GridBackdrop />
+                <ScanlineSweep />
 
-              <a
-                href="#main"
-                className="sr-only pane px-4 py-2 font-mono text-label uppercase focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-[var(--z-toast)] focus-visible:text-mint-300"
-              >
-                Skip to content
-              </a>
+                <a
+                  href="#main"
+                  className="sr-only pane px-4 py-2 font-mono text-label uppercase focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-[var(--z-toast)] focus-visible:text-mint-300"
+                >
+                  Skip to content
+                </a>
 
-              {SHOW_TOKENS ? (
-                <main id="main" className="relative z-[var(--z-content)]">
-                  {/* No fallback worth designing: this route is dev-only and
-                      the chunk is a few kB from the same origin. */}
-                  <Suspense fallback={null}>
-                    <TokenSheet />
-                  </Suspense>
-                </main>
-              ) : (
-                <>
-                  <FloatingNav />
+                {SHOW_TOKENS ? (
                   <main id="main" className="relative z-[var(--z-content)]">
-                    <Hero />
-                    <Experience />
-                    <Projects />
-                    <BattleStation />
-                    <Arsenal />
-                    <Contact />
+                    {/* No fallback worth designing: this route is dev-only and
+                      the chunk is a few kB from the same origin. */}
+                    <Suspense fallback={null}>
+                      <TokenSheet />
+                    </Suspense>
                   </main>
-                  {/* The footer's own bottom padding clears the fixed HUD, which
+                ) : (
+                  <>
+                    <FloatingNav />
+                    <main id="main" className="relative z-[var(--z-content)]">
+                      <Hero />
+                      <Experience />
+                      <Projects />
+                      <BattleStation />
+                      <Arsenal />
+                      <Contact />
+                    </main>
+                    {/* The footer's own bottom padding clears the fixed HUD, which
                     is why <main> no longer carries any. */}
-                  <Footer />
-                  <StatusHUD />
-                </>
-              )}
+                    <Footer />
+                    <StatusHUD />
+                  </>
+                )}
 
-              <CustomCursor />
-            </PaletteProvider>
-          </ToastProvider>
+                <CustomCursor />
+              </PaletteProvider>
+            </ToastProvider>
+          </BootProvider>
         </SmoothScrollProvider>
       </PointerProvider>
     </MotionProvider>

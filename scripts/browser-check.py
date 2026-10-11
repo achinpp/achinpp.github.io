@@ -46,9 +46,9 @@ BROWSERS = [
     r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
 ]
 
-# Settle time after load before measuring. The hero's boot overlay is 900ms and
-# the typing script runs after it, so anything shorter measures a page that is
-# still mid-animation.
+# Settle time after load before measuring. The boot overlay types for ~1.8s,
+# holds for 380ms and fades for 600ms, so anything under about 3s measures a
+# page that is still behind glass.
 SETTLE_MS = 3500
 
 failures: list[str] = []
@@ -334,6 +334,54 @@ DOM_ASSERTIONS = """
 """
 
 
+BOOT_PROBE = """
+(() => {
+  const overlay = document.querySelector('[data-boot]');
+  if (!overlay) return null;
+  const bar = overlay.querySelector('[role="progressbar"]');
+  return {
+    locked: document.body.classList.contains('scroll-lock'),
+    progress: Number(bar?.getAttribute('aria-valuenow') ?? -1),
+    focusInside: overlay.contains(document.activeElement),
+    covers:
+      Math.round(overlay.getBoundingClientRect().width) >= window.innerWidth &&
+      Math.round(overlay.getBoundingClientRect().height) >= window.innerHeight,
+    label: overlay.getAttribute('aria-label'),
+  };
+})()
+"""
+
+# Every <img> the page ships, HEAD-checked against the server it was served
+# from. This is the one asset failure nothing else in this script can see:
+# Chrome logs no console error for an image that 404s, the alt text is still
+# in the DOM, and the width/height attributes still reserve the box. A lazy
+# image below the fold has not even been requested, so `naturalWidth` cannot
+# answer for it either — the request has to be made deliberately.
+MEDIA_PROBE = """
+(async () => {
+  const imgs = Array.from(document.querySelectorAll('img[src]'));
+  const out = [];
+  for (const img of imgs) {
+    let ok = false, status = 0;
+    try {
+      const res = await fetch(img.src, { method: 'HEAD', cache: 'no-store' });
+      ok = res.ok;
+      status = res.status;
+    } catch (e) {
+      status = -1;
+    }
+    out.push({
+      path: new URL(img.src).pathname,
+      ok,
+      status,
+      sized: img.hasAttribute('width') && img.hasAttribute('height'),
+    });
+  }
+  return out;
+})()
+"""
+
+
 async def main() -> None:
     if OUT.exists():
         shutil.rmtree(OUT)
@@ -415,6 +463,68 @@ async def main() -> None:
             notes.append(f"LCP element: {lcp_element}")
 
         # ----------------------------------------------------------- DOM
+        # --------------------------------------------------- boot overlay
+        # The terminal is a loading screen now, which means it is the first
+        # thing anybody sees and the last thing anybody wants stuck. Three
+        # ways it can go wrong, all of them silent: it never appears, it
+        # never leaves, or it appears without taking the page with it (no
+        # scroll lock, no focus) and becomes a picture of a modal.
+        print("\nboot overlay")
+        page.clear()
+        await page.send("Page.navigate", url=f"{ORIGIN}/")
+
+        # Poll for the SETTLED overlay, not the first frame it exists on.
+        # React commits the DOM, paints, and only then runs the passive
+        # effects that take the scroll lock and move focus. Probing the
+        # instant `[data-boot]` appears catches that gap — measured at one
+        # frame wide — and reports a modal that never locked anything.
+        boot = None
+        for _ in range(60):
+            await asyncio.sleep(0.05)
+            probe = await page.evaluate(BOOT_PROBE)
+            if probe is None:
+                # Gone already means it was never caught, not that it passed.
+                if boot is not None:
+                    break
+                continue
+            boot = probe
+            if probe["locked"] and probe["focusInside"]:
+                break
+
+        if check(boot is not None, "boot overlay appears"):
+            assert boot is not None
+            check(boot["covers"], "it covers the viewport")
+            check(boot["locked"], "the page behind it is scroll locked")
+            check(boot["focusInside"], "focus is inside it, not in the page behind")
+            check(boot["label"] == "Boot sequence", "it has an accessible name", str(boot["label"]))
+
+            # The bar is characters typed over characters in the script. A
+            # fake one would sit at a round number here or never move.
+            first = boot["progress"]
+            await asyncio.sleep(0.45)
+            later = await page.evaluate(BOOT_PROBE)
+            check(
+                later is None or later["progress"] > first,
+                "the progress bar tracks the script",
+                f"{first}% then {later['progress'] if later else 'gone'}%",
+            )
+
+        start = asyncio.get_running_loop().time()
+        gone = False
+        for _ in range(100):
+            await asyncio.sleep(0.1)
+            if not await page.evaluate("!!document.querySelector('[data-boot]')"):
+                gone = True
+                break
+        took = round((asyncio.get_running_loop().time() - start) * 1000)
+        check(gone, "boot overlay hands the page over", f"{took}ms after the last probe")
+        check(
+            not await page.evaluate("document.body.classList.contains('scroll-lock')"),
+            "the scroll lock is released with it",
+        )
+        await asyncio.sleep(SETTLE_MS / 1000)
+
+        # ----------------------------------------------------------- DOM
         print("\nDOM (only true once React has mounted and run)")
         dom = await page.evaluate(DOM_ASSERTIONS)
         expected = ["hero", "experience", "projects", "battlestation", "arsenal", "contact"]
@@ -445,7 +555,7 @@ async def main() -> None:
         # box is still reserved by the width/height attributes. Only
         # naturalWidth tells the truth.
         portrait = await page.evaluate(
-            "(() => { const i = document.querySelector('#hero figure img'); "
+            "(() => { const i = document.querySelector('#hero img'); "
             "if (!i) return null; return { w: i.naturalWidth, h: i.naturalHeight, "
             "box: Math.round(i.getBoundingClientRect().width), src: i.currentSrc }; })()"
         )
@@ -460,6 +570,14 @@ async def main() -> None:
                 "hero portrait is not upscaled",
                 f"rendered {portrait['box']}px from a {portrait['w']}px source",
             )
+
+        # Every image on the page, fetched rather than assumed. See MEDIA_PROBE.
+        media = await page.evaluate(MEDIA_PROBE)
+        broken = [m["path"] for m in media if not m["ok"]]
+        check(len(media) >= 3, "the briefing captures are on the page", f"{len(media)} images")
+        check(not broken, "every image is served", "; ".join(broken[:3]))
+        unsized = [m["path"] for m in media if not m["sized"]]
+        check(not unsized, "every image reserves its box", "; ".join(unsized[:3]))
 
         # The hero is meant to be exactly one viewport at the reference size.
         # Adding anything to it — the portrait, most recently — pushes the
@@ -593,10 +711,19 @@ async def main() -> None:
         )
         check(running == 0, "no animation is still running", f"{running} running")
 
-        transcript = await page.evaluate(
-            "document.querySelectorAll('.sr-only p, [class*=\"sr-only\"] p').length"
+        # The boot overlay is skipped outright under reduced motion, rather
+        # than shown as a still for the same duration. This is the assertion
+        # that holds that decision in place: it used to count the lines of the
+        # terminal transcript, which moved to the overlay and would now be
+        # counting something that correctly does not exist.
+        booted = await page.evaluate(
+            "({ overlay: !!document.querySelector('[data-boot]'), "
+            "locked: document.body.classList.contains('scroll-lock'), "
+            "name: (document.querySelector('h1')?.textContent || '').trim() })"
         )
-        check(transcript >= 6, "terminal transcript complete on arrival", f"{transcript} lines")
+        check(not booted["overlay"], "boot overlay is skipped under reduced motion")
+        check(not booted["locked"], "the page is scrollable immediately")
+        check(bool(booted["name"]), "the name is on screen with nothing to wait for", booted["name"])
         await screenshot(page, "reduced-motion-1440", 1440, 900)
         await page.send("Emulation.setEmulatedMedia", features=[])
 

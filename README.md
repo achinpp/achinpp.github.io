@@ -5,7 +5,7 @@ Hand built. No UI kit, no component library.
 
 **Vite 6 · React 18 · TypeScript · Tailwind CSS v4 · Motion (Framer) · Lenis**
 
-The build was done in twelve reviewable stages. [`stage.md`](./stage.md) is the single source of
+The build was done in thirteen reviewable stages. [`stage.md`](./stage.md) is the single source of
 truth: every stage records what shipped, every deviation from the plan with its reasoning, and
 what was verified versus what still needs a human with a browser.
 
@@ -67,7 +67,8 @@ Copy `.env.example` to `.env` and fill both variables in.
 | Decide what to do about the `OSCP` pill (see the file header)              | `src/data/skills.ts`       |
 | A PGP fingerprint, if you have one (the footer line is omitted without it) | `src/data/contact.ts`      |
 | A HackTheBox handle, if you have one (the row shows the numeric id)        | `src/data/contact.ts`      |
-| Confirm the hero portrait's caption, or clear it                           | `src/data/profile.ts`      |
+| Drop `Red_Cypher_3.0.jpeg` into `assets/`, then re-run the media script    | `src/data/achievements.ts` |
+| Screenshots for the other two briefings, if you have any                   | `src/data/projects.ts`     |
 
 Anything you did not state is marked in its data file, and most of it also shows a **dev only
 warning in the UI**. Those markers are compiled out of production builds, so they are visible
@@ -128,17 +129,30 @@ assets cannot drift from the design system.
 `public/favicon.svg` is hand written and not generated. It is the primary favicon for every
 current browser, and its geometry is matched 1:1 to the script.
 
-The hero portrait is a separate script, because it has a separate source:
+Photographs and screenshots are two separate scripts, because they have separate sources:
 
 ```bash
-python scripts/process-portrait.py
+python scripts/process-portrait.py   # the hero figure
+python scripts/process-media.py      # briefing screenshots, event photos
 ```
 
-Reads `assets/portrait-source.png`, the cut out with a transparent background, trims it to its
-alpha bounding box and writes `public/portrait.webp` (24 kB). `assets/` is the source cupboard:
-nothing in it is served or bundled. Replacing the photograph means dropping a new cut-out in
-there, re-running the script, and updating `width`/`height` on `PORTRAIT` in `src/data/profile.ts`
-to whatever the script prints.
+`assets/` is the source cupboard: nothing in it is served or bundled.
+
+`process-portrait.py` reads `assets/portrait-source.png`, the cut out with a transparent
+background, trims it to its alpha bounding box and writes `public/portrait.webp` (24 kB).
+
+`process-media.py` writes into `public/media/`. The Packet Tracer topology gets real work done
+to it: its canvas is a flat grey with black labels, which on an obsidian page is a slab of
+daylight, so the script splits the pixels by chroma, drops the canvas to alpha 0 and redraws the
+achromatic ink in the site's own light grey. The coloured device icons are left alone. The
+header comment explains why the two obvious alternatives, a CSS `invert()` and a light plate,
+are both worse.
+
+A job marked optional is skipped with a note when its source is missing rather than failing the
+run. `red-cypher` is one of those, waiting on a file.
+
+Either way: re-run the script, then paste the `width`/`height` it prints into the matching entry
+in `src/data/`.
 
 The script needs **Pillow**. It renders the card with system fonts rather than the brand fonts,
 because those ship as woff2 and decompressing woff2 needs Brotli; the header comment explains
@@ -156,8 +170,21 @@ npm run check:browser              # terminal 2
 `scripts/browser-check.py` drives an installed Chrome or Edge over the DevTools Protocol. It
 needs **Python with `websockets`** and no npm packages at all. It measures LCP and CLS for real,
 fails on any console error, asserts the DOM once React has mounted, drives the command palette
-from the keyboard, and writes screenshots into `.browser-check/`: one per section, plus 1440,
-768 and 390, the palette open, reduced motion, and the 404 page.
+from the keyboard, puts the boot overlay through its whole lifecycle, HEAD-fetches every image
+on the page, and writes screenshots into `.browser-check/`: one per section, plus 1440, 768 and
+390, the palette open, reduced motion, and the 404 page.
+
+Two of those deserve a note.
+
+**The boot overlay checks poll for the settled state, not the first frame.** React commits the
+DOM, paints, and only then runs the passive effects that take the scroll lock and move focus.
+Probing the instant `[data-boot]` appears catches that one frame gap and reports a modal that
+never locked anything, which is how the check first failed against correct code.
+
+**Images are fetched, not inspected.** A broken `<img>` is the one asset failure nothing else
+here can see: Chrome logs no console error for an image that 404s, the alt text is still in the
+DOM, and the width/height attributes still reserve the box. A lazy image below the fold has not
+even been requested, so `naturalWidth` cannot answer for it either.
 
 LCP is the **best of three cold loads** (HTTP cache off for all three), and the script prints
 all three. A single measurement is not a number: the same commit measured 1776ms one day and
@@ -193,14 +220,14 @@ reduced motion. They are position indicators, not animation: freezing them would
 
 ```
 assets/            source images, not served and not bundled
-public/            static assets, icons, 404 page, résumé
+public/            static assets, icons, media/, 404 page, résumé
 scripts/           asset generation, the browser check
 src/
-  components/      one folder per section, plus chrome/ layout/ ui/
+  components/      one folder per section, plus boot/ chrome/ layout/ ui/
   data/            all content, the only files you need to edit
   hooks/           behaviour primitives
   lib/             motion tokens, fuzzy scorer
-  providers/       motion, pointer, smooth scroll, toast, palette
+  providers/       boot, motion, pointer, smooth scroll, toast, palette
   styles/          design tokens and @font-face
 stage.md           the build log and the remaining checklist
 ```

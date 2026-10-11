@@ -1,49 +1,39 @@
 import { motion } from 'motion/react';
 import { ArrowDown, Download } from 'lucide-react';
-import { PROFILE, TERMINAL_SCRIPT } from '@/data/profile';
+import { PROFILE } from '@/data/profile';
 import { Portrait } from '@/components/hero/Portrait';
 import { RoleRotator } from '@/components/hero/RoleRotator';
 import { ScrollHint } from '@/components/hero/ScrollHint';
-import { TerminalWindow } from '@/components/hero/TerminalWindow';
 import { GlowButton } from '@/components/ui/GlowButton';
 import { ScrambleText } from '@/components/ui/ScrambleText';
+import { useBoot } from '@/hooks/useBoot';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useScrollTo } from '@/hooks/useScrollTo';
-import { useTypewriter } from '@/hooks/useTypewriter';
 import { duration, easeOutExpo, stagger } from '@/lib/motion/easings';
 import { maskReveal } from '@/lib/motion/variants';
 
-/** Grounded in the brief — nothing here is invented. */
-const META = [
-  { label: 'Focus', value: 'AppSec · Cloud · Adversarial ML' },
-  { label: 'Based', value: PROFILE.location },
-  { label: 'Affiliation', value: 'IEEE SIGHT · IEEE IAS' },
-] as const;
-
 const NAME_LINES = [PROFILE.firstName, PROFILE.name.slice(PROFILE.firstName.length).trim()];
 
+/**
+ * The hero, after the terminal and the meta rail both came out of it.
+ *
+ * The terminal is the boot overlay now, and the `FOCUS / BASED / AFFILIATION`
+ * rail is gone at your request. What is left is the two things a hero is
+ * actually for: who this is, and what to do next. Everything the rail carried
+ * is still on the page: the roles in the rotator directly below the name,
+ * the location in the HUD along the bottom edge and in the contact panel, the
+ * IEEE chapters on the experience timeline, where they come with a role and a
+ * date instead of sitting as three bare words.
+ *
+ * **The reveal is gated on the boot overlay, not on a typing script.** It
+ * used to wait for the terminal's first line to finish, which no longer
+ * exists here. `booted` is true immediately under reduced motion, so that
+ * path arrives at a finished hero with nothing held back.
+ */
 export function Hero() {
   const reduced = useReducedMotion();
   const scrollTo = useScrollTo();
-
-  const typing = useTypewriter(TERMINAL_SCRIPT, { enabled: true, instant: reduced });
-
-  /**
-   * The name appears once `whoami` has finished executing — line 0 of the
-   * script — rather than after the whole transcript.
-   *
-   * That ordering is the point: the brief asked for the terminal to run
-   * `whoami` and *then* render the name. Waiting for all six lines would put
-   * Largest Contentful Paint even later, since the hero grid keeps growing as
-   * each piece of it lands.
-   *
-   * Stage 10 measured this properly for the first time. The Stage 2 figure
-   * (~1654ms) was arithmetic, and it was measuring the wrong moment: LCP
-   * tracks the hero *grid*, which keeps being re-reported as larger content
-   * paints inside it, so the real number is when the CTAs finish — not when
-   * the name starts revealing.
-   */
-  const revealName = typing.lineIndex >= 1;
+  const { booted } = useBoot();
 
   return (
     <section
@@ -51,41 +41,13 @@ export function Hero() {
       className="relative flex min-h-svh flex-col justify-center px-5 py-28 sm:px-10"
     >
       <div className="mx-auto w-full max-w-6xl">
-        <div className="grid gap-y-12 lg:grid-cols-12 lg:gap-x-8">
-          {/* ------------------------------------------------- terminal */}
-          <motion.div
-            initial={reduced ? false : { opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: duration.slow, ease: easeOutExpo, delay: 0.1 }}
-            className="lg:col-span-6 xl:col-span-5"
-          >
-            <TerminalWindow typing={typing} />
-          </motion.div>
-
-          {/* --------------------------------------------- meta rail */}
-          <motion.dl
-            initial={reduced ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: duration.slow, delay: 0.35 }}
-            className="flex flex-col divide-y divide-hairline lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:self-end"
-          >
-            {META.map((row) => (
-              <div key={row.label} className="flex items-baseline gap-4 py-2.5">
-                <dt className="w-24 shrink-0 font-mono text-[0.5625rem] tracking-[0.2em] text-obsidian-500 uppercase">
-                  {row.label}
-                </dt>
-                <dd className="font-mono text-[0.6875rem] tracking-[0.08em] text-ink-muted">
-                  {row.value}
-                </dd>
-              </div>
-            ))}
-          </motion.dl>
-
+        <div className="grid items-end gap-y-14 lg:grid-cols-12 lg:gap-x-10">
           {/* -------------------------------------------- name block */}
-          <div className="lg:col-span-8 lg:row-start-2">
-            {/* Eyebrow — ties the headline back to the whoami that produced it. */}
+          <div className="lg:col-span-7">
+            {/* Eyebrow. Ties the headline back to the whoami that ran on the
+                boot screen a second ago and produced this name. */}
             <div className="h-4">
-              {revealName && (
+              {booted && (
                 <ScrambleText
                   text="identity confirmed"
                   tickMs={26}
@@ -102,7 +64,7 @@ export function Hero() {
                   <motion.span
                     variants={maskReveal}
                     initial={reduced ? false : 'hidden'}
-                    animate={revealName || reduced ? 'visible' : 'hidden'}
+                    animate={booted || reduced ? 'visible' : 'hidden'}
                     transition={{
                       duration: duration.reveal,
                       ease: easeOutExpo,
@@ -120,24 +82,20 @@ export function Hero() {
 
             <motion.div
               initial={reduced ? false : { opacity: 0 }}
-              animate={{ opacity: revealName || reduced ? 1 : 0 }}
+              animate={{ opacity: booted || reduced ? 1 : 0 }}
               transition={{ duration: duration.base, delay: 0.3 }}
               className="mt-7"
             >
-              <RoleRotator start={revealName} />
+              <RoleRotator start={booted} />
             </motion.div>
 
             {/* ------------------------------------------------ CTAs */}
             <motion.div
               initial={reduced ? false : { opacity: 0, y: 12 }}
               animate={{
-                opacity: revealName || reduced ? 1 : 0,
-                y: revealName || reduced ? 0 : 12,
+                opacity: booted || reduced ? 1 : 0,
+                y: booted || reduced ? 0 : 12,
               }}
-              // Stage 10: delay 0.45 -> 0.22, which brings the résumé button
-              // forward without changing the fade itself. Shortening the fade
-              // as well was tried and measured at zero benefit, so it was
-              // reverted — see the Stage 10 notes on what actually moved LCP.
               transition={{ duration: duration.slow, ease: easeOutExpo, delay: 0.22 }}
               className="mt-11 flex flex-wrap items-center gap-4"
             >
@@ -164,14 +122,14 @@ export function Hero() {
           </div>
 
           {/* --------------------------------------------- portrait
-              Last in the DOM, and last on a phone — where the stack is
-              terminal, meta, name, role, CTAs, face. Putting it before the
-              name reads better on a wide screen but pushes the name itself
-              below the fold at 390px, and the name is the one thing the
-              first screen has to contain. On `lg` it is placed explicitly
-              into row 2 beside the name, so source order costs nothing
-              there and the visual order still matches the DOM. */}
-          <div className="lg:col-span-4 lg:col-start-9 lg:row-start-2 lg:self-end">
+              Last in the DOM, and last on a phone, where the stack is name,
+              role, CTAs, face. Putting it first reads better on a wide
+              screen but pushes the name itself below the fold at 390px, and
+              the name is the one thing the first screen has to contain. On
+              `lg` it is placed explicitly into the right hand columns, so
+              source order costs nothing there and the visual order still
+              matches the DOM. */}
+          <div className="lg:col-span-4 lg:col-start-9">
             <Portrait />
           </div>
         </div>

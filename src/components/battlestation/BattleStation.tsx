@@ -4,6 +4,7 @@ import { Section } from '@/components/layout/Section';
 import { SectionHeading } from '@/components/layout/SectionHeading';
 import { AchievementBadge, LockedSlot } from '@/components/battlestation/AchievementBadge';
 import { ContributionStrip } from '@/components/battlestation/ContributionStrip';
+import { FieldRecord } from '@/components/battlestation/FieldRecord';
 import { StatGrid } from '@/components/battlestation/StatGrid';
 import { stagger } from '@/lib/motion/easings';
 import { fadeUp, revealViewport, staggerGroup } from '@/lib/motion/variants';
@@ -55,6 +56,10 @@ export function BattleStation() {
               <LockedSlot key={i} index={ACHIEVEMENTS.length + i + 1} />
             ))}
           </motion.ul>
+
+          {/* Pictures from the events, between the wall and the footnotes.
+            Renders nothing while no achievement carries one. */}
+          <FieldRecord achievements={ACHIEVEMENTS} />
 
           {/* Organisers, as a footnote. They belong with the wall but not in a
             128px badge column, and a competition is worth more with the body

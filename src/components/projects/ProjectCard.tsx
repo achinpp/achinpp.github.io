@@ -164,6 +164,41 @@ export function ProjectCard({ project, isOpen, onOpen }: Props) {
             </ul>
           )}
 
+          {/* ----------------------------------------------- the capture
+              Natural aspect ratio, no crop. A fixed band with `object-cover`
+              was the first attempt and it is wrong for these two in
+              particular: the Packet Tracer topology runs edge to edge, so any
+              crop takes a router off the end of it, and a diagram missing its
+              ISP link is not a smaller diagram but a wrong one.
+
+              It sits here, directly under the copy, and NOT in the `mt-auto`
+              block below. In the bottom block it was pushed to the foot of a
+              card that stretches to match its row, which on the feature tile
+              opened a 200px hole between the capability list and the
+              screenshot. Down here the slack collects under the picture
+              instead, where it reads as a margin above a footer rather than
+              as a gap in the middle of the card.
+
+              Dimmed at rest and full strength on card hover, the same bargain
+              the hero portrait makes: quiet until someone is actually looking
+              at it. `loading="lazy"` because every one of these is well below
+              the fold, and both dimensions on the element because a lazy
+              image with no reserved box is a layout shift that arrives mid
+              scroll, which is the kind CLS counts and visitors notice most. */}
+          {project.media && (
+            <div className="mt-7 overflow-hidden rounded-lg border border-hairline bg-obsidian-950">
+              <img
+                src={project.media.src}
+                alt={project.media.alt}
+                width={project.media.width}
+                height={project.media.height}
+                loading="lazy"
+                decoding="async"
+                className="block w-full opacity-75 transition-opacity duration-500 ease-out-expo group-hover:opacity-100"
+              />
+            </div>
+          )}
+
           <div className="mt-auto pt-7">
             <div className="flex flex-wrap gap-1.5">
               {shownStack.map((item) => (

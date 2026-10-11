@@ -1440,6 +1440,156 @@ and 390.
 
 ---
 
+## STAGE 13 — The Boot Sequence ✅
+
+The terminal leaves the landing page and becomes the loading screen. The hero loses its meta
+rail. Screenshots arrive on two briefings, Red Cypher gets its details, and two review only
+markers come out.
+
+- [x] **The `root@shadow` terminal is a boot overlay**, with a real progress bar, four ways to
+      skip it, and a reduced motion path that does not show it at all
+- [x] **The hero is the name and the portrait**, nothing else
+- [x] **No caption on the portrait**, and no caption mechanism either
+- [x] **Screenshots on BRIEFING_01 and BRIEFING_02**, in the card and at full size in the panel
+- [x] **Red Cypher 3.0** carries Team LO49 and its organisers
+- [x] **The dev only markers are gone** from Arsenal and from Experience & Leadership
+- [x] Boot overlay, scroll lock, focus and every image on the page are now asserted by
+      `npm run check:browser`
+
+**Accept when:** the terminal runs once, in front, and the page it hands over to is the page. ✅
+
+### What the boot screen had to be, and what it costs
+
+> NOTE: **The page is already behind the glass.** The whole site renders on the first frame and
+> the overlay sits on top of it, opaque. It is not a gate holding anything back. So the lift is
+> a fade with nothing to wait for, and anyone who skips lands on a page that is already laid
+> out and decoded. That keeps the cost honest: the boot screen adds time to the first thing a
+> visitor can **read**, and there is no way around that, but it adds nothing to the work the
+> browser has to do.
+
+> NOTE: **The script was retuned, because the old one measured 5.0s.** That was fine when it
+> ran beside the name and you could read the page while it typed. As the only thing on screen
+> it is five seconds of nobody being able to do anything. Two of its six lines also repeated
+> what the page says better anyway: `cat ./role` against the role rotator directly under the
+> name, and `status --availability` against the availability pill in the HUD. Both are gone,
+> the rest is faster, and the sequence now runs ~1.8s with the page revealed by ~2.3s.
+>
+> `whoami` stays. The eyebrow over the name reads `identity confirmed`, and that is the command
+> it is confirming.
+
+> NOTE: **It replays on every load.** Remembering in `sessionStorage` would spare a returning
+> visitor the wait, and it would also mean a reload during review shows something different
+> from a reload in a fresh tab. Predictable won. One read in the `useState` initialiser in
+> `<BootProvider>` reverses it if you would rather have the other trade.
+
+> NOTE: **Reduced motion skips it outright**, rather than showing a still of it for the same
+> duration. A loading screen over an already loaded page is decoration, and that is the one
+> thing the preference unambiguously asks for less of. The preference is known synchronously on
+> the first render, so nothing flashes.
+
+> NOTE: **Four ways out:** the button in the window chrome, Escape, a click anywhere on the
+> glass, and the preference above. All four go through one `dismiss` callback, which jumps to
+> the end of the script while it is running and takes the page immediately once it is done.
+
+> NOTE: **LCP now reads better and means less.** The measured figure went from 1764ms to
+> 1244ms, and that is not an improvement anybody can feel: the largest paint is now the overlay,
+> which is a big opaque box that arrives early. Time to the name is about 2.3s. The metric is
+> still worth keeping because a regression in it is still a regression, but this stage's number
+> should not be compared to Stage 12's.
+
+### Two defects the browser pass found, both in this stage's own work
+
+> NOTE: **Focus dropped onto `<body>` for the last 700ms of the sequence.** The skip button was
+> gated on `!done`, so it unmounted the moment the script finished, and the focus trap had
+> nothing left to hold. A keyboard user's place on the page quietly disappeared behind glass
+> they could not see past. It stays mounted now, which is also the better control: once the
+> transcript is done it skips the hold and the fade instead of skipping nothing.
+
+> NOTE: **My own new check failed against correct code.** It probed the instant `[data-boot]`
+> appeared, which is one frame before React runs the passive effects that take the scroll lock
+> and move focus, so it reported a modal that never locked anything. The check polls for the
+> settled state now. This is the same class of mistake as the phantom `[data-boot]` selector
+> recorded at Stage 10, from the other direction: that one could never fail, this one could
+> never pass.
+
+### The hero, after
+
+> NOTE: **The `FOCUS / BASED / AFFILIATION` rail is gone and nothing went with it.** The roles
+> are in the rotator directly under the name. The location is in the HUD along the bottom edge
+> and in the contact panel. The IEEE chapters are on the experience timeline, where they come
+> with a role and a date instead of sitting as three bare words. The rail was a summary of
+> things the page already says, placed above the thing it was summarising.
+
+> NOTE: **The portrait caption is gone, and so is the caption field.** `DevFest Sri Lanka 2025`
+> was inferred from the shirt in the photograph and the filename it arrived under. A `caption`
+> sitting at `null` would have been an empty slot, and an empty slot is an invitation to fill
+> it with a guess, so the whole mechanism went. The figure is also 16rem to 18rem wider now the
+> terminal has vacated the hero, which is still inside the band where a 451px source is sharp.
+
+### The briefing captures
+
+> NOTE: **The Packet Tracer diagram needed real work, not a filter.** It arrived as a flat grey
+> canvas with black labels on it, which on an obsidian page is a slab of daylight. A CSS
+> `invert()` turns mid grey into mid grey and the thing still glares; a light plate turns the
+> card into a window with the lights on. So `scripts/process-media.py` splits the pixels by
+> chroma: achromatic pixels are the canvas, the labels and the white screens, and their alpha
+> becomes their distance from the canvas lightness while their colour becomes the site's own
+> ink; coloured pixels are the Cisco icons and the green link lights, and those are the diagram,
+> so they are kept exactly as they are. The result is a schematic drawn in the site's ink on the
+> site's background, which is what a network diagram in a portfolio should look like anyway.
+
+> NOTE: **Natural aspect ratio, no crop.** A fixed band with `object-cover` was the first
+> attempt and it is wrong for these two in particular: the topology runs edge to edge, so any
+> crop takes a router off the end of it, and a diagram missing its ISP link is not a smaller
+> diagram but a wrong one.
+
+> NOTE: **The capture sits under the copy, not in the card's bottom block.** In the bottom block
+> it was pushed to the foot of a card that stretches to match its row, which on the feature tile
+> opened a 200px hole between the capability list and the screenshot. Under the copy the slack
+> collects below the picture instead, where it reads as a margin above a footer.
+
+### The markers that came out
+
+> NOTE: **The Arsenal legend and the `DRAFT COPY` marker are gone, and so are the fields behind
+> them.** `source: 'stated' | 'derived'` held the same value sixty four times once the skill
+> list became wholly yours, and `draftBullets` was `true` on all five roles. A warning that
+> fires on everything has stopped warning about anything. What they were saying now lives in the
+> file headers: the bullets are still my wording for what each role ordinarily covers, and that
+> is worth replacing with something you actually did.
+>
+> The markers on the **project status badges** and on the **contact form** stay. Those still
+> point at one specific unconfirmed thing each.
+
+### Red Cypher 3.0
+
+> NOTE: **⚠ `Red_Cypher_3.0.jpeg` is not in the project folder,** and nothing by that name is
+> anywhere on this machine. The panel that would show it is built, wired and currently rendering
+> nothing, which costs the layout nothing at all. Drop the file into `assets/` as
+> `red-cypher-source.jpeg`, run `python scripts/process-media.py`, and paste the two numbers it
+> prints into `ACHIEVEMENTS[0].image`.
+>
+> The nearest thing on this machine is
+> `Pictures\Linkedin\redcypher 3.0\WhatsApp Image 2026-09-16 at 21.37.04.jpeg`. It is the
+> qualifier round announcement poster, listing twenty qualifying teams with LO49 among them. It
+> was not used: it is the organiser's marketing graphic with nineteen other teams on it, and it
+> says `Online Qualifier Round` under a badge that says Finalist. Say the word if it is the one
+> you meant.
+
+> NOTE: **⚠ The date is still blank.** Your message read "date is" and stopped.
+
+> NOTE: **The organiser line is yours, not the poster's.** You wrote `IEEE SB of UOR & HackSL`
+> and the footnote expands that to `IEEE Student Branch of the University of Ruhuna and HackSL`.
+> Worth knowing: the poster above credits `Organized By` to the IEEE Computer Society (UoR
+> Student Branch Chapter) and the University of Ruhuna IEEE Student Branch, and lists HackSL as
+> `Media Partner`. You are the authority on your own competition, so it stands as you wrote it.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+`npm run test` 8/8 · `npm run check:browser` **all checks pass**, LCP 1244ms best of
+1244-1744ms, CLS 0.0064 · production build 382.5 kB JS (122.1 kB gzip) / 63.3 kB CSS · boot
+overlay, hero, briefings and Battle Station all reviewed in browser at 1440 and 390.
+
+---
+
 ## Working Agreement
 
 1. One stage at a time. I build it, you review it, we iterate, then we advance.
@@ -1469,6 +1619,7 @@ and 390.
 
 ---
 
-**Current status:** `STAGE 12 — your content is in` → remaining: **dates**, the **OSCP
-question**, **project links**, a **PGP fingerprint**, **Lighthouse on the deployed site**,
-**Safari and Firefox**, a **screen reader pass**, and the **deploy**. See the README table.
+**Current status:** `STAGE 13 — the terminal is the loading screen` → remaining: the
+**Red Cypher photo**, **dates**, the **OSCP question**, **project links**, a **PGP
+fingerprint**, **Lighthouse on the deployed site**, **Safari and Firefox**, a **screen reader
+pass**, and the **deploy**. See the README table.

@@ -1,26 +1,28 @@
 /**
  * Arsenal, the skill cloud.
  *
- * Every entry below was supplied by you, verbatim, so `source` is `'stated'`
- * across the board. The `'derived'` value stays in the type because the
- * mechanism is worth keeping: anything added later that was inferred rather
- * than stated gets flagged in the dev only legend at the foot of the section.
+ * Every entry below was supplied by you, verbatim.
  *
- * ⚠ TWO THINGS TO LOOK AT.
+ * Each skill used to carry a provenance field feeding a review only legend at
+ * the foot of the section. Both are gone. Once the list became wholly yours
+ * that field held the same value sixty four times and the legend said so in a
+ * box you had to look past on every reload, which is a warning that has
+ * stopped warning about anything. If something inferred is ever added here,
+ * the honest fix is not to rebuild that machinery but to not add it.
  *
- * 1. **`OSCP` is in the list.** It is a certification, not a technique, and
- *    sitting in a skill cloud it reads as "I hold the OSCP". If you hold it,
- *    it belongs in its own credential line where it can carry a date and a
- *    verification link. If you do not, it should come out. It is left where
- *    you put it until you say which.
- * 2. **Ten pills that used to be here are gone,** because they are not in
- *    your list: Python, Node.js, FastAPI, Threat Modeling, Cloud Security,
- *    Semgrep, Trivy, Gitleaks, YOLO, VGG19, Google ADK, Gemini API,
- *    Adversarial ML, SAST, CI/CD Pipelines, VLANs and Extended ACLs, Port
- *    Security and Network Segmentation. Several still appear on the project
- *    cards, which is not a contradiction (a stack list says what a project
- *    used, a skill cloud says what you want to be asked about) but it is
- *    worth a look.
+ * ⚠ `OSCP` is in the list and it is the one entry worth arguing about. It is
+ * a certification, not a technique, and sitting in a skill cloud it reads as
+ * "I hold the OSCP". If you hold it, it belongs in its own credential line
+ * where it can carry a date and a verification link. If you do not, it should
+ * come out. It is left where you put it until you say which.
+ *
+ * ⚠ Ten pills that used to be here are gone, because they are not in your
+ * list: Python, Node.js, FastAPI, Threat Modeling, Cloud Security, Semgrep,
+ * Trivy, Gitleaks, YOLO, VGG19, Google ADK, Gemini API, Adversarial ML, SAST,
+ * CI/CD Pipelines, VLANs and Extended ACLs, Port Security and Network
+ * Segmentation. Several still appear on the project cards, which is not a
+ * contradiction (a stack list says what a project used, a skill cloud says
+ * what you want to be asked about) but it is worth a look.
  *
  * `full` carries the expanded form wherever a name was shortened to fit a
  * pill. Nothing is renamed, only abbreviated.
@@ -45,122 +47,114 @@ export type Category = (typeof CATEGORIES)[number];
 export type Skill = {
   name: string;
   category: Category;
-  /** 'stated' = you listed it · 'derived' = inferred from something else. */
-  source: 'stated' | 'derived';
   /** Expanded form, where the pill name is an abbreviation. */
   full?: string;
 };
 
 export const SKILLS: Skill[] = [
   // ---------------------------------------------------- Offensive Security
-  { name: 'Ethical Hacking', category: 'Offensive Security', source: 'stated' },
-  { name: 'Penetration Testing', category: 'Offensive Security', source: 'stated' },
-  { name: 'Reverse Engineering', category: 'Offensive Security', source: 'stated' },
-  { name: 'Reconnaissance', category: 'Offensive Security', source: 'stated' },
-  { name: 'Cryptography', category: 'Offensive Security', source: 'stated' },
-  { name: 'Steganography', category: 'Offensive Security', source: 'stated' },
-  { name: 'Offensive Security Tooling', category: 'Offensive Security', source: 'stated' },
-  { name: 'Hacking', category: 'Offensive Security', source: 'stated' },
-  { name: 'OSCP', category: 'Offensive Security', source: 'stated' },
+  { name: 'Ethical Hacking', category: 'Offensive Security' },
+  { name: 'Penetration Testing', category: 'Offensive Security' },
+  { name: 'Reverse Engineering', category: 'Offensive Security' },
+  { name: 'Reconnaissance', category: 'Offensive Security' },
+  { name: 'Cryptography', category: 'Offensive Security' },
+  { name: 'Steganography', category: 'Offensive Security' },
+  { name: 'Offensive Security Tooling', category: 'Offensive Security' },
+  { name: 'Hacking', category: 'Offensive Security' },
+  { name: 'OSCP', category: 'Offensive Security' },
 
   // -------------------------------------------------- Defensive Operations
-  { name: 'Cybersecurity', category: 'Defensive Operations', source: 'stated' },
-  { name: 'Defensive Security', category: 'Defensive Operations', source: 'stated' },
-  { name: 'Defensive Security Tooling', category: 'Defensive Operations', source: 'stated' },
+  { name: 'Cybersecurity', category: 'Defensive Operations' },
+  { name: 'Defensive Security', category: 'Defensive Operations' },
+  { name: 'Defensive Security Tooling', category: 'Defensive Operations' },
   {
     name: 'SOAR',
     category: 'Defensive Operations',
-    source: 'stated',
     full: 'Security Orchestration, Automation and Response',
   },
   {
     name: 'EDR',
     category: 'Defensive Operations',
-    source: 'stated',
     full: 'Endpoint Detection and Response',
   },
-  { name: 'Incident Detection & Response', category: 'Defensive Operations', source: 'stated' },
-  { name: 'Digital Forensics', category: 'Defensive Operations', source: 'stated' },
-  { name: 'Log Management & Analysis', category: 'Defensive Operations', source: 'stated' },
-  { name: 'IT Security Operations', category: 'Defensive Operations', source: 'stated' },
-  { name: 'Network Security', category: 'Defensive Operations', source: 'stated' },
-  { name: 'Security Principles', category: 'Defensive Operations', source: 'stated' },
+  { name: 'Incident Detection & Response', category: 'Defensive Operations' },
+  { name: 'Digital Forensics', category: 'Defensive Operations' },
+  { name: 'Log Management & Analysis', category: 'Defensive Operations' },
+  { name: 'IT Security Operations', category: 'Defensive Operations' },
+  { name: 'Network Security', category: 'Defensive Operations' },
+  { name: 'Security Principles', category: 'Defensive Operations' },
 
   // --------------------------------------------------- AppSec & DevSecOps
-  { name: 'Application Security', category: 'AppSec & DevSecOps', source: 'stated' },
-  { name: 'DevSecOps', category: 'AppSec & DevSecOps', source: 'stated' },
-  { name: 'OWASP Top 10', category: 'AppSec & DevSecOps', source: 'stated' },
-  { name: 'GitHub Actions', category: 'AppSec & DevSecOps', source: 'stated' },
+  { name: 'Application Security', category: 'AppSec & DevSecOps' },
+  { name: 'DevSecOps', category: 'AppSec & DevSecOps' },
+  { name: 'OWASP Top 10', category: 'AppSec & DevSecOps' },
+  { name: 'GitHub Actions', category: 'AppSec & DevSecOps' },
 
   // ------------------------------------------------- AI & LLM Engineering
-  { name: 'Generative AI', category: 'AI & LLM Engineering', source: 'stated' },
-  { name: 'Generative AI Security', category: 'AI & LLM Engineering', source: 'stated' },
-  { name: 'Agentic AI', category: 'AI & LLM Engineering', source: 'stated' },
-  { name: 'Multi-agent Systems', category: 'AI & LLM Engineering', source: 'stated' },
+  { name: 'Generative AI', category: 'AI & LLM Engineering' },
+  { name: 'Generative AI Security', category: 'AI & LLM Engineering' },
+  { name: 'Agentic AI', category: 'AI & LLM Engineering' },
+  { name: 'Multi-agent Systems', category: 'AI & LLM Engineering' },
   {
     name: 'LLMs',
     category: 'AI & LLM Engineering',
-    source: 'stated',
     full: 'Large Language Models',
   },
-  { name: 'Prompt Engineering', category: 'AI & LLM Engineering', source: 'stated' },
-  { name: 'LangChain', category: 'AI & LLM Engineering', source: 'stated' },
+  { name: 'Prompt Engineering', category: 'AI & LLM Engineering' },
+  { name: 'LangChain', category: 'AI & LLM Engineering' },
   {
     name: 'MCP',
     category: 'AI & LLM Engineering',
-    source: 'stated',
     full: 'Model Context Protocol',
   },
-  { name: 'AI Application Development', category: 'AI & LLM Engineering', source: 'stated' },
-  { name: 'MITRE ATLAS', category: 'AI & LLM Engineering', source: 'stated' },
-  { name: 'Claude Code', category: 'AI & LLM Engineering', source: 'stated' },
+  { name: 'AI Application Development', category: 'AI & LLM Engineering' },
+  { name: 'MITRE ATLAS', category: 'AI & LLM Engineering' },
+  { name: 'Claude Code', category: 'AI & LLM Engineering' },
 
   // ------------------------------------------------------ Cloud & Systems
-  { name: 'Amazon Bedrock', category: 'Cloud & Systems', source: 'stated' },
-  { name: 'AWS SageMaker', category: 'Cloud & Systems', source: 'stated' },
-  { name: 'Amazon Q', category: 'Cloud & Systems', source: 'stated' },
-  { name: 'Amazon VPC', category: 'Cloud & Systems', source: 'stated' },
-  { name: 'AWS KMS', category: 'Cloud & Systems', source: 'stated' },
-  { name: 'AWS Systems Manager', category: 'Cloud & Systems', source: 'stated' },
-  { name: 'Amazon CloudWatch', category: 'Cloud & Systems', source: 'stated' },
-  { name: 'Linux System Administration', category: 'Cloud & Systems', source: 'stated' },
-  { name: 'Windows System Administration', category: 'Cloud & Systems', source: 'stated' },
+  { name: 'Amazon Bedrock', category: 'Cloud & Systems' },
+  { name: 'AWS SageMaker', category: 'Cloud & Systems' },
+  { name: 'Amazon Q', category: 'Cloud & Systems' },
+  { name: 'Amazon VPC', category: 'Cloud & Systems' },
+  { name: 'AWS KMS', category: 'Cloud & Systems' },
+  { name: 'AWS Systems Manager', category: 'Cloud & Systems' },
+  { name: 'Amazon CloudWatch', category: 'Cloud & Systems' },
+  { name: 'Linux System Administration', category: 'Cloud & Systems' },
+  { name: 'Windows System Administration', category: 'Cloud & Systems' },
 
   // ---------------------------------------------------- Engineering & Web
-  { name: 'Java', category: 'Engineering & Web', source: 'stated' },
-  { name: 'Web Development', category: 'Engineering & Web', source: 'stated' },
-  { name: 'Web Maintenance', category: 'Engineering & Web', source: 'stated' },
-  { name: 'Web Production Management', category: 'Engineering & Web', source: 'stated' },
-  { name: 'CLI', category: 'Engineering & Web', source: 'stated' },
+  { name: 'Java', category: 'Engineering & Web' },
+  { name: 'Web Development', category: 'Engineering & Web' },
+  { name: 'Web Maintenance', category: 'Engineering & Web' },
+  { name: 'Web Production Management', category: 'Engineering & Web' },
+  { name: 'CLI', category: 'Engineering & Web' },
 
   // ------------------------------------------------------ Making & Design
-  { name: '3D Modeling', category: 'Making & Design', source: 'stated' },
-  { name: '3D Printing', category: 'Making & Design', source: 'stated' },
-  { name: 'CAD/CAM', category: 'Making & Design', source: 'stated' },
-  { name: 'Robotics', category: 'Making & Design', source: 'stated' },
+  { name: '3D Modeling', category: 'Making & Design' },
+  { name: '3D Printing', category: 'Making & Design' },
+  { name: 'CAD/CAM', category: 'Making & Design' },
+  { name: 'Robotics', category: 'Making & Design' },
   {
     name: 'PCB Design',
     category: 'Making & Design',
-    source: 'stated',
     full: 'Printed Circuit Board Design',
   },
   {
     name: 'UX Design',
     category: 'Making & Design',
-    source: 'stated',
     full: 'User Experience Design',
   },
-  { name: 'Graphic Design', category: 'Making & Design', source: 'stated' },
-  { name: 'Video Editing', category: 'Making & Design', source: 'stated' },
+  { name: 'Graphic Design', category: 'Making & Design' },
+  { name: 'Video Editing', category: 'Making & Design' },
 
   // -------------------------------------------------- Governance & People
-  { name: 'Standards Development Policies', category: 'Governance & People', source: 'stated' },
-  { name: 'Regulatory Compliance', category: 'Governance & People', source: 'stated' },
-  { name: 'Professional Ethics', category: 'Governance & People', source: 'stated' },
-  { name: 'Project Management', category: 'Governance & People', source: 'stated' },
-  { name: 'Leadership', category: 'Governance & People', source: 'stated' },
-  { name: 'Teaching', category: 'Governance & People', source: 'stated' },
-  { name: 'Research Skills', category: 'Governance & People', source: 'stated' },
+  { name: 'Standards Development Policies', category: 'Governance & People' },
+  { name: 'Regulatory Compliance', category: 'Governance & People' },
+  { name: 'Professional Ethics', category: 'Governance & People' },
+  { name: 'Project Management', category: 'Governance & People' },
+  { name: 'Leadership', category: 'Governance & People' },
+  { name: 'Teaching', category: 'Governance & People' },
+  { name: 'Research Skills', category: 'Governance & People' },
 ];
 
 /**

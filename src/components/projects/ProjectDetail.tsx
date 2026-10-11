@@ -133,6 +133,28 @@ export function ProjectDetail({ project, onClose }: Props) {
             {project.brief}
           </p>
 
+          {/* The capture at full size. Eager here, unlike on the card: this
+              panel only exists because someone asked for it, so the image is
+              the point rather than an extra. */}
+          {project.media && (
+            <figure className="mt-8">
+              <div className="overflow-hidden rounded-lg border border-hairline bg-obsidian-950">
+                <img
+                  src={project.media.src}
+                  alt={project.media.alt}
+                  width={project.media.width}
+                  height={project.media.height}
+                  decoding="async"
+                  className="block w-full"
+                />
+              </div>
+              <figcaption className="mt-3 flex items-center gap-2.5 font-mono text-[0.5625rem] tracking-[0.18em] text-obsidian-500 uppercase">
+                <span aria-hidden className="h-px w-5 bg-hairline-strong" />
+                capture · {project.index.toLowerCase()}
+              </figcaption>
+            </figure>
+          )}
+
           <section className="mt-9">
             <h4 className="font-mono text-label text-mint-600 uppercase">Capabilities</h4>
             <ul className="mt-4 grid gap-2.5 sm:grid-cols-2">

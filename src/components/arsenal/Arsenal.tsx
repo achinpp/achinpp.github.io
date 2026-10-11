@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { CATEGORIES, SKILLS, type Category } from '@/data/skills';
+import { SKILLS, type Category } from '@/data/skills';
 import { Section } from '@/components/layout/Section';
 import { SectionHeading } from '@/components/layout/SectionHeading';
 import { FilterChips } from '@/components/arsenal/FilterChips';
@@ -22,8 +22,12 @@ const SEED = new Map(SKILLS.map((skill, i) => [skill.name, i]));
  * animates with them rather than snapping.
  *
  * Pills are all the same size. Varying them by implied strength would be a
- * proficiency claim with no number attached to argue with — which is the same
+ * proficiency claim with no number attached to argue with, which is the same
  * thing a percentage bar does, just harder to pin down.
+ *
+ * A review only legend used to sit at the foot of this section, counting how
+ * many pills you supplied against how many were inferred. It is gone with the
+ * field that fed it; see the header of `src/data/skills.ts` for why.
  */
 export function Arsenal() {
   const [active, setActive] = useState<Category | null>(null);
@@ -63,34 +67,6 @@ export function Arsenal() {
         {visible.length} of {SKILLS.length} skills shown
         {active ? `, filtered by ${active}` : ''}
       </p>
-
-      {import.meta.env.DEV && <ProvenanceLegend />}
     </Section>
-  );
-}
-
-/**
- * Review time only: which pills you supplied and which were inferred from
- * something else. Compiled out of production.
- *
- * Every pill is currently `stated`, so the second line does not render. The
- * legend stays because the moment anything is added that you did not list,
- * it should be visible during review rather than blending in.
- */
-function ProvenanceLegend() {
-  const derived = SKILLS.filter((skill) => skill.source === 'derived');
-
-  return (
-    <div className="mt-12 rounded-lg border border-signal-900 bg-signal-900/10 p-4">
-      <p className="font-mono text-[0.5625rem] leading-relaxed tracking-[0.16em] text-signal-400 uppercase">
-        ⚠ dev only: {SKILLS.length - derived.length} supplied by you · {derived.length} inferred ·{' '}
-        {CATEGORIES.length} categories
-      </p>
-      {derived.length > 0 && (
-        <p className="mt-2.5 font-mono text-[0.5625rem] leading-relaxed tracking-[0.1em] text-signal-400/70">
-          inferred: {derived.map((skill) => skill.name).join(' · ')}
-        </p>
-      )}
-    </div>
   );
 }

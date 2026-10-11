@@ -48,9 +48,9 @@ export const PROFILE = {
 
 /* -------------------------------------------------------------------------
    Hero portrait
-   The cut-out that stands beside the name. Set to `null` and the hero drops
-   the figure, the caption and the preload with no other edits — the layout
-   is a grid, so the column simply goes empty.
+   The cut out that stands beside the name. Set this to `null` and the hero
+   drops the figure with no other edits: the layout is a grid, so the column
+   simply goes empty.
    ------------------------------------------------------------------------- */
 
 export type Portrait = {
@@ -58,8 +58,6 @@ export type Portrait = {
   width: number;
   height: number;
   alt: string;
-  caption: string | null;
-  captionConfirmed: boolean;
 };
 
 export const PORTRAIT: Portrait | null = {
@@ -75,26 +73,31 @@ export const PORTRAIT: Portrait | null = {
   width: 451,
   height: 614,
 
-  /** Describes the photograph. The visible caption carries the context. */
-  alt: `${PROFILE.name}`,
-
   /**
-   * ⚠ inferred — read off the shirt in the photograph and the filename it
-   * arrived under (`devfest_photo.png`). It says where the picture was taken,
-   * which is not the same as a claim about what you did there. Set it to
-   * `null` to render the figure with no caption at all.
+   * The only text attached to the figure, and it says nothing the picture
+   * does not. There is deliberately no caption: the inferred
+   * `DevFest Sri Lanka 2025` line was removed at your request, and with it
+   * the whole caption mechanism, so there is no empty slot inviting a guess.
    */
-  caption: 'DevFest Sri Lanka · 2025',
-
-  /** Flip to `true` once the caption above is confirmed; it silences the
-      dev-only warning under the figure. */
-  captionConfirmed: false,
+  alt: PROFILE.name,
 };
 
 /* -------------------------------------------------------------------------
    Terminal boot script
-   Kept deliberately short: every character is typed, so a long script means
-   the visitor watches a cursor instead of reading the page. ~2.5s total.
+
+   This runs on the boot overlay, not on the landing page, which changes what
+   it is allowed to cost. In the hero it ran beside the name and the visitor
+   could read the page while it typed; as a loading screen it is the only
+   thing on the glass, so every character is time nobody can do anything in.
+
+   The old six line script measured about 5.0s end to end. Two of its lines
+   repeated facts the page states better anyway: `cat ./role` against the role
+   rotator, and `status --availability` against the availability pill in the
+   HUD. Both are gone, the rest is faster, and the script now runs ~1.8s with
+   the page revealed by ~2.3s.
+
+   `whoami` stays, because the eyebrow over the name reads `identity
+   confirmed` and that is the command it is confirming.
    ------------------------------------------------------------------------- */
 
 export type TerminalLine = {
@@ -108,15 +111,17 @@ export type TerminalLine = {
 };
 
 export const TERMINAL_SCRIPT: TerminalLine[] = [
-  { text: 'executing whoami...', kind: 'cmd', speed: 18, pauseAfter: 200 },
+  { text: 'init shadow-command-center', kind: 'cmd', speed: 14, pauseAfter: 100 },
+  { text: 'secure channel established', kind: 'ok', speed: 10, pauseAfter: 120 },
+  { text: 'whoami', kind: 'cmd', speed: 16, pauseAfter: 90 },
   {
     text: PROFILE.name.toLowerCase().replace(/\s+/g, '.'),
     kind: 'out',
-    speed: 34,
-    pauseAfter: 380,
+    speed: 20,
+    pauseAfter: 150,
   },
-  { text: 'cat ./role', kind: 'cmd', speed: 26, pauseAfter: 180 },
-  { text: 'cybersecurity · devsecops · ai research', kind: 'out', speed: 14, pauseAfter: 340 },
-  { text: 'status --availability', kind: 'cmd', speed: 26, pauseAfter: 180 },
-  { text: PROFILE.availability.toUpperCase(), kind: 'ok', speed: 18 },
+  { text: 'access granted', kind: 'ok', speed: 12 },
 ];
+
+/** Total characters, for the boot progress bar. */
+export const TERMINAL_LENGTH = TERMINAL_SCRIPT.reduce((n, line) => n + line.text.length, 0);
