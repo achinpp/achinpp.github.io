@@ -1588,6 +1588,86 @@ markers come out.
 1244-1744ms, CLS 0.0064 · production build 382.5 kB JS (122.1 kB gzip) / 63.3 kB CSS · boot
 overlay, hero, briefings and Battle Station all reviewed in browser at 1440 and 390.
 
+## STAGE 14 — In The Field ✅
+
+Four volunteering photographs land under the experience timeline, cut down to a title, a place
+and at most one line each. The IoT Challenge role finally gets real bullets.
+
+- [x] **A new block under the timeline**, four cards, no seventh nav entry
+- [x] **Four photographs processed**, cropped to one shape and dimmed to sit on the page
+- [x] **The Sussex photograph is unmirrored**, so the signs in it read forwards
+- [x] **`sku-iot-challenge-26` carries your own account** of the platform instead of my draft
+- [x] `npm run check:browser` counts seven images now and fetches every one of them
+
+**Accept when:** the block reads as evidence for the roles above it, not as a photo gallery. ✅
+
+### What was cut, and why that was the job
+
+> NOTE: **You sent four write ups and asked for the important parts only.** They run several
+> paragraphs each. What went in is a title, a place and at most one line; what came out was
+> every pleasantry ("it was a rewarding experience", "proud to have led"), every restatement of
+> the title, and every detail that belongs to a role rather than to a photograph. A portfolio is
+> not a feed. Four paragraphs under four pictures would bury the one thing a visitor takes from
+> this block, which is that the teaching happened and here is what it looked like.
+
+> NOTE: **The IoT Challenge stack was not cut, it was moved.** Node.js endpoints, Google Apps
+> Script, the Sheets API, token validation, duplicate prevention, rate limiting, the automated
+> confirmations, the glassmorphism frontend and the Canvas particle grid are now three bullets
+> on `sku-iot-challenge-26` in `src/data/experience.ts`, which is where a hiring reader looks
+> for a stack. That entry had my invented draft wording until now, so this is the first of the
+> five roles to carry your own account. Four to go.
+
+> NOTE: **The embedded systems lecture has no note and no venue**, because your line named
+> neither. `Embedded Systems Lecture / First year students` is the whole card. It leaves a gap
+> under the mono line where the other three carry a sentence, and that gap is correct: the card
+> is quieter because there is less that is actually known.
+
+### Why it is not a seventh section
+
+> NOTE: **A nav entry promises a destination.** Four photographs are not one. They are also
+> literally what the roles above them did on the day: the IoT Club entry ran the workshop, the
+> dev team entry built the platform. Directly under the rail they read as evidence for the list
+> they follow; two sections away they would read as a gallery. The rail's scroll range stops at
+> the last role, so the line still finishes before the photographs start.
+
+### The photographs
+
+> NOTE: **Cropped in the asset, not with `object-cover`.** Three of the four arrived as tall
+> phone portraits. Letting CSS crop them to 4:3 would have shipped most of a megabyte of pixels
+> the page never draws. `scripts/process-media.py` now has a second pipeline for photographs:
+> one 4:3 window, placed by a per picture `focus` value rather than centred, since the subject
+> in a phone portrait is almost never in the middle. Captures keep their own shape, because for
+> a screenshot the shape is information.
+
+> NOTE: **⚠ The Sussex photograph arrived mirrored.** Every sign in it reads backwards, which is
+> what a phone does when it saves a selfie camera frame the way the viewfinder showed it. It is
+> flipped back, so the room is the room that was there and `SMART BOARD ROOM` is readable. One
+> flag in the job list reverses that if you would rather ship it exactly as it came.
+
+> NOTE: **Dimmed harder than the first attempt.** They went in at the Battle Station treatment,
+> `saturate(0.5)` over 80% opacity, and four photographs at that strength were the brightest
+> thing on the page: the lecture hall in particular is a white ceiling under fluorescent light.
+> They sit at `saturate(0.4) brightness(0.86)` over 70% now, full colour on hover. 146 kB for
+> all four, lazy loaded, below the fold.
+
+> NOTE: **⚠ The IoT Challenge photograph is you at a lectern**, not the platform your write up
+> describes. It is the one picture that came with that story, so it is the one on the card, and
+> the card says what the photograph is rather than claiming to show a screen. A capture of the
+> platform itself would be a better card if you have one.
+
+### Housekeeping
+
+> NOTE: **`README.md` and `stage.md` were CRLF on disk** and had been failing `prettier --check`
+> since Stage 13, because the patch scripts that wrote them used `write_text`, which translates
+> newlines on Windows. `core.autocrlf` is `true` here, so git normalised them on the way in and
+> `git status` showed nothing wrong. Both are back to LF.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+`npm run test` 8/8 · `npm run check:browser` **all checks pass**, LCP 1040ms best of
+1040-1220ms, CLS 0.0064 · production build 386.1 kB JS (123.3 kB gzip) / 63.4 kB CSS · 0 em
+dashes and 0 dev only strings in the bundle · the new block reviewed in browser at 1440 and
+390, top and bottom.
+
 ---
 
 ## Working Agreement
@@ -1619,7 +1699,7 @@ overlay, hero, briefings and Battle Station all reviewed in browser at 1440 and 
 
 ---
 
-**Current status:** `STAGE 13 — the terminal is the loading screen` → remaining: the
-**Red Cypher photo**, **dates**, the **OSCP question**, **project links**, a **PGP
-fingerprint**, **Lighthouse on the deployed site**, **Safari and Firefox**, a **screen reader
-pass**, and the **deploy**. See the README table.
+**Current status:** `STAGE 14 — in the field` → remaining: the **Red Cypher photo**, **dates**,
+**four sets of role bullets**, the **OSCP question**, **project links**, a **PGP fingerprint**,
+**Lighthouse on the deployed site**, **Safari and Firefox**, a **screen reader pass**, and the
+**deploy**. See the README table.

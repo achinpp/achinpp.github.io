@@ -5,7 +5,7 @@ Hand built. No UI kit, no component library.
 
 **Vite 6 · React 18 · TypeScript · Tailwind CSS v4 · Motion (Framer) · Lenis**
 
-The build was done in thirteen reviewable stages. [`stage.md`](./stage.md) is the single source of
+The build was done in fourteen reviewable stages. [`stage.md`](./stage.md) is the single source of
 truth: every stage records what shipped, every deviation from the plan with its reasoning, and
 what was verified versus what still needs a human with a browser.
 
@@ -58,7 +58,7 @@ Copy `.env.example` to `.env` and fill both variables in.
 | What                                                                       | Where                      |
 | -------------------------------------------------------------------------- | -------------------------- |
 | Dates for all five roles (they currently render `[ dates tbc ]`)           | `src/data/experience.ts`   |
-| Replace the draft role bullets with your own wording                       | `src/data/experience.ts`   |
+| Replace the draft role bullets on the other four roles                     | `src/data/experience.ts`   |
 | Expand `SKU`, if it stands for something                                   | `src/data/experience.ts`   |
 | Confirm the four project status badges                                     | `src/data/projects.ts`     |
 | Add public repo and demo links per briefing                                | `src/data/projects.ts`     |
@@ -69,6 +69,7 @@ Copy `.env.example` to `.env` and fill both variables in.
 | A HackTheBox handle, if you have one (the row shows the numeric id)        | `src/data/contact.ts`      |
 | Drop `Red_Cypher_3.0.jpeg` into `assets/`, then re-run the media script    | `src/data/achievements.ts` |
 | Screenshots for the other two briefings, if you have any                   | `src/data/projects.ts`     |
+| Dates for the four field photographs, and a capture of the IoT platform    | `src/data/outreach.ts`     |
 
 Anything you did not state is marked in its data file, and most of it also shows a **dev only
 warning in the UI**. Those markers are compiled out of production builds, so they are visible
@@ -141,12 +142,23 @@ python scripts/process-media.py      # briefing screenshots, event photos
 `process-portrait.py` reads `assets/portrait-source.png`, the cut out with a transparent
 background, trims it to its alpha bounding box and writes `public/portrait.webp` (24 kB).
 
-`process-media.py` writes into `public/media/`. The Packet Tracer topology gets real work done
-to it: its canvas is a flat grey with black labels, which on an obsidian page is a slab of
-daylight, so the script splits the pixels by chroma, drops the canvas to alpha 0 and redraws the
-achromatic ink in the site's own light grey. The coloured device icons are left alone. The
-header comment explains why the two obvious alternatives, a CSS `invert()` and a light plate,
-are both worse.
+`process-media.py` writes into `public/media/`, and it has two pipelines because it has two
+kinds of source.
+
+A **capture** is a screenshot, and it keeps its own shape, because its shape is information: the
+Packet Tracer topology runs edge to edge and a crop takes a router off the end of it. That
+topology also gets real work done to it. Its canvas is a flat grey with black labels, which on
+an obsidian page is a slab of daylight, so the script splits the pixels by chroma, drops the
+canvas to alpha 0 and redraws the achromatic ink in the site's own light grey. The coloured
+device icons are left alone. The header comment explains why the two obvious alternatives, a CSS
+`invert()` and a light plate, are both worse.
+
+A **photo** is cropped to a fixed 4:3, because four photographs of four shapes in one grid is a
+ragged wall. The crop is a window placed by a per picture `focus` value rather than centred,
+since the subject in a tall phone portrait almost never is. Doing this here rather than with
+`object-cover` in CSS is worth most of a megabyte across the four field photographs. One of
+them, Sussex, arrived mirrored from a selfie camera and carries `mirror=True` so its signs read
+forwards.
 
 A job marked optional is skipped with a note when its source is missing rather than failing the
 run. `red-cypher` is one of those, waiting on a file.

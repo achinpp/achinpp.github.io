@@ -9,12 +9,14 @@
  * - `period: null` means no dates were given. It renders as a visible
  *   `dates tbc` tag rather than a plausible looking guess, because a wrong
  *   date on a CV shaped page is worse than a blank one.
- * - **The bullets are still my wording** for what each role ordinarily
- *   covers, not supplied achievements. No numbers, no claimed outcomes.
- *   They used to render under a review only `DRAFT COPY` marker; that marker
- *   is gone at your request, along with the flag that drove it, so this
- *   header is now the only place that says so. Replace a bullet with
- *   something you actually did and it stops being draft.
+ * - **The bullets are still my wording on four of the five roles**, for what
+ *   each one ordinarily covers, not supplied achievements. No numbers, no
+ *   claimed outcomes. They used to render under a review only `DRAFT COPY`
+ *   marker; that marker is gone at your request, along with the flag that
+ *   drove it, so this header is now the only place that says so. Replace a
+ *   bullet with something you actually did and it stops being draft, which is
+ *   exactly what happened to `sku-iot-challenge-26`: those three bullets are
+ *   now your own account of the platform, condensed. Four to go.
  * - **Order is yours now.** It was a guess until you reordered the entries
  *   and added the dates; what is on screen is the order in this file.
  *
@@ -62,9 +64,11 @@ export const EXPERIENCE: ExperienceEntry[] = [
     location: 'Kandy Uni',
     period: '2026',
     tag: 'Engineering',
+    /** Yours, from the write up you sent. No longer my draft wording. */
     bullets: [
-      'Build and maintain the technical side of the competition platform.',
-      'Work with the organising team to turn the event format into something that runs.',
+      'Guided the dev team on the official event platform: participant registration, and the information hub for students, organisers and sponsors.',
+      'Built the registration backend serverless, on Node.js endpoints with Google Apps Script and the Sheets API: token validation, duplicate prevention, rate limiting and automated email confirmation.',
+      'Delivered the frontend in HTML5, custom glassmorphism CSS and modular ES6, over an interactive Canvas particle grid.',
     ],
   },
   {
