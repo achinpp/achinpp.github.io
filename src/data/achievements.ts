@@ -35,11 +35,21 @@ export type Achievement = {
   /** The organising body, rendered as a footnote under the whole wall. */
   organiser: string | null;
   /**
-   * A photograph or poster from the event, shown in the field record panel
-   * under the wall. `null` renders no panel at all, which is why one missing
-   * image costs nothing.
+   * One line above the photographs, for the context a 128px badge column
+   * cannot hold. `null` when there is nothing to add.
    */
-  image: AchievementImage | null;
+  fieldNote: string | null;
+  /**
+   * Photographs from the event, shown in the field record panel under the
+   * wall. An empty array renders no panel at all, which is why an event with
+   * no pictures costs the layout nothing.
+   */
+  images: AchievementImage[];
+  /**
+   * Who took them, as one line under the pair. Required whenever the
+   * photographs are somebody else's work, which the organiser's are.
+   */
+  imageCredit: string | null;
 };
 
 /**
@@ -50,8 +60,10 @@ export type AchievementImage = {
   src: string;
   width: number;
   height: number;
-  /** Describes the picture. The visible caption carries the context. */
+  /** Describes the picture, for a reader who cannot see it. */
   alt: string;
+  /** Three or four words, shown over the picture. */
+  caption: string;
 };
 
 export const ACHIEVEMENTS: Achievement[] = [
@@ -60,21 +72,40 @@ export const ACHIEVEMENTS: Achievement[] = [
     event: 'RED CYPHER 3.0',
     result: 'Finalist',
     rarity: 'legendary',
-    /** ⚠ Your message read "date is" and stopped. Still blank. */
+    /** ⚠ Still blank. Asked twice, never given, and neither photograph
+     *  carries EXIF to read it off. */
     date: null,
     note: 'Team LO49',
-    organiser: 'IEEE Student Branch of the University of Ruhuna and HackSL',
     /**
-     * ⚠ `Red_Cypher_3.0.jpeg` is not in the project folder. Nothing by that
-     * name is anywhere on this machine. Drop it in beside `assets/` and run
-     * `python scripts/process-media.py`, which already has the job wired up
-     * and skips it quietly while the source is missing. Then set this to:
-     *
-     *     { src: '/media/red-cypher.webp', width: …, height: …, alt: '…' }
-     *
-     * with the two numbers the script prints.
+     * Your second message said "IEEE of Ruhuna university", and the footer
+     * burnt into both photographs says `ORGANIZED BY IEEE COMPUTER SOCIETY OF
+     * THE UNIVERSITY OF RUHUNA`. That is the form used here. HackSL is gone
+     * from this line, since your correction did not name them.
      */
-    image: null,
+    organiser: 'IEEE Computer Society of the University of Ruhuna',
+    /**
+     * ⚠ Your placing is deliberately not here. You said 19th of more than
+     * 100 and then said to put it as reaching the finals from that field, so
+     * that is what this says. Both halves of the sentence are yours.
+     */
+    fieldNote: 'Finalist from more than 100 teams, and one of the 40 at the physical finals.',
+    images: [
+      {
+        src: '/media/red-cypher-team.webp',
+        width: 1000,
+        height: 562,
+        alt: 'Three team members standing in front of a Red Cypher 3.0 backdrop.',
+        caption: 'Team LO49',
+      },
+      {
+        src: '/media/red-cypher-floor.webp',
+        width: 1000,
+        height: 563,
+        alt: 'Three competitors working at desktop machines in a university computer lab.',
+        caption: 'On the finals floor',
+      },
+    ],
+    imageCredit: 'REF Media, University of Ruhuna · Sachintha Dissanayake and Dulanjana Yatagama',
   },
   {
     id: 'cryptx-2',
@@ -84,7 +115,9 @@ export const ACHIEVEMENTS: Achievement[] = [
     date: null,
     note: 'Team Cipher',
     organiser: 'ICT Society (ICTS), Faculty of Technology, University of Sri Jayewardenepura',
-    image: null,
+    fieldNote: null,
+    images: [],
+    imageCredit: null,
   },
 ];
 

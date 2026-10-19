@@ -5,7 +5,7 @@ Hand built. No UI kit, no component library.
 
 **Vite 6 · React 18 · TypeScript · Tailwind CSS v4 · Motion (Framer) · Lenis**
 
-The build was done in fourteen reviewable stages. [`stage.md`](./stage.md) is the single source of
+The build was done in fifteen reviewable stages. [`stage.md`](./stage.md) is the single source of
 truth: every stage records what shipped, every deviation from the plan with its reasoning, and
 what was verified versus what still needs a human with a browser.
 
@@ -63,11 +63,11 @@ Copy `.env.example` to `.env` and fill both variables in.
 | Confirm the four project status badges                                     | `src/data/projects.ts`     |
 | Add public repo and demo links per briefing                                | `src/data/projects.ts`     |
 | Dates for the two competition results                                      | `src/data/achievements.ts` |
+| Check the photographer credit on the Red Cypher pictures is right          | `src/data/achievements.ts` |
 | More achievements: the wall has two badges and two locked slots            | `src/data/achievements.ts` |
 | Decide what to do about the `OSCP` pill (see the file header)              | `src/data/skills.ts`       |
 | A PGP fingerprint, if you have one (the footer line is omitted without it) | `src/data/contact.ts`      |
 | A HackTheBox handle, if you have one (the row shows the numeric id)        | `src/data/contact.ts`      |
-| Drop `Red_Cypher_3.0.jpeg` into `assets/`, then re-run the media script    | `src/data/achievements.ts` |
 | Screenshots for the other two briefings, if you have any                   | `src/data/projects.ts`     |
 | Dates for the four field photographs, and a capture of the IoT platform    | `src/data/outreach.ts`     |
 
@@ -153,12 +153,19 @@ canvas to alpha 0 and redraws the achromatic ink in the site's own light grey. T
 device icons are left alone. The header comment explains why the two obvious alternatives, a CSS
 `invert()` and a light plate, are both worse.
 
-A **photo** is cropped to a fixed 4:3, because four photographs of four shapes in one grid is a
+A **photo** is cropped to a fixed shape, because photographs of several shapes in one grid is a
 ragged wall. The crop is a window placed by a per picture `focus` value rather than centred,
-since the subject in a tall phone portrait almost never is. Doing this here rather than with
-`object-cover` in CSS is worth most of a megabyte across the four field photographs. One of
-them, Sussex, arrived mirrored from a selfie camera and carries `mirror=True` so its signs read
-forwards.
+since the subject in a tall phone portrait almost never is, and `focus` applies to whichever
+axis is being cut. The shape is per job: 4:3 for the field photographs, 16:9 for the two Red
+Cypher pictures, where a 4:3 window is too narrow to hold a row of three people without cutting
+one of them in half. Doing this here rather than with `object-cover` in CSS is worth well over a
+megabyte across the six.
+
+Two more per job options matter. `mirror` flips a frame back: Sussex arrived mirrored from a
+selfie camera and its signs read backwards without it. `trim` cuts measured rows off the top and
+bottom before anything else runs, which is how the REF Media branding bars come off the Red
+Cypher photographs. Those are the organiser's pictures, so the credit the bar carried moves to a
+readable line under the pair in `src/data/achievements.ts` rather than disappearing.
 
 A job marked optional is skipped with a note when its source is missing rather than failing the
 run. `red-cypher` is one of those, waiting on a file.

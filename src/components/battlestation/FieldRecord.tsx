@@ -4,64 +4,93 @@ import type { Achievement } from '@/data/achievements';
 import { fadeUp, revealViewport, staggerGroup } from '@/lib/motion/variants';
 
 /**
- * A picture from an event, pinned under the badge wall.
+ * Pictures from an event, pinned under the badge wall.
  *
- * It lives in the badge column rather than in a section of its own, because
- * what it is for is evidence: the hexagon says `Finalist` and this is the
- * thing that happened. Two columns away it would be a gallery.
+ * They live in the badge column rather than in a section of their own,
+ * because what they are for is evidence: the hexagon says `Finalist` and this
+ * is the thing that happened. Two columns away it would be a gallery.
+ *
+ * **The line above the pictures carries what the badge cannot.** A hexagon is
+ * 128px wide and the note under it has to survive at that width, so anything
+ * longer than about three words goes here instead. For Red Cypher that is the
+ * size of the field the finals were drawn from, which is the part of the
+ * result that actually means something.
+ *
+ * **The credit line is not decoration.** These are the organiser's official
+ * photographs, with REF Media branding bars burnt into the source. The bars
+ * come off in `scripts/process-media.py`, because a white logo strip on an
+ * obsidian page is a slab of daylight, and the credit they carried moves here
+ * at a size somebody can actually read.
  *
  * The treatment is the same bargain the hero portrait makes. Desaturated and
- * dimmed at rest, because the one photograph on a page built from obsidian
- * and a single mint accent will otherwise read as a snapshot pasted over the
- * design; full colour on hover, which is when someone is looking closely
- * enough to want the detail.
+ * dimmed at rest, because photographs on a page built from obsidian and a
+ * single mint accent otherwise read as snapshots pasted over the design; full
+ * colour on hover, which is when someone is looking closely enough to want
+ * the detail.
  *
- * Renders nothing when no achievement carries an image, which is the state it
- * is in right now. See `ACHIEVEMENTS[0].image` for what is missing.
+ * Renders nothing for an achievement with no pictures, and nothing at all
+ * when none of them have any.
  */
 export function FieldRecord({ achievements }: { achievements: Achievement[] }) {
-  const withImages = achievements.filter((a) => a.image !== null);
+  const withImages = achievements.filter((a) => a.images.length > 0);
   if (withImages.length === 0) return null;
 
   return (
-    <motion.ul
-      variants={staggerGroup()}
-      initial="hidden"
-      whileInView="visible"
-      viewport={revealViewport}
-      className="mt-12 grid gap-5 sm:grid-cols-2"
-    >
-      {withImages.map((achievement) => {
-        const image = achievement.image;
-        if (!image) return null;
+    <div className="mt-12 space-y-12">
+      {withImages.map((achievement) => (
+        <motion.section
+          key={achievement.id}
+          variants={staggerGroup()}
+          initial="hidden"
+          whileInView="visible"
+          viewport={revealViewport}
+          aria-label={`Photographs from ${achievement.event}`}
+        >
+          {achievement.fieldNote && (
+            <motion.p
+              variants={fadeUp}
+              className="mb-5 flex items-start gap-3 text-[0.8125rem] leading-relaxed text-ink-muted"
+            >
+              <Camera aria-hidden size={13} className="mt-1 shrink-0 text-mint-600" />
+              {achievement.fieldNote}
+            </motion.p>
+          )}
 
-        return (
-          <motion.li key={achievement.id} variants={fadeUp}>
-            <figure className="group relative overflow-hidden rounded-xl border border-hairline bg-obsidian-950 transition-colors duration-400 hover:border-mint-900">
-              <img
-                src={image.src}
-                alt={image.alt}
-                width={image.width}
-                height={image.height}
-                loading="lazy"
-                decoding="async"
-                className="block w-full opacity-80 [filter:saturate(0.5)_contrast(1.05)] transition-all duration-500 ease-out-expo group-hover:opacity-100 group-hover:[filter:saturate(1)_contrast(1)]"
-              />
+          <ul className="grid gap-5 sm:grid-cols-2">
+            {achievement.images.map((image) => (
+              <motion.li key={image.src} variants={fadeUp}>
+                <figure className="group relative overflow-hidden rounded-xl border border-hairline bg-obsidian-950 transition-colors duration-400 hover:border-mint-900">
+                  <img
+                    src={image.src}
+                    alt={image.alt}
+                    width={image.width}
+                    height={image.height}
+                    loading="lazy"
+                    decoding="async"
+                    className="block w-full opacity-70 [filter:saturate(0.4)_contrast(1.06)_brightness(0.86)] transition-all duration-500 ease-out-expo group-hover:opacity-100 group-hover:[filter:saturate(1)_contrast(1)_brightness(1)]"
+                  />
 
-              {/* The caption sits on the picture rather than under it, so the
-                  panel stays one object instead of an image with a label
-                  floating beneath it. */}
-              <figcaption className="absolute inset-x-0 bottom-0 flex items-center gap-2.5 bg-[linear-gradient(to_top,oklch(0.105_0.012_265/0.92),transparent)] px-4 pt-10 pb-3.5 font-mono text-[0.5625rem] tracking-[0.2em] text-ink-muted uppercase">
-                <Camera aria-hidden size={11} className="shrink-0 text-mint-600" />
-                {achievement.event}
-                {achievement.note && (
-                  <span className="text-obsidian-500">· {achievement.note}</span>
-                )}
-              </figcaption>
-            </figure>
-          </motion.li>
-        );
-      })}
-    </motion.ul>
+                  {/* The caption sits on the picture rather than under it, so
+                      the panel stays one object instead of an image with a
+                      label floating beneath it. */}
+                  <figcaption className="absolute inset-x-0 bottom-0 bg-[linear-gradient(to_top,oklch(0.105_0.012_265/0.92),transparent)] px-4 pt-10 pb-3.5 font-mono text-[0.5625rem] tracking-[0.2em] text-ink-muted uppercase">
+                    {image.caption}
+                  </figcaption>
+                </figure>
+              </motion.li>
+            ))}
+          </ul>
+
+          {achievement.imageCredit && (
+            <motion.p
+              variants={fadeUp}
+              className="mt-3.5 font-mono text-[0.5625rem] leading-relaxed tracking-[0.16em] text-obsidian-500 uppercase"
+            >
+              Photographs: {achievement.imageCredit}
+            </motion.p>
+          )}
+        </motion.section>
+      ))}
+    </div>
   );
 }

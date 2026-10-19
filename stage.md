@@ -1668,6 +1668,72 @@ and at most one line each. The IoT Challenge role finally gets real bullets.
 dashes and 0 dev only strings in the bundle · the new block reviewed in browser at 1440 and
 390, top and bottom.
 
+## STAGE 15 — Red Cypher, With Evidence ✅
+
+The two finals photographs arrive, the organiser line is corrected, and the result finally says
+what field it was drawn from.
+
+- [x] **Two photographs under the badge wall**, team portrait and finals floor
+- [x] **REF Media branding bars trimmed** out of both in the asset
+- [x] **The credit moved to a readable line** under the pair rather than a 9px strip
+- [x] **The organiser line corrected** to the form burnt into your own photographs
+- [x] **`Finalist from more than 100 teams`**, phrased as you asked for it
+- [x] An achievement can now carry more than one picture
+
+**Accept when:** the hexagon says Finalist and the panel under it shows why. ✅
+
+### The result line
+
+> NOTE: **Your placing is deliberately not on the site.** You said 19th of more than 100, and
+> then said to put it as reaching the finals from that field. So the line reads
+> `Finalist from more than 100 teams, and one of the 40 at the physical finals.` Both halves are
+> your own numbers. Say the word and the second clause comes off, leaving the single sentence
+> you actually dictated.
+
+> NOTE: **It had to go above the pictures, not under the badge.** The hexagon column is 128px
+> and the note under it has to survive at that width. `Team LO49` fits; a sentence with two
+> numbers in it wraps to six lines and knocks the badge row out of alignment, which is the exact
+> failure recorded at Stage 5. The field record panel is the first place on this wall with a
+> full measure of text in it.
+
+> NOTE: **⚠ The date is still blank**, asked for twice now. Neither photograph carries EXIF to
+> read it off; both have been stripped, which is what a download from a social platform does.
+
+### The organiser
+
+> NOTE: **Corrected to the form on your own photographs.** You first wrote `IEEE SB of UOR &
+HackSL`, and at Stage 13 I kept that and flagged that the qualifier poster disagreed. Your
+> correction says `IEEE of Ruhuna university`, and the footer burnt into both of these photos
+> says `ORGANIZED BY IEEE COMPUTER SOCIETY OF THE UNIVERSITY OF RUHUNA`. The footnote now reads
+> `Organised by the IEEE Computer Society of the University of Ruhuna.` HackSL is gone from it,
+> because your correction did not name them.
+
+### The photographs
+
+> NOTE: **The branding bars came off in the asset.** Both sources carry a REF Media strip, and
+> one is boxed in by a second white sponsor bar across the top. A white logo strip on an
+> obsidian page is the same slab of daylight as the Packet Tracer canvas, so `trim` cuts the
+> measured rows off before anything else runs.
+
+> NOTE: **The credit did not come off with it.** These are the organiser's official
+> photographs, not yours or mine, so the names move to a line under the pair where they are
+> readable instead of 9px tall: REF Media, University of Ruhuna, and the two photographers the
+> bar names. If that line is wrong in any particular, it is the one thing on this page worth
+> fixing before the site is public.
+
+> NOTE: **16:9, not the 4:3 the field photographs use.** A 4:3 window on the team portrait is
+> 1399px wide against a row of three people spanning 1510px, so somebody loses an arm. The crop
+> shape is per job now, and `focus` works on whichever axis is being cut rather than only the
+> vertical one.
+
+> NOTE: **An achievement carries a list of pictures now**, not one. Two photographs of the same
+> event fill the two column grid exactly, and the alternative was inventing a second achievement
+> to hang the second picture on.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+`npm run test` 8/8 · `npm run check:browser` **all checks pass**, 9 images fetched, LCP 1240ms
+best of 1240-1664ms, CLS 0.0064 · Battle Station reviewed in browser at 1440 and 390.
+
 ---
 
 ## Working Agreement
@@ -1699,7 +1765,7 @@ dashes and 0 dev only strings in the bundle · the new block reviewed in browser
 
 ---
 
-**Current status:** `STAGE 14 — in the field` → remaining: the **Red Cypher photo**, **dates**,
-**four sets of role bullets**, the **OSCP question**, **project links**, a **PGP fingerprint**,
-**Lighthouse on the deployed site**, **Safari and Firefox**, a **screen reader pass**, and the
-**deploy**. See the README table.
+**Current status:** `STAGE 15 — Red Cypher, with evidence` → remaining: **dates**, **four sets
+of role bullets**, the **OSCP question**, **project links**, a **PGP fingerprint**, **Lighthouse
+on the deployed site**, **Safari and Firefox**, a **screen reader pass**, and the **deploy**.
+See the README table.
