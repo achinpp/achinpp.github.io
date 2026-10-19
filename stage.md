@@ -1753,6 +1753,51 @@ sets of photographs.
 
 ---
 
+## STAGE 16 — Volunteering Is A Section ✅
+
+`In the field` becomes `Volunteering`, leaves the experience timeline, and takes its own place
+below the Arsenal with a real section heading and a nav entry.
+
+- [x] **A seventh section**, `05 / FIELD OPS`, between Arsenal and Contact
+- [x] **The heading is the display face**, the same treatment as `Secure Channel`
+- [x] **Nav, HUD, palette and the active indicator all picked it up** from one array
+- [x] **Everything renamed from `outreach` to `volunteering`**, files and assets included
+- [x] **The Sussex photograph replaced** with the frame you sent
+
+**Accept when:** it reads as somewhere to go rather than something under something else. ✅
+
+> NOTE: **This reverses the call made one stage ago, and the new one is better.** Stage 14 put
+> the photographs under the timeline on the argument that a nav entry promises a destination and
+> four pictures are not one. That was a judgement about layout. The judgement that matters is
+> about weight: volunteering you have to scroll past on the way to something else is
+> volunteering nobody counted. It now has a heading in the display face, an index, a codename
+> and a line in the palette, and it costs the nav bar about 110px at 1440, which it has.
+
+> NOTE: **Everything came from one array.** `src/data/sections.ts` gained a row and Contact's
+> index went from `05` to `06`. The floating nav, the HUD readout, the active section indicator
+> and the command palette all read that file, so none of them were touched. The palette went
+> from 12 options to 13 on its own, which is the whole point of the single list.
+
+> NOTE: **`outreach` is gone as a word.** The data file, the type, the constant, the component,
+> the four source photographs and the four generated assets were all named `outreach`, and
+> leaving half of them while the section on screen says `Volunteering` is the kind of split that
+> makes a codebase lie to the next person reading it. One word, one thing.
+
+> NOTE: **The Sussex frame is the one you sent**, and it is still mirrored at the source, so it
+> is still flipped back. The crop sits lower in the frame than the old one, at `focus=0.55`,
+> because this version puts the adults near the top and the children working near the bottom and
+> a centred window would have cut the circuit on the table.
+
+> NOTE: **The experience lede lost its last sentence.** It pointed at photographs that are no
+> longer underneath it.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+`npm run test` 8/8 · `npm run check:browser` **all checks pass**, seven sections in order, 13
+palette options, 9 images, LCP 1200ms best of 1200-1884ms, CLS 0.0064 · the new section and the
+nav reviewed in browser at 1440 and 390.
+
+---
+
 ## Working Agreement
 
 1. One stage at a time. I build it, you review it, we iterate, then we advance.
@@ -1782,7 +1827,7 @@ sets of photographs.
 
 ---
 
-**Current status:** `STAGE 15 — Red Cypher, with evidence` → remaining: **dates**, **four sets
+**Current status:** `STAGE 16 — volunteering is a section` → remaining: **dates**, **four sets
 of role bullets**, the **OSCP question**, **project links**, a **PGP fingerprint**, **Lighthouse
 on the deployed site**, **Safari and Firefox**, a **screen reader pass**, and the **deploy**.
 See the README table.

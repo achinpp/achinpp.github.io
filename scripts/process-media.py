@@ -7,7 +7,7 @@ Turn the briefing screenshots and the field photographs into shippable assets.
 Reads  assets/study-coach-source.png        (Agent Development Kit, dark UI)
        assets/northbridge-source.png        (Cisco Packet Tracer topology, grey canvas)
        assets/red-cypher-*-source.jpg       (two photographs from the finals)
-       assets/outreach-*-source.*           (four volunteering photographs)
+       assets/volunteering-*-source.*       (four volunteering photographs)
 Writes public/media/*.webp
 
 OPTIONAL SOURCES. A job marked optional is skipped with a note when its source
@@ -161,12 +161,12 @@ JOBS = [
     ),
     # The two standing figures and the table sit above centre in a frame that
     # is mostly the backs of heads.
-    Job('outreach-anthonys-source.jpeg', 'outreach-anthonys.webp', photo=True, focus=0.44),
+    Job('volunteering-anthonys-source.jpeg', 'volunteering-anthonys.webp', photo=True, focus=0.44),
     # Already 4:3, so the crop is a no op and only the resize runs.
-    Job('outreach-embedded-source.jpg', 'outreach-embedded.webp', photo=True),
-    Job('outreach-sussex-source.jpeg', 'outreach-sussex.webp', photo=True, focus=0.48, mirror=True),
+    Job('volunteering-embedded-source.jpg', 'volunteering-embedded.webp', photo=True),
+    Job('volunteering-sussex-source.jpeg', 'volunteering-sussex.webp', photo=True, focus=0.55, mirror=True),
     # Speaker on the left, slide on the right, both in the upper half.
-    Job('outreach-iot-challenge-source.jpeg', 'outreach-iot-challenge.webp', photo=True, focus=0.42),
+    Job('volunteering-iot-challenge-source.jpeg', 'volunteering-iot-challenge.webp', photo=True, focus=0.42),
 ]
 
 

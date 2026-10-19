@@ -5,7 +5,7 @@ Hand built. No UI kit, no component library.
 
 **Vite 6 · React 18 · TypeScript · Tailwind CSS v4 · Motion (Framer) · Lenis**
 
-The build was done in fifteen reviewable stages. [`stage.md`](./stage.md) is the single source of
+The build was done in sixteen reviewable stages. [`stage.md`](./stage.md) is the single source of
 truth: every stage records what shipped, every deviation from the plan with its reasoning, and
 what was verified versus what still needs a human with a browser.
 
@@ -69,7 +69,7 @@ Copy `.env.example` to `.env` and fill both variables in.
 | A PGP fingerprint, if you have one (the footer line is omitted without it) | `src/data/contact.ts`      |
 | A HackTheBox handle, if you have one (the row shows the numeric id)        | `src/data/contact.ts`      |
 | Screenshots for the other two briefings, if you have any                   | `src/data/projects.ts`     |
-| Dates for the four field photographs, and a capture of the IoT platform    | `src/data/outreach.ts`     |
+| Dates for the four volunteering photographs, and a capture of the platform | `src/data/volunteering.ts` |
 
 Anything you did not state is marked in its data file, and most of it also shows a **dev only
 warning in the UI**. Those markers are compiled out of production builds, so they are visible
@@ -156,7 +156,7 @@ device icons are left alone. The header comment explains why the two obvious alt
 A **photo** is cropped to a fixed shape, because photographs of several shapes in one grid is a
 ragged wall. The crop is a window placed by a per picture `focus` value rather than centred,
 since the subject in a tall phone portrait almost never is, and `focus` applies to whichever
-axis is being cut. The shape is per job: 4:3 for the field photographs, 16:9 for the two Red
+axis is being cut. The shape is per job: 4:3 for the volunteering photographs, 16:9 for the two Red
 Cypher pictures, where a 4:3 window is too narrow to hold a row of three people without cutting
 one of them in half. Doing this here rather than with `object-cover` in CSS is worth well over a
 megabyte across the six.

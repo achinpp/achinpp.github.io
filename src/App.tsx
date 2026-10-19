@@ -11,6 +11,7 @@ import { StatusHUD } from '@/components/chrome/StatusHUD';
 import { Experience } from '@/components/experience/Experience';
 import { Hero } from '@/components/hero/Hero';
 import { Projects } from '@/components/projects/Projects';
+import { Volunteering } from '@/components/volunteering/Volunteering';
 import { BootProvider } from '@/providers/BootProvider';
 import { MotionProvider } from '@/providers/MotionProvider';
 import { PaletteProvider } from '@/providers/PaletteProvider';
@@ -78,6 +79,7 @@ export function App() {
                       <Projects />
                       <BattleStation />
                       <Arsenal />
+                      <Volunteering />
                       <Contact />
                     </main>
                     {/* The footer's own bottom padding clears the fixed HUD, which

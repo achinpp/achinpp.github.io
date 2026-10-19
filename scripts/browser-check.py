@@ -527,8 +527,11 @@ async def main() -> None:
         # ----------------------------------------------------------- DOM
         print("\nDOM (only true once React has mounted and run)")
         dom = await page.evaluate(DOM_ASSERTIONS)
-        expected = ["hero", "experience", "projects", "battlestation", "arsenal", "contact"]
-        check(dom["sections"] == expected, "all six sections rendered in order", str(dom["sections"]))
+        expected = [
+            "hero", "experience", "projects", "battlestation",
+            "arsenal", "volunteering", "contact",
+        ]
+        check(dom["sections"] == expected, "all seven sections rendered in order", str(dom["sections"]))
         check(dom["h1s"] == 1, "exactly one <h1>", f"{dom['h1s']} found")
         check(bool(dom["h1Text"]), "the <h1> has text", repr(dom["h1Text"])[:60])
         check(dom["badHeadingJumps"] == 0, "no skipped heading levels", str(dom["badHeadingJumps"]))

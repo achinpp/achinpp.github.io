@@ -30,7 +30,14 @@ export const SECTIONS: Section[] = [
     inNav: true,
   },
   { id: 'arsenal', label: 'Arsenal', index: '04', codename: 'LOADOUT', inNav: true },
-  { id: 'contact', label: 'Contact', index: '05', codename: 'SECURE CHANNEL', inNav: true },
+  {
+    id: 'volunteering',
+    label: 'Volunteering',
+    index: '05',
+    codename: 'FIELD OPS',
+    inNav: true,
+  },
+  { id: 'contact', label: 'Contact', index: '06', codename: 'SECURE CHANNEL', inNav: true },
 ];
 
 export const SECTION_IDS = SECTIONS.map((s) => s.id);

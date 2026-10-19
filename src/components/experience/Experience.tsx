@@ -3,7 +3,6 @@ import { useScroll } from 'motion/react';
 import { EXPERIENCE } from '@/data/experience';
 import { Section } from '@/components/layout/Section';
 import { SectionHeading } from '@/components/layout/SectionHeading';
-import { Outreach } from '@/components/experience/Outreach';
 import { TimelineEntry } from '@/components/experience/TimelineEntry';
 import { TimelineRail } from '@/components/experience/TimelineRail';
 
@@ -30,7 +29,7 @@ export function Experience() {
       <SectionHeading
         id="experience"
         title="Experience & Leadership"
-        lede="Five roles across two IEEE chapters, a university IoT club and a school research club: committees, web presence, events, build work and media. The workshops, lectures and exhibitions those roles ran are underneath."
+        lede="Five roles across two IEEE chapters, a university IoT club and a school research club: committees, web presence, events, build work and media."
       />
 
       <div ref={listRef} className="relative mt-16 lg:mt-24">
@@ -42,11 +41,6 @@ export function Experience() {
           ))}
         </ol>
       </div>
-
-      {/* Outside `listRef` on purpose: the rail's scroll range is a property
-          of the list of roles, and stretching it over the photographs below
-          would leave the line still drawing after the last card is gone. */}
-      <Outreach />
     </Section>
   );
 }
