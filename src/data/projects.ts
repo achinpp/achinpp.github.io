@@ -14,11 +14,11 @@
  * `repo` and `demo` are `null` because no links were supplied. That renders
  * no button at all rather than a dead one.
  *
- * `media` is `null` on two of the four, for the same reason: you supplied a
- * screenshot for the study coach agent and for the Northbridge topology, and
- * nothing for the other two. A card with no screenshot simply has no media
- * band, so the grid is not holding a gap open for a picture that may never
- * come.
+ * `media` is a list, and it is empty on one of the four: you have supplied
+ * captures for the study coach agent, the Northbridge topology and two for
+ * the DevSecOps pipeline, and nothing for the threat detection research. An
+ * empty list renders no media band at all, so the grid is not holding a gap
+ * open for a picture that may never come.
  */
 
 /**
@@ -53,6 +53,12 @@ export type ProjectMedia = {
   height: number;
   /** Describes the screenshot for anyone who cannot see it. */
   alt: string;
+  /**
+   * Two or three words under the picture in the briefing panel. It used to
+   * read `capture · briefing_04`, which was fine while a project had one
+   * picture and useless the moment one had two.
+   */
+  label: string;
 };
 
 export type Project = {
@@ -74,8 +80,12 @@ export type Project = {
   capabilities: string[];
   /** One paragraph for the expanded briefing. */
   brief: string;
-  /** Screenshot, or null where none was supplied. */
-  media: ProjectMedia | null;
+  /**
+   * Captures, in the order they should be read. The card shows the first and
+   * only the first, because a card is a thumbnail of a briefing rather than
+   * a gallery; the briefing panel shows all of them.
+   */
+  media: ProjectMedia[];
   repo: string | null;
   demo: string | null;
 };
@@ -99,12 +109,15 @@ export const PROJECTS: Project[] = [
     ],
     brief:
       'An exam preparation assistant built on Google ADK and the Gemini API, with a FastAPI backend and a custom interface. It plans what to study and when, then runs the session itself: prioritising topics, logging what was covered, and tutoring and quizzing against the plan.',
-    media: {
-      src: '/media/study-coach.webp',
-      width: 1280,
-      height: 626,
-      alt: 'The agent in the Agent Development Kit console, planning two exams and listing what is due next.',
-    },
+    media: [
+      {
+        src: '/media/study-coach.webp',
+        width: 1280,
+        height: 626,
+        alt: 'The agent in the Agent Development Kit console, planning two exams and listing what is due next.',
+        label: 'the agent console',
+      },
+    ],
     repo: null,
     demo: null,
   },
@@ -126,12 +139,15 @@ export const PROJECTS: Project[] = [
     ],
     brief:
       'A security redesign of an enterprise finance network. Threat modeling at Layer 2 and at the segmentation boundary drove the control set, which is VLANs with extended ACLs between them plus switchport port security. A cost analysis then turned the result into a three phase rollout rather than one unaffordable cutover.',
-    media: {
-      src: '/media/northbridge.webp',
-      width: 1280,
-      height: 517,
-      alt: 'The network topology: an ISP router, an HQ core switch, a separate management switch carrying AAA and syslog, a branch site, and the application, database and web servers behind the core.',
-    },
+    media: [
+      {
+        src: '/media/northbridge.webp',
+        width: 1280,
+        height: 517,
+        alt: 'The network topology: an ISP router, an HQ core switch, a separate management switch carrying AAA and syslog, a branch site, and the application, database and web servers behind the core.',
+        label: 'the segmented topology',
+      },
+    ],
     repo: null,
     demo: null,
   },
@@ -151,7 +167,7 @@ export const PROJECTS: Project[] = [
     ],
     brief:
       'An AI threat detection system combining VGG19 and YOLO, built around the failure mode that breaks most detectors in the field: a physical adversarial patch worn or carried into frame. The two models are integrated specifically to mitigate that class of attack rather than to raise clean input accuracy.',
-    media: null,
+    media: [],
     repo: null,
     demo: null,
   },
@@ -173,7 +189,22 @@ export const PROJECTS: Project[] = [
     ],
     brief:
       'An automated security workflow wrapped around the deployment of OWASP WebGoat. Semgrep covers static analysis, Trivy covers dependencies, and Gitleaks catches committed secrets: three gates on the same pipeline, validated against an application that is vulnerable by design, so a pass that should fail is visible immediately.',
-    media: null,
+    media: [
+      {
+        src: '/media/devsecops-pipeline.webp',
+        width: 956,
+        height: 820,
+        alt: 'A GitHub Actions run of the DevSecOps Pipeline workflow. Build and test, Semgrep, Trivy filesystem and Trivy container scanning all pass; the Gitleaks secrets gate fails, on a commit whose message says it adds a dummy AWS key to prove the gate.',
+        label: 'the secrets gate firing',
+      },
+      {
+        src: '/media/devsecops-webgoat.webp',
+        width: 1032,
+        height: 250,
+        alt: 'A path traversal request to WebGoat in the address bar, returning a directory listing with path-traversal-secret.jpg highlighted in it.',
+        label: 'the app it is proved against',
+      },
+    ],
     repo: null,
     demo: null,
   },

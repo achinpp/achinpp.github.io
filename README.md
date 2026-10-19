@@ -68,7 +68,7 @@ Copy `.env.example` to `.env` and fill both variables in.
 | Decide what to do about the `OSCP` pill (see the file header)              | `src/data/skills.ts`       |
 | A PGP fingerprint, if you have one (the footer line is omitted without it) | `src/data/contact.ts`      |
 | A HackTheBox handle, if you have one (the row shows the numeric id)        | `src/data/contact.ts`      |
-| Screenshots for the other two briefings, if you have any                   | `src/data/projects.ts`     |
+| A screenshot for the threat detection research, if you have one            | `src/data/projects.ts`     |
 | Dates for the four volunteering photographs, and a capture of the platform | `src/data/volunteering.ts` |
 
 Anything you did not state is marked in its data file, and most of it also shows a **dev only
@@ -163,12 +163,13 @@ one of them in half. Doing this here rather than with `object-cover` in CSS is w
 megabyte across the six.
 
 Two more per job options matter. `mirror` flips a frame back: Sussex arrived mirrored from a
-selfie camera and its signs read backwards without it. `trim` cuts measured rows off the top and
-bottom before anything else runs, which is how the REF Media branding bars come off the Red
-Cypher photographs. Those are the organiser's pictures, so the credit the bar carried moves to a
-readable line under the pair in `src/data/achievements.ts` rather than disappearing. `trim` also
-lands the bottom edge of the scoreboard capture on a row separator, so the table ends on a row
-rather than through one.
+selfie camera and its signs read backwards without it. `trim` cuts a measured number of pixels
+off each edge before anything else runs, as `(left, top, right, bottom)`. It takes the REF Media
+branding bars off the Red Cypher photographs, lands the bottom edge of the scoreboard capture on
+a row separator so the table ends on a row rather than through one, and takes the devtools pane
+and the empty white off the WebGoat frame. Those photographs are the organiser's pictures, so
+the credit the bar carried moves to a readable line under the pair in
+`src/data/achievements.ts` rather than disappearing.
 
 A job marked optional is skipped with a note when its source is missing rather than failing the
 run. Nothing is optional at the moment: every source has arrived.

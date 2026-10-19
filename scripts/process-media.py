@@ -6,6 +6,8 @@ Turn the briefing screenshots and the field photographs into shippable assets.
 
 Reads  assets/study-coach-source.png        (Agent Development Kit, dark UI)
        assets/northbridge-source.png        (Cisco Packet Tracer topology, grey canvas)
+       assets/devsecops-pipeline-source.png (a failing pipeline run, dark UI)
+       assets/devsecops-webgoat-source.png  (a path traversal response, light page)
        assets/red-cypher-*-source.jpg       (two photographs from the finals)
        assets/red-cypher-leaderboard-*.png  (the finals scoreboard, dark UI)
        assets/volunteering-*-source.*       (four volunteering photographs)
@@ -124,9 +126,10 @@ class Job:
     photo: bool = False
     #: The shape a photograph is cropped to. Ignored unless `photo`.
     aspect: float = PHOTO_ASPECT
-    #: Rows to cut off the top and the bottom before anything else, for the
-    #: branding bars on the organiser's photographs. Measured off the source.
-    trim: tuple[int, int] = (0, 0)
+    #: Pixels to cut off each edge before anything else, as (left, top,
+    #: right, bottom). Measured off the source, never guessed. Branding bars,
+    #: dead space and panels that repeat the frame all come off here.
+    trim: tuple[int, int, int, int] = (0, 0, 0, 0)
     #: Split the grey Packet Tracer canvas out into the alpha channel.
     strip: bool = False
     #: Skip with a note when the source is missing instead of failing.
@@ -149,7 +152,7 @@ JOBS = [
         'red-cypher-floor.webp',
         photo=True,
         aspect=WIDE_ASPECT,
-        trim=(0, 102),
+        trim=(0, 0, 0, 102),
         focus=0.45,
     ),
     Job(
@@ -157,7 +160,7 @@ JOBS = [
         'red-cypher-team.webp',
         photo=True,
         aspect=WIDE_ASPECT,
-        trim=(0, 101),
+        trim=(0, 0, 0, 101),
         focus=0.5,
     ),
     # The finals scoreboard, and a capture rather than a photograph: it is a
@@ -166,7 +169,20 @@ JOBS = [
     # measured at y=796. The source ends part way through rank 22, and half a
     # table row reads as a screenshot taken carelessly rather than as a list
     # that continues.
-    Job('red-cypher-leaderboard-source.png', 'red-cypher-leaderboard.webp', trim=(0, 28)),
+    Job(
+        'red-cypher-leaderboard-source.png',
+        'red-cypher-leaderboard.webp',
+        trim=(0, 0, 0, 28),
+    ),
+    # The pipeline run is a dark interface at 956 wide, so it needs nothing
+    # but an encode.
+    Job('devsecops-pipeline-source.png', 'devsecops-pipeline.webp'),
+    # The WebGoat frame is a 1624x423 strip, of which the right 592 columns
+    # are a devtools pane repeating the response that is already readable in
+    # the page, and the bottom 173 rows are empty white. Both come off, which
+    # leaves the two things that are the evidence: the traversal payload in
+    # the address bar and the directory listing it came back with.
+    Job('devsecops-webgoat-source.png', 'devsecops-webgoat.webp', trim=(0, 0, 592, 173)),
     # The two standing figures and the table sit above centre in a frame that
     # is mostly the backs of heads.
     Job('volunteering-anthonys-source.jpeg', 'volunteering-anthonys.webp', photo=True, focus=0.44),
@@ -256,9 +272,9 @@ def main() -> int:
         image = Image.open(source).convert('RGBA')
         original = image.size
 
-        top, bottom = job.trim
-        if top or bottom:
-            image = image.crop((0, top, image.width, image.height - bottom))
+        left, top, right, bottom = job.trim
+        if left or top or right or bottom:
+            image = image.crop((left, top, image.width - right, image.height - bottom))
 
         if job.mirror:
             image = image.transpose(Image.FLIP_LEFT_RIGHT)

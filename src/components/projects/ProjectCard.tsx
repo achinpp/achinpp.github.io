@@ -184,14 +184,20 @@ export function ProjectCard({ project, isOpen, onOpen }: Props) {
               at it. `loading="lazy"` because every one of these is well below
               the fold, and both dimensions on the element because a lazy
               image with no reserved box is a layout shift that arrives mid
-              scroll, which is the kind CLS counts and visitors notice most. */}
-          {project.media && (
+              scroll, which is the kind CLS counts and visitors notice most.
+
+              The first capture and only the first, even where a briefing has
+              two. A card is a thumbnail of a briefing, not a gallery, and a
+              tile carrying a stack of screenshots would set its own row
+              height against the three tiles beside it. The rest are in the
+              panel, which is where someone has asked to see them. */}
+          {project.media.length > 0 && (
             <div className="mt-7 overflow-hidden rounded-lg border border-hairline bg-obsidian-950">
               <img
-                src={project.media.src}
-                alt={project.media.alt}
-                width={project.media.width}
-                height={project.media.height}
+                src={project.media[0].src}
+                alt={project.media[0].alt}
+                width={project.media[0].width}
+                height={project.media[0].height}
                 loading="lazy"
                 decoding="async"
                 className="block w-full opacity-75 transition-opacity duration-500 ease-out-expo group-hover:opacity-100"

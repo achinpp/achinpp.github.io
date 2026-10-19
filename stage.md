@@ -1895,6 +1895,58 @@ restarted without you asking, so this and Stage 17 are both waiting on one.
 
 ---
 
+## STAGE 19 — The Pipeline, Proved ✅
+
+Two captures land on `BRIEFING_04`, and a briefing can hold more than one picture now.
+
+- [x] **`devsecops_CICD.png`** processed into `media/devsecops-pipeline.webp`, 956x820
+- [x] **`devsecops_CICD2.png`** processed into `media/devsecops-webgoat.webp`, 1032x250
+- [x] **`media` is a list**, not one picture or none
+- [x] **The card shows the first, the briefing panel shows both**
+- [x] **`trim` cuts all four edges**, not just the top and the bottom
+
+**Accept when:** the briefing shows the gate firing and the app it fires against. ✅
+
+> NOTE: **The first capture is the best thing on this briefing.** It is a run of the workflow in
+> which build, Semgrep, Trivy filesystem and Trivy container all pass and the Gitleaks gate
+> fails, on a commit whose own message says it adds a dummy AWS key to prove the gate. That is
+> not a screenshot of a pipeline, it is a screenshot of a pipeline working, and the difference
+> is the whole project. The alt text says so for anyone who cannot see it.
+
+> NOTE: **The card shows one picture and the panel shows both.** A card is a thumbnail of a
+> briefing rather than a gallery, and `BRIEFING_04` is a standard tile sharing a row with
+> another one, so a stack of screenshots in it would set the height of that row against its
+> neighbour. The dark GitHub Actions frame is the one on the card; the WebGoat frame is a bright
+> band and it waits until someone has opened the briefing.
+
+> NOTE: **The captions name the picture now.** They read `capture · briefing_04`, which was fine
+> while a briefing had one picture and useless the moment one had two, so `ProjectMedia` carries
+> a short `label` and the caption uses it. The other two briefings got labels as well, which is
+> a small improvement in its own right: `the segmented topology` says more than the index
+> already printed at the top of the panel.
+
+> NOTE: **592 columns and 173 rows came off the WebGoat frame.** The source is a 1624x423 strip,
+> of which the right third is a devtools pane repeating the response text that is already
+> readable in the page, and the bottom is empty white. What is left is the two things that are
+> actually the evidence: the traversal payload in the address bar and the directory listing it
+> returned, with `path-traversal-secret.jpg` highlighted in it. `trim` grew from two numbers to
+> four to do it, and the three jobs that used it were updated.
+
+> NOTE: ⚠ **It is still a white frame on an obsidian page.** The page body in that capture is a
+> plain WebGoat response, so there is no equivalent of the Packet Tracer canvas trick available
+> here without misrepresenting what the browser showed. It is dimmed at rest like every other
+> capture and it only appears inside the briefing panel, which I think is enough. If it reads as
+> a slab of daylight when you look at it, say so and it can be cropped to the address bar and
+> the first three lines.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+`npm run test` 8/8 · assets 32.7 kB and 46.6 kB · production build clean at 387.88 kB JS
+(123.99 kB gzip) · both generated files reviewed directly. ⚠ **Still no browser pass.** Stages
+17, 18 and 19 are all waiting on one: the preview server was stopped for low memory while the
+session was idle and is not restarted without you asking.
+
+---
+
 ## Working Agreement
 
 1. One stage at a time. I build it, you review it, we iterate, then we advance.
@@ -1924,7 +1976,7 @@ restarted without you asking, so this and Stage 17 are both waiting on one.
 
 ---
 
-**Current status:** `STAGE 18 — the scoreboard` → remaining: **dates**, **four sets
+**Current status:** `STAGE 19 — the pipeline, proved` → remaining: **dates**, **four sets
 of role bullets**, the **OSCP question**, **project links**, a **PGP fingerprint**, **Lighthouse
 on the deployed site**, **Safari and Firefox**, a **screen reader pass**, and the **deploy**.
 See the README table.
