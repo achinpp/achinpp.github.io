@@ -1947,6 +1947,74 @@ session was idle and is not restarted without you asking.
 
 ---
 
+## STAGE 20 — The Badge Opens ✅
+
+The finals scoreboard goes behind the Finalist hexagon. Hover it on a mouse, tap it on a phone.
+
+- [x] **The hexagon is the control**, not a link beside it
+- [x] **Hover opens it on a mouse**, tap toggles it where there is no hover
+- [x] **Keyboard opens it too**, with Escape to close and `aria-expanded` to say which
+- [x] **The scoreboard leaves the field record**, so the two photographs are a pair again
+- [x] **A `scoreboard` sub label inside the hexagon**, so the badge looks operable
+
+**Accept when:** the badge says `Finalist` and can prove it. ✅
+
+> NOTE: **This is a better home for that picture than the one it had.** The scoreboard was in
+> the field record at the same weight as the two photographs, which made three pictures of
+> roughly equal importance under a wall that only claims one thing. A scoreboard is not a
+> picture of the day, it is the receipt for the word on the hexagon, and a receipt belongs
+> behind the claim. The two photographs are a pair again, which is the shape that grid was
+> built for.
+
+> NOTE: **Hover owns the panel, and the click does nothing where there is a hover.** `isFine`
+> comes from the pointer provider, which is a `(hover: hover) and (pointer: fine)` media query
+> rather than a user agent guess. Without that split, hovering opens the panel and the click
+> that follows closes the thing the visitor was reaching for. Where there is no hover, the tap
+> is the only way in, so it toggles, and a tap anywhere else closes it.
+
+> NOTE: **It is a `<button>` with `aria-expanded`, not a tooltip.** A tooltip is for a short
+> label and announces itself as one; this is a disclosure wrapped around a picture. Focus opens
+> it, blur and Escape close it, and the accessible name reads `Finalist Show the finals
+scoreboard` rather than leaving a keyboard user to guess that a hexagon is operable. Badges
+> with no reveal are not buttons at all, so nothing lands on a focus stop that does nothing.
+
+> NOTE: **The hint is inside the hexagon.** Under it, the extra line pushed this badge's title
+> lower than the one beside it and broke the top alignment of the row. Inside, it costs no
+> height and reads as a sub label on the badge, which is what it is. Without any hint the
+> hexagon is a picture nobody knows to touch: `cursor: pointer` cannot be seen from across a
+> page.
+
+> NOTE: **The panel is portalled to `<body>` and positioned by arithmetic.** It is
+> `position: fixed`, and Framer leaves a transform on the badge's list item after the unlock
+> animation, which would make a fixed child position against that transform instead of the
+> viewport. The placement is computed from the trigger's box and the picture's own aspect ratio
+> rather than measured after a render, because measuring means painting it in the wrong place
+> for one frame first. It goes above the badge when there is room, below when there is not,
+> narrows itself when the viewport is too short, and clamps 16px clear of every edge.
+
+> NOTE: **Any scroll closes it.** Lenis moves the real scroll position, so the panel would
+> otherwise sit at coordinates that stopped being true. Closing beats recomputing: on a mouse
+> the pointer has left the badge anyway, and on a phone a scroll is how people dismiss things.
+
+> NOTE: **The picture is fetched on approach, not on open.** It is 32 kB and no longer on the
+> page, so without a prefetch on the first `pointerenter` the first hover opens an empty frame
+> and fills it a beat later.
+
+> NOTE: **`check:browser` gained six assertions** for this: that the picture is not on the page
+> until it is asked for, that `aria-expanded` starts false, that focusing the badge mounts the
+> panel and loads the right file, that `aria-expanded` follows, that the button says what is
+> behind it, and that Escape closes it. The page image count went from 11 back to 10, because
+> the scoreboard is no longer among them.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+`npm run test` 8/8 · production build clean at 389.92 kB JS (124.55 kB gzip), the reveal costing
+about 2 kB. ⚠ **Still no browser pass.** Stages 17 to 20 are all waiting on one, and this is the
+stage that most wants it: hover, tap and keyboard are three paths that only a browser can
+settle. The preview server was stopped for low memory while the session was idle and is not
+restarted without you asking.
+
+---
+
 ## Working Agreement
 
 1. One stage at a time. I build it, you review it, we iterate, then we advance.
@@ -1976,7 +2044,7 @@ session was idle and is not restarted without you asking.
 
 ---
 
-**Current status:** `STAGE 19 — the pipeline, proved` → remaining: **dates**, **four sets
+**Current status:** `STAGE 20 — the badge opens` → remaining: **dates**, **four sets
 of role bullets**, the **OSCP question**, **project links**, a **PGP fingerprint**, **Lighthouse
 on the deployed site**, **Safari and Firefox**, a **screen reader pass**, and the **deploy**.
 See the README table.

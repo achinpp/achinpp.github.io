@@ -43,11 +43,18 @@ export type Achievement = {
    */
   fieldNote: string | null;
   /**
-   * Pictures from the event, shown in the field record panel under the wall.
-   * An empty array renders no panel at all, which is why an event with no
-   * pictures costs the layout nothing.
+   * Photographs from the event, shown in the field record panel under the
+   * wall. An empty array renders no panel at all, which is why an event with
+   * no pictures costs the layout nothing.
    */
   images: AchievementImage[];
+  /**
+   * One picture kept behind the badge itself, revealed on hover or on tap.
+   * This is for the thing that proves the word on the hexagon rather than
+   * the thing that illustrates the day: a scoreboard is a receipt, and a
+   * receipt belongs behind the claim rather than beside it.
+   */
+  reveal: AchievementReveal | null;
   /**
    * Who took the photographs, as one line under them. Required whenever they
    * are somebody else's work, which the organiser's are. It sits under the
@@ -65,18 +72,20 @@ export type AchievementImage = {
   src: string;
   width: number;
   height: number;
-  /**
-   * A `photo` is somebody's camera: cropped to a shared shape, desaturated
-   * at rest, captioned over the picture, and grouped two to a row. A
-   * `capture` is a screenshot: it keeps its own shape and its own colours,
-   * runs the full width, and is captioned underneath, because an overlay
-   * would sit on top of the last row of a table.
-   */
-  kind: 'photo' | 'capture';
   /** Describes the picture, for a reader who cannot see it. */
   alt: string;
   /** Three or four words. */
   caption: string;
+};
+
+/**
+ * The picture behind a badge. Same shape as any other, plus the word that
+ * tells somebody it is there at all: without it the hexagon is a picture
+ * nobody knows to touch, and a pointer cursor cannot be seen from a distance.
+ */
+export type AchievementReveal = AchievementImage & {
+  /** One word under the hexagon. It has about 128px to live in. */
+  hint: string;
 };
 
 export const ACHIEVEMENTS: Achievement[] = [
@@ -107,7 +116,6 @@ export const ACHIEVEMENTS: Achievement[] = [
         src: '/media/red-cypher-team.webp',
         width: 1000,
         height: 562,
-        kind: 'photo',
         alt: 'Three team members standing in front of a Red Cypher 3.0 backdrop.',
         caption: 'Team LO49',
       },
@@ -115,29 +123,28 @@ export const ACHIEVEMENTS: Achievement[] = [
         src: '/media/red-cypher-floor.webp',
         width: 1000,
         height: 562,
-        kind: 'photo',
         alt: 'Three competitors working at desktop machines in a university computer lab.',
         caption: 'On the finals floor',
       },
-      /**
-       * ⚠ This one puts the placing on the site. Your earlier instruction was
-       * to frame the result as reaching the finals from a field of more than
-       * 100 and leave 19th off, and the field note above still does exactly
-       * that. The scoreboard says `#19` in red at the top and highlights the
-       * row. Both can be true on one page, but it is your call and it is
-       * worth making deliberately: drop this entry and the placing is gone
-       * again.
-       */
-      {
-        src: '/media/red-cypher-leaderboard.webp',
-        width: 1171,
-        height: 797,
-        kind: 'capture',
-        alt: 'The Red Cypher 3.0 finals scoreboard: 42 teams active, with team LO49 highlighted at rank 19 on 15 flags and 1,851 points.',
-        caption: 'The finals scoreboard',
-      },
     ],
     imageCredit: 'REF Media, University of Ruhuna · Sachintha Dissanayake and Dulanjana Yatagama',
+    /**
+     * ⚠ This still puts the placing on the site, and it is now one gesture
+     * away rather than permanently on the page. Your earlier instruction was
+     * to frame the result as reaching the finals from a field of more than
+     * 100 and leave 19th off, and the field note under the wall does exactly
+     * that. The scoreboard says `#19` in red and highlights the LO49 row.
+     * Set this to `null` and the placing is gone again, with nothing else to
+     * change.
+     */
+    reveal: {
+      src: '/media/red-cypher-leaderboard.webp',
+      width: 1171,
+      height: 797,
+      alt: 'The Red Cypher 3.0 finals scoreboard: 42 teams active, with team LO49 highlighted at rank 19 on 15 flags and 1,851 points.',
+      caption: 'The finals scoreboard',
+      hint: 'scoreboard',
+    },
   },
   {
     id: 'cryptx-2',
@@ -150,6 +157,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     fieldNote: null,
     images: [],
     imageCredit: null,
+    reveal: null,
   },
 ];
 

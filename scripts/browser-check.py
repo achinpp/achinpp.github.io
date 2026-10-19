@@ -351,6 +351,42 @@ BOOT_PROBE = """
 })()
 """
 
+# The disclosure behind an achievement badge. Opened from the keyboard rather
+# than with synthetic mouse events, for two reasons: hover, focus and tap all
+# call the same function, so one path proves the panel mounts and the picture
+# loads; and the keyboard path is the one that is easiest to get wrong and
+# hardest to notice.
+REVEAL_PROBE = """
+(async () => {
+  const button = document.querySelector('#battlestation button[aria-expanded]');
+  if (!button) return null;
+  const shown = () => document.querySelector('img[src*="leaderboard"]');
+
+  const before = !!shown();
+  const expandedBefore = button.getAttribute('aria-expanded');
+
+  button.focus();
+  await new Promise((r) => setTimeout(r, 150));
+
+  const opened = shown();
+  const expandedAfter = button.getAttribute('aria-expanded');
+
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  await new Promise((r) => setTimeout(r, 500));
+
+  return {
+    before,
+    expandedBefore,
+    after: !!opened,
+    src: opened ? new URL(opened.src).pathname : null,
+    expandedAfter,
+    name: (button.textContent || '').trim(),
+    labelled: (button.textContent || '').toLowerCase().includes('show'),
+    afterEscape: !!shown(),
+  };
+})()
+"""
+
 # Every <img> the page ships, HEAD-checked against the server it was served
 # from. This is the one asset failure nothing else in this script can see:
 # Chrome logs no console error for an image that 404s, the alt text is still
@@ -577,13 +613,23 @@ async def main() -> None:
         # Every image on the page, fetched rather than assumed. See MEDIA_PROBE.
         media = await page.evaluate(MEDIA_PROBE)
         broken = [m["path"] for m in media if not m["ok"]]
-        # Portrait, three briefing captures, four field photographs, two
-        # photographs from the Red Cypher finals and the finals scoreboard.
-        # The second DevSecOps capture is in the briefing panel, not here.
-        check(len(media) >= 11, "every expected image is on the page", f"{len(media)} images")
+        # Portrait, three briefing captures, four field photographs and two
+        # photographs from the Red Cypher finals. Two pictures are deliberately
+        # not in this count: the second DevSecOps capture is in the briefing
+        # panel, and the finals scoreboard is behind the Finalist badge.
+        check(len(media) >= 10, "every expected image is on the page", f"{len(media)} images")
         check(not broken, "every image is served", "; ".join(broken[:3]))
         unsized = [m["path"] for m in media if not m["sized"]]
         check(not unsized, "every image reserves its box", "; ".join(unsized[:3]))
+
+        reveal = await page.evaluate(REVEAL_PROBE)
+        if check(reveal is not None, "a badge offers a reveal"):
+            check(not reveal["before"], "the picture is not on the page until it is asked for")
+            check(reveal["expandedBefore"] == "false", "the badge starts aria-expanded=false")
+            check(reveal["after"], "focusing the badge opens it", str(reveal["src"]))
+            check(reveal["expandedAfter"] == "true", "aria-expanded follows the panel")
+            check(reveal["labelled"], "the button says what is behind it", str(reveal["name"]))
+            check(not reveal["afterEscape"], "Escape closes it again")
 
         # The hero is meant to be exactly one viewport at the reference size.
         # Adding anything to it — the portrait, most recently — pushes the

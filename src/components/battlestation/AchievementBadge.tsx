@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { motion } from 'motion/react';
 import { Lock, Trophy } from 'lucide-react';
 import type { Achievement, Rarity } from '@/data/achievements';
+import { BadgeReveal } from '@/components/battlestation/BadgeReveal';
 import { ScrambleText } from '@/components/ui/ScrambleText';
 import { duration, easeOutBack } from '@/lib/motion/easings';
 
@@ -91,47 +92,72 @@ export function AchievementBadge({
   achievement: Achievement;
   hero: boolean;
 }) {
-  const { rarity } = achievement;
+  const { rarity, reveal } = achievement;
+
+  const frame = (
+    <HexFrame stroke={STROKE[rarity]} glow={GLOW[rarity]}>
+      {/* The travelling light. One element on the page gets this: the stroke
+          repaints its path every frame, unlike a compositor transform. */}
+      {rarity === 'legendary' && (
+        <svg
+          aria-hidden
+          viewBox="0 0 100 116"
+          preserveAspectRatio="none"
+          className="absolute inset-0 size-full"
+        >
+          <path
+            d={HEX_PATH}
+            fill="none"
+            stroke="var(--color-mint-200)"
+            strokeWidth={2}
+            strokeDasharray="52 288"
+            className="motion-ok:animate-trace"
+          />
+        </svg>
+      )}
+
+      <Trophy
+        aria-hidden
+        size={hero ? 20 : 16}
+        className={rarity === 'standard' ? 'text-ink-faint' : 'text-mint-400'}
+      />
+      <span
+        className={`font-mono tracking-[0.14em] uppercase ${
+          hero ? 'text-[0.6875rem]' : 'text-[0.5625rem]'
+        } ${rarity === 'standard' ? 'text-ink-muted' : 'text-mint-200'}`}
+      >
+        {achievement.result}
+      </span>
+
+      {/* The affordance, inside the hexagon rather than under it.
+          `cursor: pointer` cannot be seen from across a page, so without a
+          word here the badge is a picture nobody knows to touch. Under the
+          hexagon it would have pushed this badge's title a line lower than
+          the one beside it and broken the row; in here it costs nothing and
+          reads as a sub label on the badge, which is what it is. */}
+      {reveal && (
+        <span
+          aria-hidden
+          className="font-mono text-[0.5rem] tracking-[0.18em] text-mint-700 uppercase transition-colors duration-300 group-hover/reveal:text-mint-300"
+        >
+          {reveal.hint}
+        </span>
+      )}
+    </HexFrame>
+  );
 
   return (
     <motion.li
       variants={unlock}
       className={`flex flex-col items-center ${hero ? 'w-40 sm:w-44' : 'w-28 sm:w-32'}`}
     >
-      <HexFrame stroke={STROKE[rarity]} glow={GLOW[rarity]}>
-        {/* The travelling light. One element on the page gets this: the stroke
-            repaints its path every frame, unlike a compositor transform. */}
-        {rarity === 'legendary' && (
-          <svg
-            aria-hidden
-            viewBox="0 0 100 116"
-            preserveAspectRatio="none"
-            className="absolute inset-0 size-full"
-          >
-            <path
-              d={HEX_PATH}
-              fill="none"
-              stroke="var(--color-mint-200)"
-              strokeWidth={2}
-              strokeDasharray="52 288"
-              className="motion-ok:animate-trace"
-            />
-          </svg>
-        )}
-
-        <Trophy
-          aria-hidden
-          size={hero ? 20 : 16}
-          className={rarity === 'standard' ? 'text-ink-faint' : 'text-mint-400'}
-        />
-        <span
-          className={`font-mono tracking-[0.14em] uppercase ${
-            hero ? 'text-[0.6875rem]' : 'text-[0.5625rem]'
-          } ${rarity === 'standard' ? 'text-ink-muted' : 'text-mint-200'}`}
-        >
-          {achievement.result}
-        </span>
-      </HexFrame>
+      {/* A badge with a picture behind it becomes the button that opens it.
+          The hexagon is the control you asked for, so the frame is the thing
+          that gets hovered and tapped rather than a separate link under it.
+          Badges without a reveal render exactly as before: no button, no
+          focus stop, nothing for a keyboard to land on that does not do
+          anything. */}
+      {reveal ? <BadgeReveal image={reveal}>{frame}</BadgeReveal> : frame}
 
       <div className="mt-5 text-center">
         <p className={`font-mono text-ink uppercase ${hero ? 'text-label-lg' : 'text-label'}`}>
