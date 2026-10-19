@@ -1730,9 +1730,26 @@ HackSL`, and at Stage 13 I kept that and flagged that the qualifier poster disag
 > event fill the two column grid exactly, and the alternative was inventing a second achievement
 > to hang the second picture on.
 
+> NOTE: **Both sources were swapped for tighter frames at your request**, `red_cypher4` for the
+> finals floor and `red_cypher3` for the team portrait. Same two scenes, shot closer, so the
+> faces carry at card size instead of being three small figures across a wide room. The bar
+> depths were measured again off the new files rather than assumed: 102 rows on one and 101 on
+> the other. Nothing else changed, and the output dimensions came out the same bar a single
+> pixel of height.
+
+### Housekeeping
+
+> NOTE: **The last two commits were rewritten to drop a stray `@`.** A PowerShell here string
+> went into a Bash command, so the quoting leaked and `@` landed as the first line of two commit
+> messages, which made it the subject. One was caught before it was pushed, one was not.
+> Rewriting it meant a force push over `main`, done at your request. The trees are byte for byte
+> what they were; only the messages and therefore the hashes changed. If you have a clone of
+> this repo anywhere else, it needs a fresh fetch.
+
 **Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
-`npm run test` 8/8 · `npm run check:browser` **all checks pass**, 9 images fetched, LCP 1240ms
-best of 1240-1664ms, CLS 0.0064 · Battle Station reviewed in browser at 1440 and 390.
+`npm run test` 8/8 · `npm run check:browser` **all checks pass**, 9 images fetched, LCP 1412ms
+best of 1412-2404ms, CLS 0.0064 · Battle Station reviewed in browser at 1440 and 390, on both
+sets of photographs.
 
 ---
 

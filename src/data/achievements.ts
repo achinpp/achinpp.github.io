@@ -100,7 +100,7 @@ export const ACHIEVEMENTS: Achievement[] = [
       {
         src: '/media/red-cypher-floor.webp',
         width: 1000,
-        height: 563,
+        height: 562,
         alt: 'Three competitors working at desktop machines in a university computer lab.',
         caption: 'On the finals floor',
       },

@@ -140,23 +140,23 @@ class Job:
 JOBS = [
     Job('study-coach-source.png', 'study-coach.webp'),
     Job('northbridge-source.png', 'northbridge.webp', strip=True),
-    # The branding bar starts at row 868 in one and the frame is boxed in by
-    # bars at 210 and 1259 in the other. Both come out 16:9 so that the row of
-    # three in front of the backdrop survives the crop intact.
+    # The REF Media bar is 101 rows deep on one and 102 on the other, measured
+    # off each source rather than assumed. Both come out 16:9 so that the row
+    # of three in front of the backdrop survives the crop intact.
     Job(
         'red-cypher-floor-source.jpg',
         'red-cypher-floor.webp',
         photo=True,
         aspect=WIDE_ASPECT,
-        trim=(0, 101),
-        focus=0.46,
+        trim=(0, 102),
+        focus=0.45,
     ),
     Job(
         'red-cypher-team-source.jpg',
         'red-cypher-team.webp',
         photo=True,
         aspect=WIDE_ASPECT,
-        trim=(210, 101),
+        trim=(0, 101),
         focus=0.5,
     ),
     # The two standing figures and the table sit above centre in a frame that
