@@ -23,14 +23,7 @@ function Prompt() {
  * copy is `aria-hidden`: a live region that appends a character at a time
  * would make a screen reader announce the same line thirty times.
  */
-export function TerminalWindow({
-  typing,
-  onSkip,
-}: {
-  typing: TypewriterState;
-  /** Dismiss the whole sequence, not just the typing. See `<BootScreen>`. */
-  onSkip: () => void;
-}) {
+export function TerminalWindow({ typing }: { typing: TypewriterState }) {
   const { lineIndex, charCount, done } = typing;
 
   return (
@@ -45,22 +38,11 @@ export function TerminalWindow({
         <span className="ml-2 truncate font-mono text-[0.625rem] tracking-[0.12em] text-ink-faint uppercase">
           root@shadow:~
         </span>
-        {/* Skippable, and visibly so: nobody should have to sit through a
-            typing animation to read a name.
-
-            It stays mounted after the script finishes, which it did not at
-            first. Unmounting it dropped focus onto <body> for the last 700ms
-            of the sequence, behind glass nobody can see past, which meant a
-            keyboard user's place on the page quietly disappeared. It is also
-            the better control: once the transcript is done, this skips the
-            hold and the fade rather than skipping nothing. */}
-        <button
-          type="button"
-          onClick={onSkip}
-          className="ml-auto shrink-0 rounded-full border border-hairline px-2.5 py-1 font-mono text-[0.5625rem] tracking-[0.16em] text-ink-faint uppercase transition-colors duration-200 hover:border-mint-800 hover:text-mint-300"
-        >
-          skip
-        </button>
+        {/* There was a `skip` button here. It is gone at your request: a
+            loading screen that advertises its own exit is a loading screen
+            admitting it is in the way. The sequence is still dismissible by
+            Escape and by a click anywhere on the glass, and reduced motion
+            never shows it at all. See `<BootScreen>`. */}
       </div>
 
       {/* Transcript */}

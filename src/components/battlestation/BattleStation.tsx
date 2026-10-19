@@ -7,7 +7,7 @@ import { ContributionStrip } from '@/components/battlestation/ContributionStrip'
 import { FieldRecord } from '@/components/battlestation/FieldRecord';
 import { StatGrid } from '@/components/battlestation/StatGrid';
 import { stagger } from '@/lib/motion/easings';
-import { fadeUp, revealViewport, staggerGroup } from '@/lib/motion/variants';
+import { revealViewport, staggerGroup } from '@/lib/motion/variants';
 
 /**
  * Battle Station.
@@ -15,16 +15,19 @@ import { fadeUp, revealViewport, staggerGroup } from '@/lib/motion/variants';
  * The badge wall and the counters share a row rather than the badge wall
  * sitting next to a one-entry "milestone timeline" as the plan had it. With a
  * single confirmed achievement a timeline is a line with one dot on it, which
- * looks broken; the counters put something substantial beside the wall and
- * the date lives under its own badge instead. Add more achievements and this
- * is still the right shape.
+ * looks broken; the counters put something substantial beside the wall. Add
+ * more achievements and this is still the right shape.
+ *
+ * **Each badge now carries its own organiser.** They were a footnote list
+ * under the wall, which asked the reader to carry an event name down the
+ * page and match it against two rows of small type. Three lines moved into
+ * the badge caption and the whole block went away.
  *
  * Empty frames beyond `ACHIEVEMENTS.length` are locked slots. See the header
  * of `src/data/achievements.ts` for why they are empty rather than invented.
  */
 export function BattleStation() {
   const lockedCount = Math.max(0, BADGE_SLOTS - ACHIEVEMENTS.length);
-  const footnotes = ACHIEVEMENTS.filter((a) => a.organiser !== null);
 
   return (
     <Section id="battlestation">
@@ -60,34 +63,6 @@ export function BattleStation() {
           {/* Pictures from the events, between the wall and the footnotes.
             Renders nothing while no achievement carries one. */}
           <FieldRecord achievements={ACHIEVEMENTS} />
-
-          {/* Organisers, as a footnote. They belong with the wall but not in a
-            128px badge column, and a competition is worth more with the body
-            that ran it named. */}
-          {footnotes.length > 0 && (
-            <motion.ul
-              variants={staggerGroup()}
-              initial="hidden"
-              whileInView="visible"
-              viewport={revealViewport}
-              className="mt-12 space-y-2 border-t border-hairline pt-6"
-            >
-              {footnotes.map((achievement) => (
-                <motion.li
-                  key={achievement.id}
-                  variants={fadeUp}
-                  className="flex flex-wrap items-baseline gap-x-3 gap-y-1"
-                >
-                  <span className="font-mono text-[0.5625rem] tracking-[0.2em] text-mint-700 uppercase">
-                    {achievement.event}
-                  </span>
-                  <span className="text-[0.8125rem] leading-relaxed text-ink-faint">
-                    Organised by the {achievement.organiser}.
-                  </span>
-                </motion.li>
-              ))}
-            </motion.ul>
-          )}
         </div>
 
         {/* ---------------------------------------------------- counters */}

@@ -11,7 +11,10 @@ import { PROJECTS } from '@/data/projects';
  *
  * Same rule for the counters: every number here is either derived from data
  * that already exists on this site, or `null`. A `null` renders `--` and a
- * `[ tbc ]` label instead of counting up to a figure nobody supplied.
+ * `[ tbc ]` label instead of counting up to a figure nobody supplied. Dates
+ * are the exception now: a missing one renders nothing at all, because a
+ * placeholder under every badge was pointing at a gap rather than filling
+ * one.
  */
 
 /** Drives the frame, the glow and the unlock animation. */
@@ -24,7 +27,7 @@ export type Achievement = {
   /** What was won or reached. */
   result: string;
   rarity: Rarity;
-  /** null renders `[ date tbc ]`. No dates have been supplied. */
+  /** Renders only when there is one. No dates have been supplied. */
   date: string | null;
   /**
    * A few words under the badge, at badge width. Keep it short: the column is
@@ -32,7 +35,7 @@ export type Achievement = {
    * paragraph that pushes the row out of alignment.
    */
   note: string | null;
-  /** The organising body, rendered as a footnote under the whole wall. */
+  /** The organising body, rendered as the last line under its own badge. */
   organiser: string | null;
   /**
    * One line above the photographs, for the context a 128px badge column

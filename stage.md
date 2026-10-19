@@ -1798,6 +1798,60 @@ nav reviewed in browser at 1440 and 390.
 
 ---
 
+## STAGE 17 — No Placeholder, No Skip ✅
+
+Two small removals. The badge wall stops announcing a date nobody gave it, and the loading
+screen stops offering a way out of itself.
+
+- [x] **`[ date tbc ]` is gone** from under every badge
+- [x] **The organiser moved into that caption**, out of the footnote list under the wall
+- [x] **The footnote block is deleted**, along with the code that built it
+- [x] **The `skip` button is gone** from the boot terminal chrome
+- [x] **The overlay takes focus itself**, now that it has no focusable child
+
+**Accept when:** nothing under a badge points at a gap, and the loading screen does not come
+with an exit sign. ✅
+
+> NOTE: **A placeholder is not the same thing as honesty.** `[ date tbc ]` was there so the site
+> would never imply a date it did not have, which was the right instinct and the wrong control:
+> it put a small grey note under every badge drawing attention to something no reader had asked
+> about. A date renders when there is a date. The field is still on the type, so giving me one
+> is a one line edit.
+
+> NOTE: **The organiser belongs with its badge.** It was a list under the wall, which asked a
+> reader to carry an event name down the page and match it against two rows of small type for a
+> fact that takes four words. In the caption it is simply the last thing the badge says. The
+> phrase `Organised by the` went with the move, because under a title and a team name the line
+> reads as the organiser without being told; it survives as `sr-only` text so a screen reader
+> still gets the relationship.
+
+> NOTE: **The organiser sets at 10px.** It is the longest line on a 128px column, and the
+> University of Sri Jayewardenepura entry runs to about five words per line at that size. The
+> alternative was widening the caption past the hexagon, which pushes the four badge row over
+> the width of its column at anything under about a 1200px window and wraps it into two rows.
+> Small type on the existing grid beats a wider grid that breaks earlier.
+
+> NOTE: **The `skip` button is gone at your request, and three exits remain.** Escape, a click
+> anywhere on the glass, and the reduced motion preference, which never shows the overlay at
+> all. The argument for the button was that nobody should have to sit through a typing animation
+> to read a name. The argument against it is yours and it is better: a loading screen that
+> advertises its own exit is a loading screen admitting it is in the way, and this one is 1.8
+> seconds over a page that has already rendered behind it.
+
+> NOTE: **Losing the button cost the overlay its only focusable child.** It was carrying more
+> than its label: the focus trap seeded focus from it, so without it focus would have stayed on
+> `<body>` behind glass nobody can see past, the dialog would never be announced, and the trap
+> would have had nothing to hold. The overlay now takes `tabIndex={-1}` and focuses itself on
+> mount, and an `sr-only` line says how to leave, since there is no longer a control to find.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+`npm run test` 8/8 · production build clean at 386.15 kB JS (123.54 kB gzip), 0 em dashes and
+0 occurrences of `date tbc` left in the bundle. ⚠ **No browser pass on this one yet.** The
+preview server was stopped while the session was idle because the machine was low on memory,
+and it is not restarted without you asking.
+
+---
+
 ## Working Agreement
 
 1. One stage at a time. I build it, you review it, we iterate, then we advance.
@@ -1827,7 +1881,7 @@ nav reviewed in browser at 1440 and 390.
 
 ---
 
-**Current status:** `STAGE 16 — volunteering is a section` → remaining: **dates**, **four sets
+**Current status:** `STAGE 17 — no placeholder, no skip` → remaining: **dates**, **four sets
 of role bullets**, the **OSCP question**, **project links**, a **PGP fingerprint**, **Lighthouse
 on the deployed site**, **Safari and Firefox**, a **screen reader pass**, and the **deploy**.
 See the README table.

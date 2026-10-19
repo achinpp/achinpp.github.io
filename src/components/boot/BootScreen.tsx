@@ -24,15 +24,22 @@ const HOLD_MS = 380;
  * thing a visitor can *read*, and there is no way around that, but it adds
  * nothing to the work the browser has to do.
  *
- * **It is skippable four ways:** the button in the window chrome, Escape, a
- * click anywhere on the glass, and the reduced motion preference, which skips
- * the overlay entirely rather than showing a still of it. See
- * `<BootProvider>` for that last one.
+ * **It is skippable three ways:** Escape, a click anywhere on the glass, and
+ * the reduced motion preference, which skips the overlay entirely rather than
+ * showing a still of it. See `<BootProvider>` for that last one. The visible
+ * `skip` button in the window chrome is gone at your request.
  *
  * **Focus is trapped and the page is scroll locked** while it is up. Both are
  * what make it a layer rather than a decoration: without the trap, Tab walks
  * into a page nobody can see, and without the lock a trackpad scrolls the
  * hero out of frame behind the glass.
+ *
+ * **Losing the button cost the overlay its only focusable child**, which is
+ * why the glass itself takes focus on mount. Without that, focus stays on
+ * `<body>` behind a layer nobody can see past, the dialog is never announced,
+ * and the trap has nothing to hold. `tabIndex={-1}` makes it focusable by
+ * script without putting it in the tab order, and the sr-only line below says
+ * how to leave, since there is no longer a control to find.
  *
  * **The progress bar is real.** It is characters typed over characters in the
  * script, not a timed animation pretending to measure something. A fake
@@ -57,6 +64,11 @@ export function BootScreen({ onDone }: { onDone: () => void }) {
     if (typing.done) onDone();
     else typing.skip();
   }, [typing, onDone]);
+
+  // The overlay is the only thing in the trap now. Focus it once, on mount.
+  useEffect(() => {
+    ref.current?.focus();
+  }, []);
 
   // Hold on the finished transcript, then hand the page over.
   useEffect(() => {
@@ -88,6 +100,7 @@ export function BootScreen({ onDone }: { onDone: () => void }) {
       // from. It ships in production on purpose: a test hook that only exists
       // in the build nobody visits is testing a different page.
       data-boot=""
+      tabIndex={-1}
       initial={{ opacity: 1 }}
       // Scaling up a touch on the way out reads as the glass lifting off the
       // page rather than the page fading in from nothing.
@@ -95,8 +108,10 @@ export function BootScreen({ onDone }: { onDone: () => void }) {
       transition={{ duration: duration.slow, ease: easeOutExpo }}
       onClick={dismiss}
       style={{ zIndex: 'var(--z-boot)' }}
-      className="fixed inset-0 flex flex-col items-center justify-center gap-10 bg-obsidian-950 dot-matrix px-5"
+      className="fixed inset-0 flex flex-col items-center justify-center gap-10 bg-obsidian-950 dot-matrix px-5 outline-none"
     >
+      <p className="sr-only">Loading. Press Escape or click anywhere to go straight to the page.</p>
+
       {/* A mint wash from below, so the glass is lit rather than flat. */}
       <span
         aria-hidden
@@ -112,7 +127,7 @@ export function BootScreen({ onDone }: { onDone: () => void }) {
           shadow command center
         </p>
 
-        <TerminalWindow typing={typing} onSkip={dismiss} />
+        <TerminalWindow typing={typing} />
 
         {/* ------------------------------------------------------ progress */}
         <div className="mt-6 flex items-center gap-4">

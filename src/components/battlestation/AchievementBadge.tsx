@@ -137,16 +137,33 @@ export function AchievementBadge({
         <p className={`font-mono text-ink uppercase ${hero ? 'text-label-lg' : 'text-label'}`}>
           <ScrambleText text={achievement.event} tickMs={28} lockPerTick={0.9} />
         </p>
-        <p className="mt-2 font-mono text-[0.5625rem] tracking-[0.16em] text-obsidian-500 uppercase">
-          {/* Honest blank: no dates were supplied. See data/achievements.ts. */}
-          {achievement.date ?? '[ date tbc ]'}
-        </p>
+        {/* No placeholder where a date is missing. `[ date tbc ]` sat under
+            every badge announcing a gap nobody had asked about, which is a
+            different thing from being honest about one. A date renders when
+            there is a date. */}
+        {achievement.date && (
+          <p className="mt-2 font-mono text-[0.5625rem] tracking-[0.16em] text-obsidian-500 uppercase">
+            {achievement.date}
+          </p>
+        )}
         {/* No `max-w` wider than the badge column. One did exist, at 14rem
             against a 7rem column, and the first note long enough to use it
-            wrapped to six lines and knocked the row out of alignment. The
-            long form lives in the footnote under the wall instead. */}
+            wrapped to six lines and knocked the row out of alignment. Width
+            comes from the column; length is handled by making the type
+            small. */}
         {achievement.note && (
           <p className="mt-2 text-[0.75rem] leading-relaxed text-ink-faint">{achievement.note}</p>
+        )}
+        {/* The organising body, which used to be a footnote under the whole
+            wall. It belongs with its own badge: a list of organisers at the
+            bottom made the reader carry an event name down the page to match
+            it up. `text-balance` keeps the four wrapped lines even rather
+            than leaving one word stranded. */}
+        {achievement.organiser && (
+          <p className="mt-2.5 text-[0.625rem] leading-relaxed text-balance text-obsidian-500">
+            <span className="sr-only">Organised by </span>
+            {achievement.organiser}
+          </p>
         )}
       </div>
     </motion.li>

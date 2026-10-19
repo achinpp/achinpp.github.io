@@ -62,7 +62,7 @@ Copy `.env.example` to `.env` and fill both variables in.
 | Expand `SKU`, if it stands for something                                   | `src/data/experience.ts`   |
 | Confirm the four project status badges                                     | `src/data/projects.ts`     |
 | Add public repo and demo links per briefing                                | `src/data/projects.ts`     |
-| Dates for the two competition results                                      | `src/data/achievements.ts` |
+| Dates for the two competition results (nothing renders without them)       | `src/data/achievements.ts` |
 | Check the photographer credit on the Red Cypher pictures is right          | `src/data/achievements.ts` |
 | More achievements: the wall has two badges and two locked slots            | `src/data/achievements.ts` |
 | Decide what to do about the `OSCP` pill (see the file header)              | `src/data/skills.ts`       |
