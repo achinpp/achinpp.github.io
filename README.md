@@ -146,7 +146,8 @@ background, trims it to its alpha bounding box and writes `public/portrait.webp`
 kinds of source.
 
 A **capture** is a screenshot, and it keeps its own shape, because its shape is information: the
-Packet Tracer topology runs edge to edge and a crop takes a router off the end of it. That
+Packet Tracer topology runs edge to edge and a crop takes a router off the end of it, and the
+Red Cypher scoreboard is a table that stops being readable the moment it is cropped. That
 topology also gets real work done to it. Its canvas is a flat grey with black labels, which on
 an obsidian page is a slab of daylight, so the script splits the pixels by chroma, drops the
 canvas to alpha 0 and redraws the achromatic ink in the site's own light grey. The coloured
@@ -165,10 +166,12 @@ Two more per job options matter. `mirror` flips a frame back: Sussex arrived mir
 selfie camera and its signs read backwards without it. `trim` cuts measured rows off the top and
 bottom before anything else runs, which is how the REF Media branding bars come off the Red
 Cypher photographs. Those are the organiser's pictures, so the credit the bar carried moves to a
-readable line under the pair in `src/data/achievements.ts` rather than disappearing.
+readable line under the pair in `src/data/achievements.ts` rather than disappearing. `trim` also
+lands the bottom edge of the scoreboard capture on a row separator, so the table ends on a row
+rather than through one.
 
 A job marked optional is skipped with a note when its source is missing rather than failing the
-run. `red-cypher` is one of those, waiting on a file.
+run. Nothing is optional at the moment: every source has arrived.
 
 Either way: re-run the script, then paste the `width`/`height` it prints into the matching entry
 in `src/data/`.

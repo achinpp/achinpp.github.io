@@ -577,9 +577,9 @@ async def main() -> None:
         # Every image on the page, fetched rather than assumed. See MEDIA_PROBE.
         media = await page.evaluate(MEDIA_PROBE)
         broken = [m["path"] for m in media if not m["ok"]]
-        # Portrait, two briefing captures, four field photographs, two from
-        # the Red Cypher finals.
-        check(len(media) >= 9, "every expected image is on the page", f"{len(media)} images")
+        # Portrait, two briefing captures, four field photographs, two
+        # photographs from the Red Cypher finals and the finals scoreboard.
+        check(len(media) >= 10, "every expected image is on the page", f"{len(media)} images")
         check(not broken, "every image is served", "; ".join(broken[:3]))
         unsized = [m["path"] for m in media if not m["sized"]]
         check(not unsized, "every image reserves its box", "; ".join(unsized[:3]))

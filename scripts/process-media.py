@@ -7,6 +7,7 @@ Turn the briefing screenshots and the field photographs into shippable assets.
 Reads  assets/study-coach-source.png        (Agent Development Kit, dark UI)
        assets/northbridge-source.png        (Cisco Packet Tracer topology, grey canvas)
        assets/red-cypher-*-source.jpg       (two photographs from the finals)
+       assets/red-cypher-leaderboard-*.png  (the finals scoreboard, dark UI)
        assets/volunteering-*-source.*       (four volunteering photographs)
 Writes public/media/*.webp
 
@@ -159,6 +160,13 @@ JOBS = [
         trim=(0, 101),
         focus=0.5,
     ),
+    # The finals scoreboard, and a capture rather than a photograph: it is a
+    # dark interface already, so it keeps its own shape and needs nothing but
+    # an encode. The 28 rows off the bottom land the cut on a row separator,
+    # measured at y=796. The source ends part way through rank 22, and half a
+    # table row reads as a screenshot taken carelessly rather than as a list
+    # that continues.
+    Job('red-cypher-leaderboard-source.png', 'red-cypher-leaderboard.webp', trim=(0, 28)),
     # The two standing figures and the table sit above centre in a frame that
     # is mostly the backs of heads.
     Job('volunteering-anthonys-source.jpeg', 'volunteering-anthonys.webp', photo=True, focus=0.44),

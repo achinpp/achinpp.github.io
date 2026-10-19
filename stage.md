@@ -1852,6 +1852,49 @@ and it is not restarted without you asking.
 
 ---
 
+## STAGE 18 — The Scoreboard ✅
+
+The finals leaderboard joins the two photographs, and the field note loses its second clause.
+
+- [x] **`and one of the 40 at the physical finals.` removed** from the Red Cypher note
+- [x] **`red_cypher3.png` processed** into `public/media/red-cypher-leaderboard.webp`
+- [x] **A third picture on the Red Cypher record**, below the pair
+- [x] **Photographs and captures now render differently**, because they are different things
+
+**Accept when:** the scoreboard is readable and the pair above it still reads as a pair. ✅
+
+> NOTE: **This puts your placing on the site, and that reverses an instruction.** You asked for
+> the result to be framed as reaching the finals from a field of more than 100 and for 19th to
+> stay off, and the field note still says exactly that. The scoreboard says `#19` in red at the
+> top of the frame and highlights the LO49 row. Both can be true on one page and the screenshot
+> is the stronger evidence, but it is your call to make deliberately rather than by accident, so
+> it is flagged in `src/data/achievements.ts` too. Delete that one entry and the placing is gone
+> again with nothing else to change.
+
+> NOTE: **It is a capture, not a photograph, and the code now knows the difference.**
+> `AchievementImage` gained a `kind`. A photograph is cropped to a shared shape, desaturated at
+> rest, captioned over the picture and laid two to a row. A capture keeps its own shape, keeps
+> its colour, runs the full width and is captioned underneath. A scoreboard at half width is a
+> table nobody can read, and the gradient caption the photographs use would have sat on top of
+> the last row of it.
+
+> NOTE: **The credit line moved up, above the capture.** `Photographs: REF Media…` sits under
+> the two photographs it actually credits. Left where it was, it would have ended up under a
+> screenshot of a web page, which is nobody's photograph.
+
+> NOTE: **28 rows came off the bottom of the capture.** The source stops part way through rank
+> 22, and half a table row reads as a screenshot taken carelessly rather than as a list that
+> continues. The cut lands on the row separator at y=796, measured off the file. The rest of the
+> frame is untouched: it is already a dark interface, so it needs nothing but an encode.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+`npm run test` 8/8 · asset 1171x797 at 31.6 kB · production build clean at 387.22 kB JS
+(123.76 kB gzip), 0 em dashes and 0 occurrences of the removed clause. ⚠ **Still no browser
+pass.** The preview server was stopped for low memory while the session was idle and is not
+restarted without you asking, so this and Stage 17 are both waiting on one.
+
+---
+
 ## Working Agreement
 
 1. One stage at a time. I build it, you review it, we iterate, then we advance.
@@ -1881,7 +1924,7 @@ and it is not restarted without you asking.
 
 ---
 
-**Current status:** `STAGE 17 — no placeholder, no skip` → remaining: **dates**, **four sets
+**Current status:** `STAGE 18 — the scoreboard` → remaining: **dates**, **four sets
 of role bullets**, the **OSCP question**, **project links**, a **PGP fingerprint**, **Lighthouse
 on the deployed site**, **Safari and Firefox**, a **screen reader pass**, and the **deploy**.
 See the README table.

@@ -43,14 +43,16 @@ export type Achievement = {
    */
   fieldNote: string | null;
   /**
-   * Photographs from the event, shown in the field record panel under the
-   * wall. An empty array renders no panel at all, which is why an event with
-   * no pictures costs the layout nothing.
+   * Pictures from the event, shown in the field record panel under the wall.
+   * An empty array renders no panel at all, which is why an event with no
+   * pictures costs the layout nothing.
    */
   images: AchievementImage[];
   /**
-   * Who took them, as one line under the pair. Required whenever the
-   * photographs are somebody else's work, which the organiser's are.
+   * Who took the photographs, as one line under them. Required whenever they
+   * are somebody else's work, which the organiser's are. It sits under the
+   * photographs and above any capture, because a screenshot of a scoreboard
+   * is nobody's photograph.
    */
   imageCredit: string | null;
 };
@@ -63,9 +65,17 @@ export type AchievementImage = {
   src: string;
   width: number;
   height: number;
+  /**
+   * A `photo` is somebody's camera: cropped to a shared shape, desaturated
+   * at rest, captioned over the picture, and grouped two to a row. A
+   * `capture` is a screenshot: it keeps its own shape and its own colours,
+   * runs the full width, and is captioned underneath, because an overlay
+   * would sit on top of the last row of a table.
+   */
+  kind: 'photo' | 'capture';
   /** Describes the picture, for a reader who cannot see it. */
   alt: string;
-  /** Three or four words, shown over the picture. */
+  /** Three or four words. */
   caption: string;
 };
 
@@ -91,12 +101,13 @@ export const ACHIEVEMENTS: Achievement[] = [
      * 100 and then said to put it as reaching the finals from that field, so
      * that is what this says. Both halves of the sentence are yours.
      */
-    fieldNote: 'Finalist from more than 100 teams, and one of the 40 at the physical finals.',
+    fieldNote: 'Finalist from more than 100 teams.',
     images: [
       {
         src: '/media/red-cypher-team.webp',
         width: 1000,
         height: 562,
+        kind: 'photo',
         alt: 'Three team members standing in front of a Red Cypher 3.0 backdrop.',
         caption: 'Team LO49',
       },
@@ -104,8 +115,26 @@ export const ACHIEVEMENTS: Achievement[] = [
         src: '/media/red-cypher-floor.webp',
         width: 1000,
         height: 562,
+        kind: 'photo',
         alt: 'Three competitors working at desktop machines in a university computer lab.',
         caption: 'On the finals floor',
+      },
+      /**
+       * ⚠ This one puts the placing on the site. Your earlier instruction was
+       * to frame the result as reaching the finals from a field of more than
+       * 100 and leave 19th off, and the field note above still does exactly
+       * that. The scoreboard says `#19` in red at the top and highlights the
+       * row. Both can be true on one page, but it is your call and it is
+       * worth making deliberately: drop this entry and the placing is gone
+       * again.
+       */
+      {
+        src: '/media/red-cypher-leaderboard.webp',
+        width: 1171,
+        height: 797,
+        kind: 'capture',
+        alt: 'The Red Cypher 3.0 finals scoreboard: 42 teams active, with team LO49 highlighted at rank 19 on 15 flags and 1,851 points.',
+        caption: 'The finals scoreboard',
       },
     ],
     imageCredit: 'REF Media, University of Ruhuna · Sachintha Dissanayake and Dulanjana Yatagama',
