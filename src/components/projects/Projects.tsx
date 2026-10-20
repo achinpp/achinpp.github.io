@@ -19,18 +19,25 @@ const ProjectDetail = lazy(async () => ({
 /**
  * Mission Briefings.
  *
- * Bento rather than a uniform grid: from `lg` the layout is 4 columns × 2
- * rows, and the four projects fill it exactly — the feature tile takes 2×2,
- * the second takes a 2×1 strip beside it, and the last two take one cell
- * each. `md` collapses to two columns with the first two tiles full-width,
- * and below that it is a single column. The weights live in the data as
- * `span`, so re-ordering or re-weighting is a data edit.
+ * Two columns from `md`, one below it, and four cards of one size.
  *
- * The rows are `minmax(17rem, auto)`, not `grid-rows-2`. Tailwind's
- * `grid-rows-2` is `repeat(2, minmax(0, 1fr))`, and a `1fr` row with a `0`
- * floor does not grow for content that overflows it — a standard tile with a
- * long title would spill straight out of its own frame, since the frame is
- * absolutely positioned to the tile and the content is in flow.
+ * THIS WAS A BENTO, AND THE BENTO WAS THE STRETCH. The feature tile stood two
+ * rows tall beside a column of two stacked cards, so its height was whatever
+ * those two came to: about 1060px against 720px of content, and the slack
+ * went into a 340px hole between the screenshot and the tags. The fourth card
+ * had no picture at all and sat 250px short of the one next to it. Neither
+ * was fixable in the tile, because a grid row is as tall as its tallest cell
+ * whatever the cell would have liked.
+ *
+ * The bento was also designed for a set of briefings where one had a
+ * screenshot and three did not, and the one with the picture had to be the
+ * big tile for the grid to balance at all. All four carry one now, so the
+ * weighting has nothing left to say and every card can be the same shape.
+ *
+ * What makes the row heights agree is in the card: a fixed height stamp at
+ * the top, then a capture clamped to 240px. Across the four briefings that
+ * leaves about 50px between the tallest card in a row and the shortest, which
+ * collects above the tag block where a card is expected to breathe.
  *
  * Which briefing is open is held here, not in the cards: the detail panel
  * morphs out of one specific card, so exactly one id can be open and the
@@ -55,7 +62,7 @@ export function Projects() {
         initial="hidden"
         whileInView="visible"
         viewport={revealViewport}
-        className="mt-16 grid gap-4 sm:gap-5 md:grid-cols-2 lg:mt-24 lg:grid-cols-4 lg:grid-rows-[repeat(2,minmax(17rem,auto))]"
+        className="mt-16 grid gap-4 sm:gap-5 md:grid-cols-2 lg:mt-24 lg:gap-6"
       >
         {PROJECTS.map((project) => (
           <ProjectCard

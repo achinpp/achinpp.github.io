@@ -2015,6 +2015,70 @@ restarted without you asking.
 
 ---
 
+## STAGE 21 — Four Cards, One Size ✅
+
+The IASS console joins the wall, and the briefings stop stretching.
+
+- [x] **The surveillance console is in** as the research briefing's capture
+- [x] **The bento is gone**, and with it the 340px hole in the feature tile
+- [x] **Four cards of one size**, two columns from `md`, one below it
+- [x] **Every capture clamped to 240px**, so no picture sets the row height
+- [x] **The pipeline run lost its tab bar**, so the clamp falls below the failing gate
+- [x] **A keyboard bug in the Stage 20 reveal**, found by the first browser pass, fixed
+
+**Accept when:** no card in a row is more than about 50px shorter than the one beside it. ✅
+Measured in a browser at 1440: row one 655 and 655, row two 655 and 655, with 55px of slack
+above one tag block and 6px, 0px and 0px above the other three. It was about 340px and 250px.
+
+> NOTE: **The bento was the stretch.** The feature tile stood two rows tall beside a column of
+> two stacked cards, so its height was whatever those two came to: about 1060px against 720px of
+> content. A grid row is as tall as its tallest cell whatever the cell would have liked, so the
+> slack had nowhere to go but into a hole between the screenshot and the tags. The fourth card,
+> with no picture at all, sat 250px short of the one next to it. The weighting was designed for
+> a set of briefings where one had a screenshot and three did not, and the one with the picture
+> had to be the big tile for the grid to balance. All four carry one now, so there is nothing
+> left for the weighting to say and `ProjectSpan` is gone from the data.
+
+> NOTE: **The capture moved above the title, and that is what lines the row up.** The
+> classification stamp is the only fixed height thing in a card, so a picture directly under it
+> starts on the same line on every card in the row. Under the copy, which is where it used to
+> sit, each picture started wherever its own title and tagline happened to end and four cards
+> read as four unrelated tiles.
+
+> NOTE: **Clamped, not cropped to a shape.** A fixed band would have to pick between `cover`,
+> which takes a router off the end of the Packet Tracer topology, and `contain`, which puts
+> 190px of dead plate either side of the near square pipeline run. A clamp needs neither: a
+> picture keeps its own aspect ratio until it passes 240px and then the overflow comes off the
+> bottom. 240 is set where it is because only one capture of the four reaches it. A clamp that
+> bites three pictures is a crop pretending to be a clamp.
+
+> NOTE: **49 rows off the pipeline run.** With the repository tab bar still on it, the clamp
+> landed 17px above the row that says the secrets gate failed, which is the only reason that
+> picture is on the card and what its label claims it shows. The cut is on the tab bar's own
+> bottom border, measured rather than guessed.
+
+> NOTE: **The capabilities and the whole stack are on every card now.** Three of the four used
+> to carry a title, one line and three pills with a `+2` after them, which is a card that makes
+> you open it to learn anything. Four cards of one size have the room, and `+2` is a worse thing
+> to read than the two words it hides.
+
+> NOTE: ⚠ **The first browser pass on Stage 20 found a real keyboard bug.** The reveal closed on
+> any scroll, and the browser scrolls a focused element into view, so tabbing to the Finalist
+> badge opened the panel and the scroll that focus itself caused shut it again within a frame.
+> The panel now follows the badge while the badge is on screen and closes when it leaves, which
+> is the honest behaviour anyway, since it is anchored to the badge rather than to the page.
+> `check:browser` drives that probe from the keyboard, so it would have caught this at Stage 20
+> had the pass been run.
+
+**Verified in a browser this time.** `npm run check:browser` all checks passed: LCP 1020ms (best
+of three cold loads, 1020 to 1192ms), CLS 0.0062, no console errors, no horizontal overflow at
+1440, 768 or 390, 11 images served and all with a reserved box. `tsc -b` clean · `eslint` clean
+(0 warnings) · `prettier --check` clean · `npm run test` 8/8 · production build clean at
+390.39 kB JS (124.65 kB gzip). Screenshots at 1440, 768 and 390 reviewed. Stages 17 to 19 are
+covered by the same pass.
+
+---
+
 ## Working Agreement
 
 1. One stage at a time. I build it, you review it, we iterate, then we advance.
@@ -2044,7 +2108,7 @@ restarted without you asking.
 
 ---
 
-**Current status:** `STAGE 20 — the badge opens` → remaining: **dates**, **four sets
+**Current status:** `STAGE 21 — four cards, one size` → remaining: **dates**, **four sets
 of role bullets**, the **OSCP question**, **project links**, a **PGP fingerprint**, **Lighthouse
 on the deployed site**, **Safari and Firefox**, a **screen reader pass**, and the **deploy**.
 See the README table.

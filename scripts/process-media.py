@@ -5,6 +5,7 @@ Turn the briefing screenshots and the field photographs into shippable assets.
     python scripts/process-media.py
 
 Reads  assets/study-coach-source.png        (Agent Development Kit, dark UI)
+       assets/adaptive-surveillance-source.png (the IASS console, dark UI)
        assets/northbridge-source.png        (Cisco Packet Tracer topology, grey canvas)
        assets/devsecops-pipeline-source.png (a failing pipeline run, dark UI)
        assets/devsecops-webgoat-source.png  (a path traversal response, light page)
@@ -174,9 +175,21 @@ JOBS = [
         'red-cypher-leaderboard.webp',
         trim=(0, 0, 0, 28),
     ),
+    # The surveillance console is a dark interface too. The 74 rows off the
+    # bottom are empty page under the device bar: dead space in a picture that
+    # a card draws 240px tall is dead space the reader pays for.
+    Job(
+        'adaptive-surveillance-source.png',
+        'adaptive-surveillance.webp',
+        trim=(0, 0, 0, 74),
+    ),
     # The pipeline run is a dark interface at 956 wide, so it needs nothing
-    # but an encode.
-    Job('devsecops-pipeline-source.png', 'devsecops-pipeline.webp'),
+    # but an encode and 49 rows off the top. Those 49 are the repository tab
+    # bar, and they cost more than they look: a card clamps this picture to
+    # 240px, and with the tab bar in it the clamp lands just above the row
+    # that says the secrets gate failed, which is the only reason the picture
+    # is there. The cut is on the tab bar's own bottom border, measured.
+    Job('devsecops-pipeline-source.png', 'devsecops-pipeline.webp', trim=(0, 49, 0, 0)),
     # The WebGoat frame is a 1624x423 strip, of which the right 592 columns
     # are a devtools pane repeating the response that is already readable in
     # the page, and the bottom 173 rows are empty white. Both come off, which

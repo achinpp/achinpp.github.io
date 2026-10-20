@@ -68,7 +68,6 @@ Copy `.env.example` to `.env` and fill both variables in.
 | Decide what to do about the `OSCP` pill (see the file header)              | `src/data/skills.ts`       |
 | A PGP fingerprint, if you have one (the footer line is omitted without it) | `src/data/contact.ts`      |
 | A HackTheBox handle, if you have one (the row shows the numeric id)        | `src/data/contact.ts`      |
-| A screenshot for the threat detection research, if you have one            | `src/data/projects.ts`     |
 | Dates for the four volunteering photographs, and a capture of the platform | `src/data/volunteering.ts` |
 
 Anything you did not state is marked in its data file, and most of it also shows a **dev only
@@ -166,8 +165,9 @@ Two more per job options matter. `mirror` flips a frame back: Sussex arrived mir
 selfie camera and its signs read backwards without it. `trim` cuts a measured number of pixels
 off each edge before anything else runs, as `(left, top, right, bottom)`. It takes the REF Media
 branding bars off the Red Cypher photographs, lands the bottom edge of the scoreboard capture on
-a row separator so the table ends on a row rather than through one, and takes the devtools pane
-and the empty white off the WebGoat frame. Those photographs are the organiser's pictures, so
+a row separator so the table ends on a row rather than through one, takes the devtools pane and
+the empty white off the WebGoat frame, and takes the repository tab bar off the pipeline run so
+that the clamp a card puts on that picture falls below the failing gate rather than above it. Those photographs are the organiser's pictures, so
 the credit the bar carried moves to a readable line under the pair in
 `src/data/achievements.ts` rather than disappearing.
 

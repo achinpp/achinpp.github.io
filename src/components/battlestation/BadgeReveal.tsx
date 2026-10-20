@@ -82,10 +82,15 @@ function place(rect: DOMRect, image: AchievementReveal): Placement {
  * animation, which would make a fixed child position against that transform
  * instead of the viewport.
  *
- * **Any scroll closes it.** Lenis moves the real scroll position, so the
- * panel would otherwise sit at coordinates that stopped being true. Closing
- * beats recomputing: on a mouse the pointer has left the badge anyway, and
- * on a touch screen a scroll is how someone dismisses things.
+ * **It follows the badge, and leaves when the badge does.** Lenis moves the
+ * real scroll position, so a panel that ignores scrolling sits at
+ * coordinates that stopped being true. This closed on any scroll at first,
+ * which the first browser pass caught as a keyboard bug: the browser scrolls
+ * a focused element into view, so tabbing to this badge opened the panel and
+ * the scroll that focus itself caused shut it again within a frame. Tracking
+ * the trigger costs a rect and a state write per scroll event, only while
+ * the panel is open, and it is the honest behaviour anyway, since the panel
+ * is anchored to the badge rather than to the page.
  */
 export function BadgeReveal({
   image,
@@ -129,6 +134,18 @@ export function BadgeReveal({
       if (e.key === 'Escape') hide();
     };
     const onResize = () => show();
+    // Follow the badge down the page, and go when it is off screen: on a
+    // touch screen that scroll is how someone dismisses this, and a panel
+    // clamped to the viewport edge would otherwise stay behind after the
+    // badge that owns it had gone.
+    const onScroll = () => {
+      const rect = triggerRef.current?.getBoundingClientRect();
+      if (!rect || rect.bottom <= 0 || rect.top >= window.innerHeight) {
+        hide();
+        return;
+      }
+      setPlacement(place(rect, image));
+    };
     // Outside taps, for the touch path where there is no pointerleave.
     const onPointerDown = (e: PointerEvent) => {
       const target = e.target as Node;
@@ -138,15 +155,15 @@ export function BadgeReveal({
 
     document.addEventListener('keydown', onKey);
     window.addEventListener('resize', onResize);
-    window.addEventListener('scroll', hide, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
     document.addEventListener('pointerdown', onPointerDown);
     return () => {
       document.removeEventListener('keydown', onKey);
       window.removeEventListener('resize', onResize);
-      window.removeEventListener('scroll', hide);
+      window.removeEventListener('scroll', onScroll);
       document.removeEventListener('pointerdown', onPointerDown);
     };
-  }, [open, hide, show]);
+  }, [open, hide, show, image]);
 
   return (
     <>

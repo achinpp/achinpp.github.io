@@ -14,11 +14,10 @@
  * `repo` and `demo` are `null` because no links were supplied. That renders
  * no button at all rather than a dead one.
  *
- * `media` is a list, and it is empty on one of the four: you have supplied
- * captures for the study coach agent, the Northbridge topology and two for
- * the DevSecOps pipeline, and nothing for the threat detection research. An
- * empty list renders no media band at all, so the grid is not holding a gap
- * open for a picture that may never come.
+ * `media` is a list, and every briefing has one now: the study coach agent,
+ * the Northbridge topology, the IASS console and two for the DevSecOps
+ * pipeline. An empty list still renders no band at all, so a briefing added
+ * without a picture costs the grid nothing.
  */
 
 /**
@@ -35,9 +34,6 @@ export type ProjectKind = 'PROJECT' | 'RESEARCH';
  * would be wrong.
  */
 export type ProjectStatus = 'ACTIVE' | 'DEPLOYED' | 'DELIVERED' | 'ARCHIVED';
-
-/** Bento weight. The grid maps these to spans; see `<Projects />`. */
-export type ProjectSpan = 'feature' | 'wide' | 'standard';
 
 /**
  * A screenshot of the thing running.
@@ -73,7 +69,6 @@ export type Project = {
   status: ProjectStatus;
   /** false renders a dev only marker warning that the badge above is a guess. */
   statusConfirmed: boolean;
-  span: ProjectSpan;
   /** Named tools and techniques, all from the brief. */
   stack: string[];
   /** What the briefing actually does. From the brief. */
@@ -82,8 +77,9 @@ export type Project = {
   brief: string;
   /**
    * Captures, in the order they should be read. The card shows the first and
-   * only the first, because a card is a thumbnail of a briefing rather than
-   * a gallery; the briefing panel shows all of them.
+   * only the first, clamped to 240px tall, because a card is a thumbnail of a
+   * briefing rather than a gallery; the briefing panel shows all of them
+   * whole. Put the one that proves the thing first.
    */
   media: ProjectMedia[];
   repo: string | null;
@@ -99,7 +95,6 @@ export const PROJECTS: Project[] = [
     tagline: 'An exam prep agent that builds the schedule, then teaches from it.',
     status: 'ACTIVE',
     statusConfirmed: false,
-    span: 'feature',
     stack: ['Google ADK', 'Gemini API', 'FastAPI', 'Python', 'Custom UI'],
     capabilities: [
       'Dynamic study schedule generation',
@@ -129,7 +124,6 @@ export const PROJECTS: Project[] = [
     tagline: 'An enterprise network redesign, threat modelled and costed into phases.',
     status: 'DELIVERED',
     statusConfirmed: false,
-    span: 'wide',
     stack: ['Threat Modeling', 'VLANs', 'Extended ACLs', 'Port Security', 'Network Segmentation'],
     capabilities: [
       'Layer 2 and segmentation threat modeling',
@@ -159,7 +153,6 @@ export const PROJECTS: Project[] = [
     tagline: 'Threat detection that holds up when the attacker wears the patch.',
     status: 'ACTIVE',
     statusConfirmed: false,
-    span: 'standard',
     stack: ['VGG19', 'YOLO', 'Adversarial ML', 'Computer Vision', 'Python'],
     capabilities: [
       'AI threat detection integrating VGG19 and YOLO',
@@ -167,7 +160,15 @@ export const PROJECTS: Project[] = [
     ],
     brief:
       'An AI threat detection system combining VGG19 and YOLO, built around the failure mode that breaks most detectors in the field: a physical adversarial patch worn or carried into frame. The two models are integrated specifically to mitigate that class of attack rather than to raise clean input accuracy.',
-    media: [],
+    media: [
+      {
+        src: '/media/adaptive-surveillance.webp',
+        width: 1280,
+        height: 584,
+        alt: 'The IASS console showing one frame twice. On the left the input, with the adversarial patch on the subject outlined and labelled; on the right the cleaned frame sent to YOLO, which detects a person at 0.92 confidence. The event log reads: adversarial patch removed, coverage 2.8 percent.',
+        label: 'before and after the patch guard',
+      },
+    ],
     repo: null,
     demo: null,
   },
@@ -179,7 +180,6 @@ export const PROJECTS: Project[] = [
     tagline: 'Security gates on every commit, proved against a deliberately broken app.',
     status: 'DEPLOYED',
     statusConfirmed: false,
-    span: 'standard',
     stack: ['Semgrep', 'Trivy', 'Gitleaks', 'CI/CD', 'OWASP WebGoat'],
     capabilities: [
       'Semgrep static analysis (SAST)',
@@ -193,7 +193,7 @@ export const PROJECTS: Project[] = [
       {
         src: '/media/devsecops-pipeline.webp',
         width: 956,
-        height: 820,
+        height: 771,
         alt: 'A GitHub Actions run of the DevSecOps Pipeline workflow. Build and test, Semgrep, Trivy filesystem and Trivy container scanning all pass; the Gitleaks secrets gate fails, on a commit whose message says it adds a dummy AWS key to prove the gate.',
         label: 'the secrets gate firing',
       },

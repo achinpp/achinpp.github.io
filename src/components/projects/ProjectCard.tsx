@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 import { motion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
-import type { Project, ProjectSpan, ProjectStatus } from '@/data/projects';
+import type { Project, ProjectStatus } from '@/data/projects';
 import { Tag, type TagTone } from '@/components/ui/Tag';
 import { useCardPointer } from '@/hooks/useCardPointer';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
@@ -11,16 +11,9 @@ import { fadeUp } from '@/lib/motion/variants';
 /**
  * Note on the reveal: these use `fadeUp`, not `scaleIn`. A layout animation
  * measures against its ancestors, and Framer cannot measure correctly through
- * an ancestor that is mid-`scale` — so a click during the entrance stagger
+ * an ancestor that is mid `scale`, so a click during the entrance stagger
  * would morph from the wrong rectangle. Opacity and translate are safe.
  */
-
-/** Bento weight → grid spans. 4 columns × 2 rows from `lg`. */
-const SPAN: Record<ProjectSpan, string> = {
-  feature: 'md:col-span-2 lg:col-span-2 lg:row-span-2',
-  wide: 'md:col-span-2 lg:col-span-2',
-  standard: '',
-};
 
 const STATUS_TONE: Record<ProjectStatus, TagTone> = {
   ACTIVE: 'signal',
@@ -31,13 +24,13 @@ const STATUS_TONE: Record<ProjectStatus, TagTone> = {
 
 /**
  * The tracked border. Sits one pixel outside the frame, and the frame's
- * background is clipped to its padding box — so this gradient is what you see
- * through the 1px border, rather than a halo sitting behind an opaque edge.
+ * background is clipped to its padding box, so this gradient is what you see
+ * through the 1px border rather than a halo sitting behind an opaque edge.
  */
 const BORDER_GLOW =
   'radial-gradient(240px circle at var(--mx) var(--my), oklch(0.888 0.145 168 / 0.95), oklch(0.888 0.145 168 / 0.3) 36%, transparent 70%)';
 
-/** The inner highlight — the same centre, far weaker, spread wider. */
+/** The inner highlight. The same centre, far weaker, spread wider. */
 const INNER_GLOW =
   'radial-gradient(420px circle at var(--mx) var(--my), oklch(0.888 0.145 168 / 0.08), transparent 70%)';
 
@@ -52,16 +45,14 @@ export function ProjectCard({ project, isOpen, onOpen }: Props) {
   const reduced = useReducedMotion();
   const { ref, enabled, rotateX, rotateY, handlers } = useCardPointer();
 
-  const isFeature = project.span === 'feature';
-  const shownStack = isFeature ? project.stack : project.stack.slice(0, 3);
-  const hiddenStack = project.stack.length - shownStack.length;
+  const capture = project.media[0] ?? null;
 
   return (
     <motion.article
       ref={ref}
       {...handlers}
       variants={fadeUp}
-      className={`group relative ${SPAN[project.span]}`}
+      className="group relative"
       style={
         {
           // The tilt needs a perspective on a non-transformed ancestor.
@@ -84,7 +75,7 @@ export function ProjectCard({ project, isOpen, onOpen }: Props) {
         )}
 
         {/* The frame, and the only thing that morphs into the detail panel.
-            Content is deliberately NOT inside it — a layout animation scales
+            Content is deliberately NOT inside it: a layout animation scales
             its subtree, which would squash and stretch every line of text on
             the way across. */}
         <motion.span
@@ -93,7 +84,7 @@ export function ProjectCard({ project, isOpen, onOpen }: Props) {
           transition={spring.morph}
           style={{ borderRadius: 'var(--radius-xl)', backgroundClip: 'padding-box' }}
           // The border brighten is plain CSS, so the card still has a hover
-          // affordance where the tracked glow is switched off — touch, coarse
+          // affordance where the tracked glow is switched off: touch, coarse
           // pointers and reduced motion.
           className="absolute inset-0 border border-hairline bg-surface shadow-elev-2 transition-colors duration-300 group-hover:border-mint-900"
         />
@@ -114,16 +105,12 @@ export function ProjectCard({ project, isOpen, onOpen }: Props) {
         >
           <header className="flex items-start justify-between gap-3">
             {/* The classification stamp carries the kind under the index, on
-                its own line, on every card.
-
-                Both on one line is what this was first, and the two narrow
-                bento tiles are 235px of inner width against a stamp of 180px
-                and a status chip of 60px, so `// BRIEFING_03 · RESEARCH`
-                wrapped mid stamp and read as a bug. Two deliberate lines read
-                as a stamp. A second chip beside the status was the other
-                option and it is worse: `PROJECT` says nothing on three cards
-                out of four, where down here it is quiet enough to ignore
-                until the one that says `RESEARCH` catches the eye. */}
+                its own line, on every card. Both on one line was what this
+                started as, and `// BRIEFING_03 · RESEARCH` wrapped mid stamp
+                in the narrow tiles this grid used to have. Two deliberate
+                lines read as a stamp, and they survived the regrid because
+                they are also the only fixed height thing in the card, which
+                is what puts all four captures on one baseline. */}
             <span className="flex flex-col gap-1 font-mono text-[0.5625rem] tracking-[0.2em] uppercase">
               <span className="text-obsidian-500 transition-colors duration-300 group-hover:text-mint-700">
                 // {project.index}
@@ -135,49 +122,30 @@ export function ProjectCard({ project, isOpen, onOpen }: Props) {
             <Tag tone={STATUS_TONE[project.status]}>{project.status}</Tag>
           </header>
 
-          <h3
-            className={`mt-6 text-ink ${isFeature ? 'text-display-md' : 'text-[1.3125rem] leading-[1.15] font-semibold tracking-[-0.02em]'}`}
-          >
-            {project.title}
-          </h3>
-
-          <p
-            className={`mt-3 text-ink-muted ${isFeature ? 'max-w-md text-[0.9375rem] leading-relaxed' : 'text-[0.8125rem] leading-relaxed'}`}
-          >
-            {project.tagline}
-          </p>
-
-          {/* The feature tile has the room to show what it actually does. */}
-          {isFeature && (
-            <ul className="mt-7 space-y-2">
-              {project.capabilities.map((item) => (
-                <li
-                  key={item}
-                  className="flex items-baseline gap-2.5 font-mono text-[0.6875rem] tracking-[0.04em] text-ink-faint"
-                >
-                  <span aria-hidden className="text-mint-700">
-                    ▸
-                  </span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          )}
-
           {/* ----------------------------------------------- the capture
-              Natural aspect ratio, no crop. A fixed band with `object-cover`
-              was the first attempt and it is wrong for these two in
-              particular: the Packet Tracer topology runs edge to edge, so any
-              crop takes a router off the end of it, and a diagram missing its
-              ISP link is not a smaller diagram but a wrong one.
+              Directly under the stamp, so every card in a row starts its
+              picture on the same line. Under the copy, which is where this
+              used to sit, each picture started wherever its own title and
+              tagline happened to end and the row read as four unrelated
+              tiles.
 
-              It sits here, directly under the copy, and NOT in the `mt-auto`
-              block below. In the bottom block it was pushed to the foot of a
-              card that stretches to match its row, which on the feature tile
-              opened a 200px hole between the capability list and the
-              screenshot. Down here the slack collects under the picture
-              instead, where it reads as a margin above a footer rather than
-              as a gap in the middle of the card.
+              CLAMPED, NOT CROPPED TO A SHAPE. The band is the picture's own
+              aspect ratio until it passes `max-h`, and then the overflow is
+              cut off the bottom. A fixed band would have to pick between
+              `cover`, which takes a router off the end of the Packet Tracer
+              topology, and `contain`, which puts 190px of dead plate either
+              side of the near square pipeline run. A clamp needs neither: a
+              wide picture is untouched and a tall one is shown from the top,
+              which on the pipeline run is the jobs list with the failing
+              gate in it. Every picture is whole in the briefing panel, which
+              is where someone has asked to see it.
+
+              The clamp is also what stops a card setting its own height
+              against the one beside it. 240px against the tallest capture's
+              natural 415px is the difference between a 250px hole in this
+              row and a 50px one. It is set where it is because only one
+              capture of the four is tall enough to reach it: a clamp that
+              bites three pictures is a crop pretending to be a clamp.
 
               Dimmed at rest and full strength on card hover, the same bargain
               the hero portrait makes: quiet until someone is actually looking
@@ -187,30 +155,63 @@ export function ProjectCard({ project, isOpen, onOpen }: Props) {
               scroll, which is the kind CLS counts and visitors notice most.
 
               The first capture and only the first, even where a briefing has
-              two. A card is a thumbnail of a briefing, not a gallery, and a
-              tile carrying a stack of screenshots would set its own row
-              height against the three tiles beside it. The rest are in the
-              panel, which is where someone has asked to see them. */}
-          {project.media.length > 0 && (
-            <div className="mt-7 overflow-hidden rounded-lg border border-hairline bg-obsidian-950">
-              <img
-                src={project.media[0].src}
-                alt={project.media[0].alt}
-                width={project.media[0].width}
-                height={project.media[0].height}
-                loading="lazy"
-                decoding="async"
-                className="block w-full opacity-75 transition-opacity duration-500 ease-out-expo group-hover:opacity-100"
-              />
-            </div>
+              two. A card is a thumbnail of a briefing, not a gallery. */}
+          {capture && (
+            <figure className="mt-6 overflow-hidden rounded-lg border border-hairline bg-obsidian-950">
+              <div className="max-h-60 overflow-hidden">
+                <img
+                  src={capture.src}
+                  alt={capture.alt}
+                  width={capture.width}
+                  height={capture.height}
+                  loading="lazy"
+                  decoding="async"
+                  className="block w-full opacity-80 transition-opacity duration-500 ease-out-expo group-hover:opacity-100"
+                />
+              </div>
+              {/* A solid strip rather than a gradient over the picture. It
+                  names what is on screen, and it finishes a clamped capture
+                  with an edge instead of leaving it looking torn. */}
+              <figcaption className="flex items-center gap-2 border-t border-hairline px-3 py-2 font-mono text-[0.5rem] tracking-[0.18em] text-obsidian-500 uppercase transition-colors duration-300 group-hover:text-mint-700">
+                <span aria-hidden className="h-px w-4 bg-hairline-strong" />
+                {capture.label}
+              </figcaption>
+            </figure>
           )}
 
+          <h3 className="mt-6 text-[1.375rem] leading-[1.15] font-semibold tracking-[-0.02em] text-ink">
+            {project.title}
+          </h3>
+
+          <p className="mt-3 text-[0.875rem] leading-relaxed text-ink-muted">{project.tagline}</p>
+
+          {/* On every card now, not just a feature tile. Four cards of one
+              size have the room for it, and a card that says only what a
+              project is called and one line about it is a card that makes
+              the reader open it to learn anything. */}
+          <ul className="mt-6 space-y-2">
+            {project.capabilities.map((item) => (
+              <li
+                key={item}
+                className="flex items-baseline gap-2.5 font-mono text-[0.6875rem] tracking-[0.04em] text-ink-faint"
+              >
+                <span aria-hidden className="text-mint-700">
+                  ▸
+                </span>
+                {item}
+              </li>
+            ))}
+          </ul>
+
           <div className="mt-auto pt-7">
+            {/* The whole stack, not the first three and a counter. The
+                counter was there because a narrow tile could not hold five
+                pills; this card can, and `+2` is a worse thing to read than
+                the two words it was hiding. */}
             <div className="flex flex-wrap gap-1.5">
-              {shownStack.map((item) => (
+              {project.stack.map((item) => (
                 <Tag key={item}>{item}</Tag>
               ))}
-              {hiddenStack > 0 && <Tag>+{hiddenStack}</Tag>}
             </div>
 
             {/* Visual affordance only. The real control is the overlay

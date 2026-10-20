@@ -361,18 +361,26 @@ REVEAL_PROBE = """
   const button = document.querySelector('#battlestation button[aria-expanded]');
   if (!button) return null;
   const shown = () => document.querySelector('img[src*="leaderboard"]');
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  // Put the badge on screen first. Focusing it from the top of the page
+  // makes the browser scroll several thousand pixels to reach it, which is
+  // the one thing a keyboard user never does: they arrive at this badge from
+  // the element above it, with the badge already in view.
+  button.scrollIntoView({ block: 'center' });
+  await wait(1200);
 
   const before = !!shown();
   const expandedBefore = button.getAttribute('aria-expanded');
 
   button.focus();
-  await new Promise((r) => setTimeout(r, 150));
+  await wait(400);
 
   const opened = shown();
   const expandedAfter = button.getAttribute('aria-expanded');
 
   document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
-  await new Promise((r) => setTimeout(r, 500));
+  await wait(900);
 
   return {
     before,
@@ -380,6 +388,7 @@ REVEAL_PROBE = """
     after: !!opened,
     src: opened ? new URL(opened.src).pathname : null,
     expandedAfter,
+    onScreen: Math.round(button.getBoundingClientRect().top) < window.innerHeight,
     name: (button.textContent || '').trim(),
     labelled: (button.textContent || '').toLowerCase().includes('show'),
     afterEscape: !!shown(),
@@ -613,11 +622,11 @@ async def main() -> None:
         # Every image on the page, fetched rather than assumed. See MEDIA_PROBE.
         media = await page.evaluate(MEDIA_PROBE)
         broken = [m["path"] for m in media if not m["ok"]]
-        # Portrait, three briefing captures, four field photographs and two
+        # Portrait, four briefing captures, four field photographs and two
         # photographs from the Red Cypher finals. Two pictures are deliberately
         # not in this count: the second DevSecOps capture is in the briefing
         # panel, and the finals scoreboard is behind the Finalist badge.
-        check(len(media) >= 10, "every expected image is on the page", f"{len(media)} images")
+        check(len(media) >= 11, "every expected image is on the page", f"{len(media)} images")
         check(not broken, "every image is served", "; ".join(broken[:3]))
         unsized = [m["path"] for m in media if not m["sized"]]
         check(not unsized, "every image reserves its box", "; ".join(unsized[:3]))
@@ -628,6 +637,7 @@ async def main() -> None:
             check(reveal["expandedBefore"] == "false", "the badge starts aria-expanded=false")
             check(reveal["after"], "focusing the badge opens it", str(reveal["src"]))
             check(reveal["expandedAfter"] == "true", "aria-expanded follows the panel")
+            check(reveal["onScreen"], "the badge stays on screen when it is focused")
             check(reveal["labelled"], "the button says what is behind it", str(reveal["name"]))
             check(not reveal["afterEscape"], "Escape closes it again")
 
