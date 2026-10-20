@@ -18,9 +18,10 @@ import { duration, easeOutExpo } from '@/lib/motion/easings';
  * 1. a radial mint bloom *behind* the figure, so it is lit by the page rather
  *    than floating on it — this one sits outside the masked box on purpose,
  *    because it has to bleed past the silhouette;
- * 2. the image, with a `drop-shadow` rim. `drop-shadow` follows the alpha
+ * 2. the image, under a `drop-shadow` rim. `drop-shadow` follows the alpha
  *    silhouette; `box-shadow` would trace the rectangle and give the whole
- *    thing away as a photo in a box;
+ *    thing away as a photo in a box. The rim is on a wrapper *outside* the
+ *    fade, not on the `<img>`, for the reason under the fade below;
  * 3. a mint sheen masked by the image's own alpha, so the tint lands on the
  *    person and not on the transparent air around them — which is the whole
  *    reason the asset is a single WebP URL and not a `<picture>`;
@@ -30,6 +31,20 @@ import { duration, easeOutExpo } from '@/lib/motion/easings';
  * The fade lives on the wrapper rather than as a second mask layer on each
  * child, so nothing here needs `mask-composite` — which is the one part of
  * the masking spec with genuinely divergent prefixed semantics.
+ *
+ * **Why the rim sits outside the fade.** A mask clips to its own border box,
+ * and the asset is trimmed to the alpha bounding box, which means the figure
+ * touches all four edges of the picture by construction. With the rim on the
+ * `<img>`, the half of the glow that belongs outside the box was cut off
+ * square: a hard green line down both arms and along the bottom, with the
+ * curve of the shoulders turning it into a rounded rectangle drawn around the
+ * photograph. You spotted it and sent a portrait padded with transparent
+ * space to cure it. Padding would have worked only up to a point, and the
+ * point is low: the hover glow is 26px at a render scale of about 0.64, so it
+ * wants roughly 60px of source margin on every side, and every one of those
+ * pixels comes off the size the face is drawn at. The clip is the bug, so the
+ * filter moved out to a wrapper the mask does not govern. A filter paints
+ * wherever its blur reaches; it is only ever a clip that stops it.
  *
  * **There is no caption.** There was one, inferred from the shirt in the
  * photograph and the filename it arrived under, and you asked for it gone.
@@ -79,29 +94,31 @@ export function Portrait() {
           className="pointer-events-none absolute inset-x-[-24%] top-[4%] bottom-[-6%] rounded-[50%] bg-[radial-gradient(58%_50%_at_50%_58%,oklch(0.888_0.145_168/0.20),transparent_72%)] blur-xl"
         />
 
-        {/* 4 — the fade, owning 2 and 3. */}
-        <div className="relative" style={{ maskImage: fade, WebkitMaskImage: fade }}>
-          {/* 2 */}
-          <img
-            src={PORTRAIT.src}
-            alt={PORTRAIT.alt}
-            width={PORTRAIT.width}
-            height={PORTRAIT.height}
-            decoding="async"
-            className="block w-full [filter:saturate(0.42)_contrast(1.16)_brightness(1.12)_drop-shadow(0_0_18px_oklch(0.888_0.145_168/0.24))] transition-[filter] duration-500 ease-out-expo group-hover:[filter:saturate(1)_contrast(1.04)_brightness(1.08)_drop-shadow(0_0_26px_oklch(0.888_0.145_168/0.36))]"
-          />
+        {/* 2 — the rim, on its own wrapper so the mask below cannot clip it. */}
+        <div className="[filter:drop-shadow(0_0_18px_oklch(0.888_0.145_168/0.24))] transition-[filter] duration-500 ease-out-expo group-hover:[filter:drop-shadow(0_0_26px_oklch(0.888_0.145_168/0.36))]">
+          {/* 4 — the fade, owning the picture and the sheen. */}
+          <div className="relative" style={{ maskImage: fade, WebkitMaskImage: fade }}>
+            <img
+              src={PORTRAIT.src}
+              alt={PORTRAIT.alt}
+              width={PORTRAIT.width}
+              height={PORTRAIT.height}
+              decoding="async"
+              className="block w-full [filter:saturate(0.42)_contrast(1.16)_brightness(1.12)] transition-[filter] duration-500 ease-out-expo group-hover:[filter:saturate(1)_contrast(1.04)_brightness(1.08)]"
+            />
 
-          {/* 3 */}
-          <span
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[linear-gradient(158deg,oklch(0.888_0.145_168/0.55)_0%,transparent_17%)] transition-opacity duration-500 group-hover:opacity-40"
-            style={{
-              maskImage: `url(${PORTRAIT.src})`,
-              WebkitMaskImage: `url(${PORTRAIT.src})`,
-              maskSize: '100% 100%',
-              WebkitMaskSize: '100% 100%',
-            }}
-          />
+            {/* 3 */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 bg-[linear-gradient(158deg,oklch(0.888_0.145_168/0.55)_0%,transparent_17%)] transition-opacity duration-500 group-hover:opacity-40"
+              style={{
+                maskImage: `url(${PORTRAIT.src})`,
+                WebkitMaskImage: `url(${PORTRAIT.src})`,
+                maskSize: '100% 100%',
+                WebkitMaskSize: '100% 100%',
+              }}
+            />
+          </div>
         </div>
 
         {/* The line the fade dissolves into: a horizon, not an edge. */}

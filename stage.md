@@ -2079,6 +2079,41 @@ covered by the same pass.
 
 ---
 
+## STAGE 22 — The Rim Leaves The Box ✅
+
+The green rectangle drawn around the portrait is gone.
+
+- [x] **The rim glow moved outside the fade**, which was clipping it
+- [x] **No hard edge down either arm**, and none along the bottom
+- [x] **The fade, the sheen and the horizon line are untouched**
+- [x] **The asset is unchanged**, so the face is still drawn at the same size
+
+**Accept when:** the halo ends where the blur ends, not where the picture does. ✅
+
+> NOTE: **A mask clips to its own border box.** The bottom fade is a mask on the wrapper, the rim
+> was a `drop-shadow` on the `<img>` inside it, and the asset is trimmed to the alpha bounding
+> box, so the figure touches all four edges of the picture by construction. Half of that glow
+> belongs outside the box, and the mask cut it off square: a straight green line down both arms,
+> another along the bottom, and the curve of the shoulders turning the pair into a rounded
+> rectangle drawn around the photograph. Proved rather than guessed: setting `mask-image: none`
+> in the browser made the edges vanish and the halo round itself out.
+
+> NOTE: **The padded portrait would not have fixed it.** You sent one with transparent space
+> added at the corners, which is the right instinct and the wrong lever. The hover glow is 26px
+> at a render scale of about 0.64, so it wants roughly 60px of source margin on every side, and
+> every one of those pixels comes off the size the face is drawn at. `process-portrait.py` also
+> trims to the alpha box on the way through, so the padding never reached the page. The clip is
+> the bug: the filter moved out to a wrapper the mask does not govern, and a filter paints
+> wherever its blur reaches. The photograph in the file you sent is the same photograph that was
+> already shipping, pixel for pixel after the trim, so `public/portrait.webp` is untouched.
+
+**Verified in a browser.** `npm run check:browser` all checks passed: LCP 1044ms (best of three
+cold loads), CLS 0.0062, no console errors. The portrait inspected at 2x at 1440 at rest and on
+hover, and at 390. `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+`npm run test` 8/8 · production build clean at 390.51 kB JS (124.65 kB gzip).
+
+---
+
 ## Working Agreement
 
 1. One stage at a time. I build it, you review it, we iterate, then we advance.
@@ -2108,7 +2143,7 @@ covered by the same pass.
 
 ---
 
-**Current status:** `STAGE 21 — four cards, one size` → remaining: **dates**, **four sets
+**Current status:** `STAGE 22 — the rim leaves the box` → remaining: **dates**, **four sets
 of role bullets**, the **OSCP question**, **project links**, a **PGP fingerprint**, **Lighthouse
 on the deployed site**, **Safari and Firefox**, a **screen reader pass**, and the **deploy**.
 See the README table.
