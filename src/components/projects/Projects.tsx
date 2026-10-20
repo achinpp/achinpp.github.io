@@ -19,7 +19,7 @@ const ProjectDetail = lazy(async () => ({
 /**
  * Mission Briefings.
  *
- * Two columns from `md`, one below it, and four cards of one size.
+ * Two columns from `md`, one below it, and six cards of one size.
  *
  * THIS WAS A BENTO, AND THE BENTO WAS THE STRETCH. The feature tile stood two
  * rows tall beside a column of two stacked cards, so its height was whatever
@@ -31,13 +31,24 @@ const ProjectDetail = lazy(async () => ({
  *
  * The bento was also designed for a set of briefings where one had a
  * screenshot and three did not, and the one with the picture had to be the
- * big tile for the grid to balance at all. All four carry one now, so the
- * weighting has nothing left to say and every card can be the same shape.
+ * big tile for the grid to balance at all. Every one carries a capture now,
+ * so the weighting has nothing left to say and every card can be the same
+ * shape. That is what made the grid able to take two more without a redesign.
  *
  * What makes the row heights agree is in the card: a fixed height stamp at
- * the top, then a capture clamped to 240px. Across the four briefings that
- * leaves about 50px between the tallest card in a row and the shortest, which
- * collects above the tag block where a card is expected to breathe.
+ * the top, then a capture clamped to 240px. Across the first four briefings
+ * that leaves about 50px between the tallest card in a row and the shortest,
+ * which collects above the tag block where a card is expected to breathe.
+ *
+ * The third row holds the only card with a hole in it, and deliberately so.
+ * BRIEFING_06 publishes no capabilities and no stack, so it is about 190px
+ * short of the one beside it. `mt-auto` collects all of that in one place,
+ * between the tagline and the CTA, rather than spreading it through the card.
+ * Filling it would mean inventing something to say about a briefing that is
+ * published precisely to say nothing, so the hole stays and reads as what it
+ * is. The row itself comes out 636px against 655px for the two above it,
+ * because both pictures in it are trimmed to the same shape in
+ * `scripts/process-media.py` rather than left at the 16:9 they arrived as.
  *
  * Which briefing is open is held here, not in the cards: the detail panel
  * morphs out of one specific card, so exactly one id can be open and the
@@ -54,7 +65,7 @@ export function Projects() {
       <SectionHeading
         id="projects"
         title="Mission Briefings"
-        lede="Three projects and one research effort. An AI study agent, an enterprise network redesign, detection that survives adversarial patches, and a pipeline that fails the build on a committed secret."
+        lede="Five projects and one research effort. An AI study agent, an enterprise network redesign, detection that survives adversarial patches, a pipeline that fails the build on a committed secret, a capture the flag platform that hosts itself, and one briefing that stays shut."
       />
 
       <motion.div

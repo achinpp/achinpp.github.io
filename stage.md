@@ -2172,6 +2172,75 @@ cold loads), CLS 0.0068, no console errors. `tsc -b` clean · `eslint` clean (0 
 
 ---
 
+## STAGE 24 — Two More Briefings ✅
+
+S.H.I.E.L.D. CTF joins the wall, and so does one that will not say what it is.
+
+- [x] **`BRIEFING_05` is S.H.I.E.L.D. CTF**, written short, from the repo
+- [x] **The repo link is on it**, the first briefing to carry one
+- [x] **`BRIEFING_06` is the title, the stamp and nothing else**
+- [x] **A `CLASSIFIED` status**, rather than a guess at one of the other four
+- [x] **Both captures trimmed to one shape**, so the last row reads as a pair
+
+**Accept when:** six cards, one of which answers no questions. ✅
+
+> NOTE: **Minimalistic meant cutting, not summarising.** That repo's README runs to ten
+> thousand characters across a stack table, a stage board, four evidence shapes and an alpha
+> recovery derivation. The card takes four capability lines and five stack pills; the briefing
+> takes one paragraph. What survived is what someone who has never seen the project needs in
+> order to know whether to open the repo: eight stages, hosts itself, flags never reach the
+> browser. The link is there for everything else, which is the first time a briefing has had
+> one to offer.
+
+> NOTE: **`CLASSIFIED` is a status, not a flag beside one.** You said not to publish anything
+> beyond the name, and every other badge on this page publishes a fact: where a project got to.
+> `ACTIVE` would say it is still moving, `ARCHIVED` would say it stopped. A fifth value is the
+> only one that answers the question with a refusal rather than an answer. It is also the only
+> badge on the page that is not my guess, so it carries `statusConfirmed: true` and shows no
+> dev warning.
+
+> NOTE: **The empty fields are empty, not filled with placeholder.** `capabilities` and `stack`
+> are `[]`, and both the card and the panel are guarded on their length, so nothing renders
+> where they would have gone. An empty list still draws its own margins, which on a card
+> already short of words reads as a block that failed to load rather than one that was never
+> there. The panel is the same: a `Capabilities` heading with nothing under it is a worse
+> answer than no heading.
+
+> NOTE: **The hole in that card is the point.** BRIEFING_06 is about 190px short of the one
+> beside it, and `mt-auto` collects all of it between the tagline and the CTA. Filling it would
+> mean inventing something to say about a briefing published precisely to say nothing, so the
+> hole stays.
+
+> NOTE: ⚠ **Both pictures arrived at 16:9 and both were being cut.** A card draws a capture at
+> most 516px wide, which is `max-w-6xl` less the gap, halved, less the padding, and clamps the
+> result at 240px tall. 16:9 at 516 wide is 290px, so the clamp took 50px off the bottom of
+> each: on the title card that was the line `clearance level 7 agents only`, through the middle
+> of the letters. Both are now trimmed to about 0.43 high by wide, which draws at 222px and
+> clears the clamp. The trims are measured off a row profile of each source rather than
+> guessed, and they are the same ratio on purpose, because the two sit side by side in the last
+> row and two pictures a few pixels apart in height there reads as a mistake.
+
+> NOTE: **`STATUS_TONE` moved into its own module.** The detail panel had its status badge
+> hard coded to `accent`, which was invisible while every status that reached it was mint, and
+> wrong the moment `CLASSIFIED` existed. Sharing the map out of `ProjectCard` cost that file
+> fast refresh, since a module that exports anything but components loses it, so the map lives
+> in `src/components/projects/status.ts` and both import it. `CLASSIFIED` is `neutral`:
+> `breach` is reserved for danger and a withheld briefing is not one, and `accent` is the
+> colour this page uses for something it wants read.
+
+> NOTE: **The grid took two more cards without a change.** That is what Stage 21 bought. Six
+> cards of one size in three rows, and the only arithmetic that moved was the page image count
+> in `check:browser`, 11 to 13, and `Missions logged` on the battle station, which reads
+> `PROJECTS.length` and went to 06 on its own.
+
+**Verified:** `check:browser` **all checks passed** · LCP 1012ms (best of three, 1012 to
+1128ms) · CLS 0.0062 · no console errors · `tsc -b` clean · `eslint` clean (0 warnings) ·
+`prettier --check` clean · `npm run test` 8/8 · production build 396.17 kB JS (127.27 kB gzip),
+the two briefings costing about 2 kB of text. Both new rows and both new briefing panels were
+read off screenshots at 1440.
+
+---
+
 ## Working Agreement
 
 1. One stage at a time. I build it, you review it, we iterate, then we advance.
@@ -2201,7 +2270,7 @@ cold loads), CLS 0.0068, no console errors. `tsc -b` clean · `eslint` clean (0 
 
 ---
 
-**Current status:** `STAGE 23 — dust on the portrait` → remaining: **dates**, **four sets
+**Current status:** `STAGE 24 — two more briefings` → remaining: **dates**, **four sets
 of role bullets**, the **OSCP question**, **project links**, a **PGP fingerprint**, **Lighthouse
 on the deployed site**, **Safari and Firefox**, a **screen reader pass**, and the **deploy**.
 See the README table.

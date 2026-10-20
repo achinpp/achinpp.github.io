@@ -6,6 +6,8 @@ Turn the briefing screenshots and the field photographs into shippable assets.
 
 Reads  assets/study-coach-source.png        (Agent Development Kit, dark UI)
        assets/adaptive-surveillance-source.png (the IASS console, dark UI)
+       assets/shield-ctf-source.png         (the CTF title card, dark artwork)
+       assets/ai-system-source.jpg          (a CONFIDENTIAL stamp on black)
        assets/northbridge-source.png        (Cisco Packet Tracer topology, grey canvas)
        assets/devsecops-pipeline-source.png (a failing pipeline run, dark UI)
        assets/devsecops-webgoat-source.png  (a path traversal response, light page)
@@ -196,6 +198,32 @@ JOBS = [
     # leaves the two things that are the evidence: the traversal payload in
     # the address bar and the directory listing it came back with.
     Job('devsecops-webgoat-source.png', 'devsecops-webgoat.webp', trim=(0, 0, 592, 173)),
+    # The last two are the only pair in this file trimmed to a shape rather
+    # than to cut something off, because they are the only pair that sits in
+    # one row of the grid and the only pair that arrived at 16:9.
+    #
+    # 16:9 is the wrong shape here. A card draws a capture at most 516px
+    # wide, which is `max-w-6xl` less the gap, halved, less the padding, and
+    # it clamps the result at 240px tall. 16:9 at 516 wide is 290px, so both
+    # of these were clamped, and a clamp cuts off the bottom: on the title
+    # card that took the line `clearance level 7 agents only` through the
+    # middle. So both are trimmed to about 0.43 high by wide, which draws at
+    # 222px and clears the clamp with room to spare.
+    #
+    # The same ratio for both is deliberate. They are side by side in the
+    # last row, and two pictures a few pixels different in height there reads
+    # as a mistake rather than as two different pictures.
+    #
+    # Title card: the composition runs y=134 to y=918 of 1080, measured by
+    # row profile rather than guessed, and the trim leaves about 20px of the
+    # background streaks above the wing tips and below the subtitle.
+    Job('shield-ctf-source.png', 'shield-ctf.webp', trim=(0, 113, 0, 141)),
+    # The CONFIDENTIAL stamp on flat black, and the only picture published of
+    # a classified briefing. 736 wide is under the 1280 cap, so it is passed
+    # through at source resolution. The stamp runs y=104 to y=314 of 414, and
+    # the trim is centred on it, so it has about 50px of plate on each side
+    # rather than sitting high in a frame the clamp cut the bottom off.
+    Job('ai-system-source.jpg', 'ai-system.webp', trim=(0, 51, 0, 47)),
     # The two standing figures and the table sit above centre in a frame that
     # is mostly the backs of heads.
     Job('volunteering-anthonys-source.jpeg', 'volunteering-anthonys.webp', photo=True, focus=0.44),

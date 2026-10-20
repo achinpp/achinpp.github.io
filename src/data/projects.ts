@@ -11,18 +11,25 @@
  *   marker shows on any card where that is false.
  * - `tagline` and `brief`. My framing of each project, not supplied copy.
  *
- * `repo` and `demo` are `null` because no links were supplied. That renders
- * no button at all rather than a dead one.
+ * `repo` and `demo` are `null` wherever no link was supplied. That renders
+ * no button at all rather than a dead one. S.H.I.E.L.D. CTF is the first with
+ * a repo, because you gave one.
  *
- * `media` is a list, and every briefing has one now: the study coach agent,
- * the Northbridge topology, the IASS console and two for the DevSecOps
- * pipeline. An empty list still renders no band at all, so a briefing added
- * without a picture costs the grid nothing.
+ * `media` is a list, and every briefing has one: the study coach agent, the
+ * Northbridge topology, the IASS console, two for the DevSecOps pipeline, the
+ * CTF title card and the stamp that is all there is of briefing 06.
+ *
+ * BRIEFING_06 IS DELIBERATELY EMPTY. You asked for the title, the picture and
+ * nothing else, so `capabilities` and `stack` are empty arrays rather than
+ * invented filler, and both the card and the panel render nothing where they
+ * would have gone. `tagline` and `brief` say only that there is nothing to
+ * read, because a card with a title and a picture and no words at all reads
+ * as a page that failed to load rather than as a withheld one.
  */
 
 /**
  * What the briefing *is*, which is a separate question from what state it is
- * in. You classified these: three projects and one research effort. Keeping
+ * in. You classified these: five projects and one research effort. Keeping
  * it apart from `status` is the point. `RESEARCH` used to be a status value,
  * which made it impossible to say that a piece of research was also active.
  */
@@ -32,8 +39,14 @@ export type ProjectKind = 'PROJECT' | 'RESEARCH';
  * `DELIVERED` is a fourth value beyond the brief's three: a costed network
  * redesign is handed over, not deployed or archived, and calling it either
  * would be wrong.
+ *
+ * `CLASSIFIED` is a fifth, and it is the one value here that is not a guess.
+ * Every other badge describes where a project got to; this one says the
+ * question is not being answered. It is its own status rather than a flag
+ * beside one, because any of the other four would be a fact published about
+ * a briefing that publishes no facts.
  */
-export type ProjectStatus = 'ACTIVE' | 'DEPLOYED' | 'DELIVERED' | 'ARCHIVED';
+export type ProjectStatus = 'ACTIVE' | 'DEPLOYED' | 'DELIVERED' | 'ARCHIVED' | 'CLASSIFIED';
 
 /**
  * A screenshot of the thing running.
@@ -203,6 +216,60 @@ export const PROJECTS: Project[] = [
         height: 250,
         alt: 'A path traversal request to WebGoat in the address bar, returning a directory listing with path-traversal-secret.jpg highlighted in it.',
         label: 'the app it is proved against',
+      },
+    ],
+    repo: null,
+    demo: null,
+  },
+  {
+    id: 'shield-ctf',
+    index: 'BRIEFING_05',
+    title: 'S.H.I.E.L.D. CTF',
+    kind: 'PROJECT',
+    tagline: 'A capture the flag platform that hosts itself, eight stages deep.',
+    status: 'DEPLOYED',
+    statusConfirmed: false,
+    stack: ['Next.js', 'TypeScript', 'PostgreSQL', 'Argon2id', 'Docker'],
+    capabilities: [
+      'Eight stages, OSINT through to a cryptographic capstone',
+      'Self hosted accounts, Argon2id hashing and opaque sessions',
+      'Flags stored and compared as digests, server side only',
+      'The whole stack up on one compose command',
+    ],
+    brief:
+      'A self hosted capture the flag platform. Eight stages run from OSINT to a capstone that cannot be opened until a key split across the other seven is complete, and each one hands over its evidence in whatever way the puzzle needs: a query terminal, a gated download, a live target, a mounted disk image. Accounts, sessions and rate limiting are its own rather than a third party service, and no flag ever reaches the browser, because flags are held and compared as digests on the server.',
+    media: [
+      {
+        src: '/media/shield-ctf.webp',
+        width: 1280,
+        height: 551,
+        alt: 'The platform title card: a winged crest around a shield with a lit keyhole in it, over a dark field of streaking data. CAPTURE THE FLAG is set in red beneath it, above the line clearance level 7 agents only.',
+        label: 'the landing title card',
+      },
+    ],
+    repo: 'https://github.com/achinpp/SHIELD-CTF',
+    demo: null,
+  },
+  {
+    id: 'ai-product-innovation',
+    index: 'BRIEFING_06',
+    title: 'AI-Powered Product Innovation System',
+    kind: 'PROJECT',
+    tagline: 'Classified. Nothing beyond the name is published.',
+    status: 'CLASSIFIED',
+    // Not a guess, so no dev warning: you told me this one is classified.
+    statusConfirmed: true,
+    stack: [],
+    capabilities: [],
+    brief:
+      'This briefing is classified. There is nothing published about what it does, what it is built on or where it got to, and the stamp above is the only picture of it.',
+    media: [
+      {
+        src: '/media/ai-system.webp',
+        width: 736,
+        height: 316,
+        alt: 'A red CONFIDENTIAL stamp on a black plate, standing in for a briefing that is not published.',
+        label: 'classified',
       },
     ],
     repo: null,

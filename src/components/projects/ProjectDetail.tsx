@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { ExternalLink, Github, X } from 'lucide-react';
 import type { Project } from '@/data/projects';
 import { Tag } from '@/components/ui/Tag';
+import { STATUS_TONE } from '@/components/projects/status';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useScrollLock } from '@/hooks/useScrollLock';
@@ -52,6 +53,18 @@ export function ProjectDetail({ project, onClose }: Props) {
   }, [onClose]);
 
   const titleId = `briefing-${project.id}-title`;
+
+  // Review markers, compiled out of production builds. A list rather than
+  // one sentence with separators in it, because a classified briefing earns
+  // neither note: its badge is yours rather than my guess, and it is never
+  // going to carry a repo link.
+  const devNotes = [
+    !project.statusConfirmed && 'status badge unconfirmed',
+    project.status !== 'CLASSIFIED' &&
+      !project.repo &&
+      !project.demo &&
+      'no repo or demo link supplied',
+  ].filter((note): note is string => typeof note === 'string');
 
   return createPortal(
     <div
@@ -121,7 +134,7 @@ export function ProjectDetail({ project, onClose }: Props) {
 
           <div className="mt-6 flex flex-wrap items-center gap-2">
             <Tag tone={project.kind === 'RESEARCH' ? 'accent' : 'neutral'}>{project.kind}</Tag>
-            <Tag tone="accent">{project.status}</Tag>
+            <Tag tone={STATUS_TONE[project.status]}>{project.status}</Tag>
             <span className="font-mono text-[0.625rem] tracking-[0.12em] text-ink-faint">
               {project.tagline}
             </span>
@@ -160,31 +173,39 @@ export function ProjectDetail({ project, onClose }: Props) {
             </figure>
           ))}
 
-          <section className="mt-9">
-            <h4 className="font-mono text-label text-mint-600 uppercase">Capabilities</h4>
-            <ul className="mt-4 grid gap-2.5 sm:grid-cols-2">
-              {project.capabilities.map((item) => (
-                <li
-                  key={item}
-                  className="flex items-baseline gap-2.5 text-sm leading-relaxed text-ink-muted"
-                >
-                  <span aria-hidden className="text-mint-600">
-                    ▸
-                  </span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </section>
+          {/* Both sections are guarded, because a classified briefing
+              publishes neither. A heading with nothing under it is a worse
+              answer than no heading: it reads as a section that failed
+              rather than one that was deliberately left out. */}
+          {project.capabilities.length > 0 && (
+            <section className="mt-9">
+              <h4 className="font-mono text-label text-mint-600 uppercase">Capabilities</h4>
+              <ul className="mt-4 grid gap-2.5 sm:grid-cols-2">
+                {project.capabilities.map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-baseline gap-2.5 text-sm leading-relaxed text-ink-muted"
+                  >
+                    <span aria-hidden className="text-mint-600">
+                      ▸
+                    </span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
-          <section className="mt-9">
-            <h4 className="font-mono text-label text-mint-600 uppercase">Stack</h4>
-            <div className="mt-4 flex flex-wrap gap-1.5">
-              {project.stack.map((item) => (
-                <Tag key={item}>{item}</Tag>
-              ))}
-            </div>
-          </section>
+          {project.stack.length > 0 && (
+            <section className="mt-9">
+              <h4 className="font-mono text-label text-mint-600 uppercase">Stack</h4>
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {project.stack.map((item) => (
+                  <Tag key={item}>{item}</Tag>
+                ))}
+              </div>
+            </section>
+          )}
 
           {(project.repo || project.demo) && (
             <div className="mt-9 flex flex-wrap gap-3">
@@ -213,10 +234,9 @@ export function ProjectDetail({ project, onClose }: Props) {
             </div>
           )}
 
-          {import.meta.env.DEV && (
+          {import.meta.env.DEV && devNotes.length > 0 && (
             <p className="mt-9 font-mono text-[0.5625rem] leading-relaxed tracking-[0.16em] text-signal-400 uppercase">
-              ⚠ dev only: status badge unconfirmed
-              {!project.repo && !project.demo && ' · no repo or demo link supplied'}
+              ⚠ dev only: {devNotes.join(' · ')}
             </p>
           )}
         </motion.div>

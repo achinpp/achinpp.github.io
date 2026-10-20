@@ -1,8 +1,9 @@
 import type { CSSProperties } from 'react';
 import { motion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
-import type { Project, ProjectStatus } from '@/data/projects';
-import { Tag, type TagTone } from '@/components/ui/Tag';
+import type { Project } from '@/data/projects';
+import { Tag } from '@/components/ui/Tag';
+import { STATUS_TONE } from '@/components/projects/status';
 import { useCardPointer } from '@/hooks/useCardPointer';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { duration, easeOutExpo, spring } from '@/lib/motion/easings';
@@ -14,13 +15,6 @@ import { fadeUp } from '@/lib/motion/variants';
  * an ancestor that is mid `scale`, so a click during the entrance stagger
  * would morph from the wrong rectangle. Opacity and translate are safe.
  */
-
-const STATUS_TONE: Record<ProjectStatus, TagTone> = {
-  ACTIVE: 'signal',
-  DEPLOYED: 'accent',
-  DELIVERED: 'accent',
-  ARCHIVED: 'neutral',
-};
 
 /**
  * The tracked border. Sits one pixel outside the frame, and the frame's
@@ -189,30 +183,40 @@ export function ProjectCard({ project, isOpen, onOpen }: Props) {
               size have the room for it, and a card that says only what a
               project is called and one line about it is a card that makes
               the reader open it to learn anything. */}
-          <ul className="mt-6 space-y-2">
-            {project.capabilities.map((item) => (
-              <li
-                key={item}
-                className="flex items-baseline gap-2.5 font-mono text-[0.6875rem] tracking-[0.04em] text-ink-faint"
-              >
-                <span aria-hidden className="text-mint-700">
-                  ▸
-                </span>
-                {item}
-              </li>
-            ))}
-          </ul>
+          {project.capabilities.length > 0 && (
+            <ul className="mt-6 space-y-2">
+              {project.capabilities.map((item) => (
+                <li
+                  key={item}
+                  className="flex items-baseline gap-2.5 font-mono text-[0.6875rem] tracking-[0.04em] text-ink-faint"
+                >
+                  <span aria-hidden className="text-mint-700">
+                    ▸
+                  </span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          )}
 
           <div className="mt-auto pt-7">
             {/* The whole stack, not the first three and a counter. The
                 counter was there because a narrow tile could not hold five
                 pills; this card can, and `+2` is a worse thing to read than
-                the two words it was hiding. */}
-            <div className="flex flex-wrap gap-1.5">
-              {project.stack.map((item) => (
-                <Tag key={item}>{item}</Tag>
-              ))}
-            </div>
+                the two words it was hiding.
+
+                Both this and the capability list above are guarded on being
+                non empty, because BRIEFING_06 publishes neither. An empty
+                list still renders its own margins, which on a card that is
+                already short of words reads as a block that failed to load
+                rather than as one that was never there. */}
+            {project.stack.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {project.stack.map((item) => (
+                  <Tag key={item}>{item}</Tag>
+                ))}
+              </div>
+            )}
 
             {/* Visual affordance only. The real control is the overlay
                 button below, which covers the whole card. */}

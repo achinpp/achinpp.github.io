@@ -60,8 +60,8 @@ Copy `.env.example` to `.env` and fill both variables in.
 | Dates for all five roles (they currently render `[ dates tbc ]`)           | `src/data/experience.ts`   |
 | Replace the draft role bullets on the other four roles                     | `src/data/experience.ts`   |
 | Expand `SKU`, if it stands for something                                   | `src/data/experience.ts`   |
-| Confirm the four project status badges                                     | `src/data/projects.ts`     |
-| Add public repo and demo links per briefing                                | `src/data/projects.ts`     |
+| Confirm the five guessed project status badges (`BRIEFING_06` is yours)    | `src/data/projects.ts`     |
+| Repo and demo links for the other four (`BRIEFING_06` never gets one)      | `src/data/projects.ts`     |
 | Dates for the two competition results (nothing renders without them)       | `src/data/achievements.ts` |
 | Check the photographer credit on the Red Cypher pictures is right          | `src/data/achievements.ts` |
 | More achievements: the wall has two badges and two locked slots            | `src/data/achievements.ts` |
@@ -144,7 +144,10 @@ background, trims it to its alpha bounding box and writes `public/portrait.webp`
 `process-media.py` writes into `public/media/`, and it has two pipelines because it has two
 kinds of source.
 
-A **capture** is a screenshot, and it keeps its own shape, because its shape is information: the
+A **capture** is a screenshot, or anything else whose own shape is the point: the S.H.I.E.L.D.
+CTF title card and the stamp that stands in for the classified briefing go down this path too,
+and both need nothing but a resize and an encode. It keeps its own shape, because that shape is
+information: the
 Packet Tracer topology runs edge to edge and a crop takes a router off the end of it, and the
 Red Cypher scoreboard is a table that stops being readable the moment it is cropped. That
 topology also gets real work done to it. Its canvas is a flat grey with black labels, which on
