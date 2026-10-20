@@ -237,6 +237,12 @@ animated for a frame and then snaps still.
 Scroll linked readouts, the HUD progress meter and the scroll hint's fade, keep tracking under
 reduced motion. They are position indicators, not animation: freezing them would make them lie.
 
+One effect is not rendered at all rather than rendered and held still: the mint dust over the
+hero portrait. It is a cursor effect, and a cloud of dust that never opens would sit over the
+face for no reason, so it does not mount under reduced motion or on a device with no fine
+pointer. The scoreboard behind the Finalist badge is the other half of that rule read the other
+way: it has a tap path, so it stays.
+
 ---
 
 ## Repo layout

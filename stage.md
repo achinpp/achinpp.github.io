@@ -2114,6 +2114,64 @@ hover, and at 390. `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --
 
 ---
 
+## STAGE 23 — Dust On The Portrait ✅
+
+Mint dust over the hero figure, which the cursor pushes out of its way.
+
+- [x] **The picture is sampled on a grid**, one mote per cell that is not transparent
+- [x] **Each mote is coloured from the pixel under it**, between mint-600 and mint-200
+- [x] **The cursor opens a hole** and the photograph shows clean through it
+- [x] **The cloud closes again** behind the cursor
+- [x] **One canvas, not 5,000 elements**, and it leaves the frame loop when the hero does
+- [x] **No fine pointer, no dust.** Same under reduced motion
+
+**Accept when:** the dust clears where the cursor is and comes back when it leaves. ✅ Measured
+in a browser: 1,620 lit pixels in a 70px box at the cursor, 754 with the cursor in it, 1,624
+once it has left.
+
+> NOTE: **It is a canvas written as raw pixels.** About 5,000 motes at the size the hero draws
+> the figure. As elements that would be 5,000 style recalculations a frame; as `fillRect` calls
+> it is 5,000 state changes a frame. Instead the frame is written into one `ImageData` buffer as
+> packed 32 bit words and blitted with a single `putImageData`, which is a few hundred
+> microseconds and leaves the GPU out of it. Frame pacing held at a 16.7ms median through a
+> 60 event cursor sweep, with one dropped frame, on a 2x display.
+
+> NOTE: **The physics are a push and a spring.** Inside 92px of the cursor each mote takes an
+> acceleration straight away from it with a linear falloff, while a spring pulls it back to its
+> own cell and friction keeps it from ringing. The forces are scaled by the frame's own delta
+> and clamped, so a 120Hz display does not settle the cloud twice as fast as a 60Hz one, and a
+> dropped frame does not launch the dust off the page.
+
+> NOTE: **It costs nothing when nothing is happening.** With no cursor near and every mote home,
+> the loop returns on its first line and the canvas is not touched. An `IntersectionObserver`
+> takes the callback off the frame loop entirely once the hero has scrolled away.
+
+> NOTE: **The dust sits outside the fade and outside the rim.** Outside the fade because a mask
+> clips to its border box and a mote pushed past the edge of the picture has to keep going,
+> which is Stage 22's bug one layer down; it carries the fade curve in its own alpha instead.
+> Outside the rim because a `drop-shadow` over a canvas that repaints every frame is a full
+> reblur every frame, for a glow the figure underneath already has.
+
+> NOTE: ⚠ **A canvas is a replaced element.** The first version sized it with `-inset-10` and
+> watched the backing store double on every pass of the `ResizeObserver` until it was
+> 38400x19200. Opposite insets do not stretch a replaced element: it keeps its intrinsic
+> 300x150, the rebuild writes that back as the backing store, the layout changes, and round it
+> goes. The size is written out now.
+
+> NOTE: **`check:browser` gained five assertions**, and the effect is what they test rather than
+> the wiring: that the dust is drawn at rest, that a synthetic `pointermove` clears a hole in it,
+> that the hole closes when the cursor leaves, that the canvas is hidden from assistive tech, and
+> that under reduced motion there is no canvas at all. The probe scrolls back to the hero first,
+> because the probe before it leaves the page at the badge wall and this layer correctly stops
+> drawing when it is off screen.
+
+**Verified in a browser.** `npm run check:browser` all checks passed: LCP 1024ms (best of three
+cold loads), CLS 0.0068, no console errors. `tsc -b` clean · `eslint` clean (0 warnings) ·
+`prettier --check` clean · `npm run test` 8/8 · production build clean at 394.07 kB JS
+(126.39 kB gzip), the dust costing about 3.7 kB.
+
+---
+
 ## Working Agreement
 
 1. One stage at a time. I build it, you review it, we iterate, then we advance.
@@ -2143,7 +2201,7 @@ hover, and at 390. `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --
 
 ---
 
-**Current status:** `STAGE 22 — the rim leaves the box` → remaining: **dates**, **four sets
+**Current status:** `STAGE 23 — dust on the portrait` → remaining: **dates**, **four sets
 of role bullets**, the **OSCP question**, **project links**, a **PGP fingerprint**, **Lighthouse
 on the deployed site**, **Safari and Firefox**, a **screen reader pass**, and the **deploy**.
 See the README table.

@@ -396,6 +396,56 @@ REVEAL_PROBE = """
 })()
 """
 
+# The dust over the hero portrait. Driven with a synthetic `pointermove`
+# rather than a CDP mouse event, because the pointer provider listens on
+# `window` and only wants `pointerType: 'mouse'`, which this can state.
+# The assertion is the effect itself and not the wiring: count the lit
+# pixels in a box at the cursor, push the cursor into it, count again.
+DUST_PROBE = """
+(async () => {
+  const canvas = document.querySelector('#hero canvas');
+  if (!canvas) return null;
+  const ctx = canvas.getContext('2d');
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  // Back to the top first. The probe above this one leaves the page at the
+  // badge wall, and the dust takes itself off the frame loop once the hero
+  // is out of view, so measuring from down there reads a paused canvas and
+  // calls it a broken effect.
+  document.querySelector('#hero').scrollIntoView({ block: 'start' });
+  await wait(1200);
+
+  const rect = canvas.getBoundingClientRect();
+  const dpr = canvas.width / rect.width;
+  const box = Math.round(70 * dpr);
+  const at = { x: rect.left + rect.width / 2, y: rect.top + rect.height * 0.42 };
+  const sx = Math.round((at.x - rect.left) * dpr - box / 2);
+  const sy = Math.round((at.y - rect.top) * dpr - box / 2);
+
+  const lit = () => {
+    const d = ctx.getImageData(sx, sy, box, box).data;
+    let n = 0;
+    for (let i = 3; i < d.length; i += 4) if (d[i] > 8) n++;
+    return n;
+  };
+
+  const move = (x, y) =>
+    window.dispatchEvent(
+      new PointerEvent('pointermove', { pointerType: 'mouse', clientX: x, clientY: y, bubbles: true }),
+    );
+
+  const before = lit();
+  move(at.x, at.y);
+  await wait(500);
+  const during = lit();
+  move(8, 8);
+  await wait(1800);
+  const after = lit();
+
+  return { before, during, after, hidden: canvas.getAttribute('aria-hidden') === 'true' };
+})()
+"""
+
 # Every <img> the page ships, HEAD-checked against the server it was served
 # from. This is the one asset failure nothing else in this script can see:
 # Chrome logs no console error for an image that 404s, the alt text is still
@@ -641,6 +691,21 @@ async def main() -> None:
             check(reveal["labelled"], "the button says what is behind it", str(reveal["name"]))
             check(not reveal["afterEscape"], "Escape closes it again")
 
+        dust = await page.evaluate(DUST_PROBE)
+        if check(dust is not None, "the portrait carries a dust layer"):
+            check(dust["before"] > 400, "the dust is drawn at rest", f"{dust['before']} lit pixels")
+            check(
+                dust["during"] < dust["before"] * 0.5,
+                "the cursor clears a hole in it",
+                f"{dust['before']} -> {dust['during']} lit pixels",
+            )
+            check(
+                dust["after"] > dust["before"] * 0.8,
+                "and the hole closes again when it leaves",
+                f"{dust['during']} -> {dust['after']} lit pixels",
+            )
+            check(dust["hidden"], "the canvas is hidden from assistive tech")
+
         # The hero is meant to be exactly one viewport at the reference size.
         # Adding anything to it — the portrait, most recently — pushes the
         # scroll hint into the HUD strip, and nothing else here would notice.
@@ -786,6 +851,10 @@ async def main() -> None:
         check(not booted["overlay"], "boot overlay is skipped under reduced motion")
         check(not booted["locked"], "the page is scrollable immediately")
         check(bool(booted["name"]), "the name is on screen with nothing to wait for", booted["name"])
+        # The dust is a cursor effect, so under reduced motion it is not
+        # rendered at all rather than rendered and held still.
+        dust_off = await page.evaluate("!document.querySelector('#hero canvas')")
+        check(dust_off, "no dust canvas under reduced motion")
         await screenshot(page, "reduced-motion-1440", 1440, 900)
         await page.send("Emulation.setEmulatedMedia", features=[])
 

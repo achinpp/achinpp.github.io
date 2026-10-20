@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { PORTRAIT } from '@/data/profile';
+import { PortraitDust } from '@/components/hero/PortraitDust';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { duration, easeOutExpo } from '@/lib/motion/easings';
 
@@ -120,6 +121,15 @@ export function Portrait() {
             />
           </div>
         </div>
+
+        {/* 5 — the dust, over the photograph and outside both the fade and
+            the rim. Outside the fade because a mote pushed past the edge of
+            the picture has to keep going and a mask would cut it off there;
+            outside the rim because a `drop-shadow` over a canvas that
+            repaints every frame is a full reblur every frame, for a glow the
+            figure under it already has. It carries the fade curve in its own
+            alpha instead. */}
+        <PortraitDust src={PORTRAIT.src} />
 
         {/* The line the fade dissolves into: a horizon, not an edge. */}
         <span
