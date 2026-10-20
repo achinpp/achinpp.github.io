@@ -60,8 +60,8 @@ Copy `.env.example` to `.env` and fill both variables in.
 | Dates for all five roles (they currently render `[ dates tbc ]`)           | `src/data/experience.ts`   |
 | Replace the draft role bullets on the other four roles                     | `src/data/experience.ts`   |
 | Expand `SKU`, if it stands for something                                   | `src/data/experience.ts`   |
-| Confirm the five guessed project status badges (`BRIEFING_06` is yours)    | `src/data/projects.ts`     |
-| Repo and demo links for the other four (`BRIEFING_06` never gets one)      | `src/data/projects.ts`     |
+| Confirm the four guessed project status badges (three are already yours)   | `src/data/projects.ts`     |
+| Repo and demo links for the other four (`BRIEFING_07` never gets one)      | `src/data/projects.ts`     |
 | Dates for the two competition results (nothing renders without them)       | `src/data/achievements.ts` |
 | Check the photographer credit on the Red Cypher pictures is right          | `src/data/achievements.ts` |
 | More achievements: the wall has two badges and two locked slots            | `src/data/achievements.ts` |
@@ -145,9 +145,8 @@ background, trims it to its alpha bounding box and writes `public/portrait.webp`
 kinds of source.
 
 A **capture** is a screenshot, or anything else whose own shape is the point: the S.H.I.E.L.D.
-CTF title card and the stamp that stands in for the classified briefing go down this path too,
-and both need nothing but a resize and an encode. It keeps its own shape, because that shape is
-information: the
+CTF title card and the stamp that stands in for the classified briefing go down this path too.
+It keeps its own shape, because that shape is information: the
 Packet Tracer topology runs edge to edge and a crop takes a router off the end of it, and the
 Red Cypher scoreboard is a table that stops being readable the moment it is cropped. That
 topology also gets real work done to it. Its canvas is a flat grey with black labels, which on
@@ -170,7 +169,11 @@ off each edge before anything else runs, as `(left, top, right, bottom)`. It tak
 branding bars off the Red Cypher photographs, lands the bottom edge of the scoreboard capture on
 a row separator so the table ends on a row rather than through one, takes the devtools pane and
 the empty white off the WebGoat frame, and takes the repository tab bar off the pipeline run so
-that the clamp a card puts on that picture falls below the failing gate rather than above it. Those photographs are the organiser's pictures, so
+that the clamp a card puts on that picture falls below the failing gate rather than above it. On
+the EventPilot capture it does three things at once: the browser's own toolbar off the top,
+which was also publishing the address and port the screenshot was taken against, the scrollbar
+off the right, and the bottom edge landed just above the console mock that page puts under its
+hero, because half a card reads as a screenshot taken carelessly. Those photographs are the organiser's pictures, so
 the credit the bar carried moves to a readable line under the pair in
 `src/data/achievements.ts` rather than disappearing.
 

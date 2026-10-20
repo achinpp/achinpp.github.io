@@ -2241,6 +2241,64 @@ read off screenshots at 1440.
 
 ---
 
+## STAGE 25 — EventPilot, And Two That Are Finished ✅
+
+A seventh briefing, a red stamp, and two badges that stopped saying `ACTIVE`.
+
+- [x] **`BRIEFING_06` is EventPilot**, written short, from the repo, with its link
+- [x] **The classified briefing moves to `BRIEFING_07`** and goes last
+- [x] **`CLASSIFIED` is red now**
+- [x] **A `COMPLETE` status** for the study coach and the surveillance research
+- [x] **The browser came off the EventPilot capture**, and the address with it
+
+**Accept when:** seven cards, and no badge claiming work that is done is still running. ✅
+
+> NOTE: **Moving the classified card to the end closed its hole for free.** It publishes no
+> capabilities and no stack, so paired with anything it ran about 190px short and `mt-auto`
+> collected all of that into one gap above the CTA. Seven cards leave one alone on the last
+> row, and the one that should be alone is the one with nothing in it: a card with no row
+> partner is sized by its own content. It comes out 502px against the 636px it would have been
+> beside EventPilot. Reordering was the entire fix; nothing was added to that briefing to make
+> it fit.
+
+> NOTE: **`CLASSIFIED` went from neutral to red, which supersedes the note in Stage 24.** I
+> argued there that a badge saying there is nothing to read should not be the loudest thing in
+> the card. You asked for red and red is the better answer: the stamp under it is red, so a
+> grey badge over a red plate was two registers in one card. `breach` is otherwise reserved for
+> danger, and the exception is now written on the tone itself in `Tag.tsx` rather than left for
+> someone to find.
+
+> NOTE: ⚠ **`COMPLETE` is a new status, and it is a judgement call you can overrule.** You said
+> both were finished. None of the four existing values says that: `DEPLOYED` would claim they
+> are running somewhere, `DELIVERED` would claim they were handed to someone, `ARCHIVED` would
+> say they were put down rather than finished. Both carry `statusConfirmed: true`, because the
+> fact is yours even though the word is mine. Say so if either is really deployed or delivered.
+
+> NOTE: **The EventPilot capture was photographed through a browser, so the trim does three
+> things.** 42 rows off the top is the browser's own toolbar, which is not part of the product
+> and which was also publishing the address and port the screenshot was taken against. 8
+> columns off the right is the scrollbar thumb. 181 rows off the bottom land the frame at
+> y=810, just above the console mock that page puts under its hero, measured at y=812, because
+> the next thing down is a card and half a card reads as a screenshot taken carelessly.
+
+> NOTE: **That capture draws 15px shorter than the title card beside it**, which puts the two
+> titles in that row 14px out of line. It cannot be fixed by trimming: matching the title
+> card's ratio would need the frame to run to y=864, which is 52px into the console mock. The
+> row above has had study coach clamped at 240px next to Northbridge at 208px since Stage 21, a
+> 33px offset, so this is the smaller of the two and the better of the pair.
+
+> NOTE: **The LCP reading moved and it was not this.** The harness reported 1680ms where Stage
+> 24 reported 1012ms, so the previous commit was built and measured back to back under the same
+> conditions: 1668ms against 1688ms. The machine is slower tonight, by about 650ms, and these
+> two briefings cost 20ms of noise and 1.6 kB.
+
+**Verified:** `check:browser` **all checks passed** · 14 images · LCP 1688ms (best of three) ·
+CLS 0.0067 · no console errors · `tsc -b` clean · `eslint` clean (0 warnings) ·
+`prettier --check` clean · `npm run test` 8/8 · production build 397.81 kB JS (127.95 kB gzip).
+All four rows and both new briefing panels were read off screenshots at 1440.
+
+---
+
 ## Working Agreement
 
 1. One stage at a time. I build it, you review it, we iterate, then we advance.
@@ -2270,7 +2328,7 @@ read off screenshots at 1440.
 
 ---
 
-**Current status:** `STAGE 24 — two more briefings` → remaining: **dates**, **four sets
+**Current status:** `STAGE 25 — eventpilot, and two that are finished` → remaining: **dates**, **four sets
 of role bullets**, the **OSCP question**, **project links**, a **PGP fingerprint**, **Lighthouse
 on the deployed site**, **Safari and Firefox**, a **screen reader pass**, and the **deploy**.
 See the README table.

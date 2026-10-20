@@ -5,7 +5,10 @@ export type TagTone = 'neutral' | 'accent' | 'breach' | 'signal';
 const TONE: Record<TagTone, string> = {
   neutral: 'border-hairline text-ink-faint',
   accent: 'border-mint-900 bg-mint-950/50 text-mint-300',
-  /** Danger semantics only — never decorative. */
+  /**
+   * Danger semantics, and the one exception: the `CLASSIFIED` status badge,
+   * which is red to match the stamp it sits over. Never decorative.
+   */
   breach: 'border-breach-900 bg-breach-900/30 text-breach-300',
   signal: 'border-signal-900 bg-signal-900/25 text-signal-400',
 };

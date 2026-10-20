@@ -8,6 +8,7 @@ Reads  assets/study-coach-source.png        (Agent Development Kit, dark UI)
        assets/adaptive-surveillance-source.png (the IASS console, dark UI)
        assets/shield-ctf-source.png         (the CTF title card, dark artwork)
        assets/ai-system-source.jpg          (a CONFIDENTIAL stamp on black)
+       assets/eventpilot-source.png         (the EventPilot landing page, dark UI)
        assets/northbridge-source.png        (Cisco Packet Tracer topology, grey canvas)
        assets/devsecops-pipeline-source.png (a failing pipeline run, dark UI)
        assets/devsecops-webgoat-source.png  (a path traversal response, light page)
@@ -224,6 +225,16 @@ JOBS = [
     # the trim is centred on it, so it has about 50px of plate on each side
     # rather than sitting high in a frame the clamp cut the bottom off.
     Job('ai-system-source.jpg', 'ai-system.webp', trim=(0, 51, 0, 47)),
+    # The EventPilot landing page, photographed through a browser, so the trim
+    # has three jobs. 42 rows off the top is the browser's own toolbar, which
+    # is not part of the product and which was also publishing the address the
+    # screenshot was taken against, an IP and a port. 8 columns off the right
+    # is the scrollbar thumb. 181 rows off the bottom end the frame at y=810,
+    # just above the console mock the page puts under the hero, measured at
+    # y=812: the next thing down is a card, and half a card reads as a
+    # screenshot taken carelessly. What is left is the hero with the page's
+    # own spacing above and below it.
+    Job('eventpilot-source.png', 'eventpilot.webp', trim=(0, 42, 8, 181)),
     # The two standing figures and the table sit above centre in a frame that
     # is mostly the backs of heads.
     Job('volunteering-anthonys-source.jpeg', 'volunteering-anthonys.webp', photo=True, focus=0.44),

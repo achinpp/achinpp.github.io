@@ -6,20 +6,23 @@
  * was set by you. Two things are still mine:
  *
  * - `status`. The brief asked for `DEPLOYED / ACTIVE / ARCHIVED` badges but
- *   never said which applies to what. The values below are my reading of each
- *   project's shape, flagged with `statusConfirmed: false`, and a dev only
- *   marker shows on any card where that is false.
+ *   never said which applies to what. Where the value is my reading of a
+ *   project's shape it is flagged with `statusConfirmed: false`, and a dev
+ *   only marker shows on any card where that is false. Four are still
+ *   guesses. Three are not: you said the study coach and the surveillance
+ *   research are both finished, and that briefing 07 is classified.
  * - `tagline` and `brief`. My framing of each project, not supplied copy.
  *
  * `repo` and `demo` are `null` wherever no link was supplied. That renders
- * no button at all rather than a dead one. S.H.I.E.L.D. CTF is the first with
- * a repo, because you gave one.
+ * no button at all rather than a dead one. S.H.I.E.L.D. CTF and EventPilot
+ * carry one each, because you gave them.
  *
  * `media` is a list, and every briefing has one: the study coach agent, the
  * Northbridge topology, the IASS console, two for the DevSecOps pipeline, the
- * CTF title card and the stamp that is all there is of briefing 06.
+ * CTF title card, the EventPilot landing page, and the stamp that is all
+ * there is of briefing 07.
  *
- * BRIEFING_06 IS DELIBERATELY EMPTY. You asked for the title, the picture and
+ * BRIEFING_07 IS DELIBERATELY EMPTY. You asked for the title, the picture and
  * nothing else, so `capabilities` and `stack` are empty arrays rather than
  * invented filler, and both the card and the panel render nothing where they
  * would have gone. `tagline` and `brief` say only that there is nothing to
@@ -29,7 +32,7 @@
 
 /**
  * What the briefing *is*, which is a separate question from what state it is
- * in. You classified these: five projects and one research effort. Keeping
+ * in. You classified these: six projects and one research effort. Keeping
  * it apart from `status` is the point. `RESEARCH` used to be a status value,
  * which made it impossible to say that a piece of research was also active.
  */
@@ -40,13 +43,21 @@ export type ProjectKind = 'PROJECT' | 'RESEARCH';
  * redesign is handed over, not deployed or archived, and calling it either
  * would be wrong.
  *
- * `CLASSIFIED` is a fifth, and it is the one value here that is not a guess.
+ * `COMPLETE` is a fifth: the work is done and is not being continued. You
+ * told me the study coach and the surveillance research had both finished,
+ * and none of the other four says that. `DEPLOYED` would claim they are
+ * running somewhere, `DELIVERED` would claim they were handed to someone, and
+ * `ARCHIVED` would say they were put down rather than finished. Say the word
+ * if either is really one of those three and I will move it.
+ *
+ * `CLASSIFIED` is a sixth, and it is the one value here that is not a guess.
  * Every other badge describes where a project got to; this one says the
  * question is not being answered. It is its own status rather than a flag
  * beside one, because any of the other four would be a fact published about
  * a briefing that publishes no facts.
  */
-export type ProjectStatus = 'ACTIVE' | 'DEPLOYED' | 'DELIVERED' | 'ARCHIVED' | 'CLASSIFIED';
+export type ProjectStatus =
+  'ACTIVE' | 'COMPLETE' | 'DEPLOYED' | 'DELIVERED' | 'ARCHIVED' | 'CLASSIFIED';
 
 /**
  * A screenshot of the thing running.
@@ -106,8 +117,9 @@ export const PROJECTS: Project[] = [
     title: 'Study Coach AI Agent',
     kind: 'PROJECT',
     tagline: 'An exam prep agent that builds the schedule, then teaches from it.',
-    status: 'ACTIVE',
-    statusConfirmed: false,
+    status: 'COMPLETE',
+    // Yours, not my reading: you said this one is finished.
+    statusConfirmed: true,
     stack: ['Google ADK', 'Gemini API', 'FastAPI', 'Python', 'Custom UI'],
     capabilities: [
       'Dynamic study schedule generation',
@@ -164,8 +176,9 @@ export const PROJECTS: Project[] = [
     title: 'Intelligent Adaptive Surveillance System',
     kind: 'RESEARCH',
     tagline: 'Threat detection that holds up when the attacker wears the patch.',
-    status: 'ACTIVE',
-    statusConfirmed: false,
+    status: 'COMPLETE',
+    // Yours, not my reading: you said this one is finished.
+    statusConfirmed: true,
     stack: ['VGG19', 'YOLO', 'Adversarial ML', 'Computer Vision', 'Python'],
     capabilities: [
       'AI threat detection integrating VGG19 and YOLO',
@@ -251,8 +264,37 @@ export const PROJECTS: Project[] = [
     demo: null,
   },
   {
-    id: 'ai-product-innovation',
+    id: 'eventpilot',
     index: 'BRIEFING_06',
+    title: 'EventPilot',
+    kind: 'PROJECT',
+    tagline: 'Describe an event in plain words and it runs the whole campaign.',
+    status: 'DEPLOYED',
+    statusConfirmed: false,
+    stack: ['Next.js', 'Gemini', 'Supabase', 'pgvector', 'Buffer API'],
+    capabilities: [
+      'A whole campaign plan from one event description',
+      'Captions, hashtags and poster images generated per post',
+      'Scheduling into Buffer from relative publish windows',
+      'An RSVP chatbot grounded in one event, on the web or WhatsApp',
+    ],
+    brief:
+      'An event marketing platform that takes a plain text description and returns the campaign: audience, messaging, a content calendar, and a sequence of posts with captions and generated poster images, scheduled into Buffer from windows like two weeks before and event day. Every guest gets a private chat link, and the bot answers from that event and no other, because retrieval is a pgvector search whose SQL function takes the event id as an argument rather than as a prompt instruction. The same logic answers over WhatsApp, so a guest can confirm without opening anything. All of it is one Next.js app, with no separate backend, no queue and no worker process.',
+    media: [
+      {
+        src: '/media/eventpilot.webp',
+        width: 1280,
+        height: 515,
+        alt: 'The EventPilot landing page on a near black background. The headline reads Streamline Your Event Marketing With Generative AI, over a line about configuring events, synthesising multi day campaigns, scheduling posts and launching attendee chatbots, and two buttons.',
+        label: 'the landing page',
+      },
+    ],
+    repo: 'https://github.com/achinpp/Event_Management',
+    demo: null,
+  },
+  {
+    id: 'ai-product-innovation',
+    index: 'BRIEFING_07',
     title: 'AI-Powered Product Innovation System',
     kind: 'PROJECT',
     tagline: 'Classified. Nothing beyond the name is published.',
