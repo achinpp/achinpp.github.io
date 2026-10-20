@@ -4,8 +4,8 @@ import { PROJECTS } from '@/data/projects';
 /**
  * Battle Station: competition record and open source activity.
  *
- * Two results are now on the wall. `BADGE_SLOTS` is still 4, so the rest are
- * **locked slots** rather than invented entries. That is both honest and the
+ * Three results are now on the wall. `BADGE_SLOTS` is still 4, so the rest
+ * are **locked slots** rather than invented entries. That is both honest and the
  * normal visual language of an achievement system. Add entries below and each
  * one takes the next slot.
  *
@@ -158,6 +158,58 @@ export const ACHIEVEMENTS: Achievement[] = [
     images: [],
     imageCredit: null,
     reveal: null,
+  },
+  {
+    id: 'platinum-league',
+    /**
+     * `event` and `result` are the two lines the award card itself prints:
+     * `Platinum League` and `Platinum League 1st place`. Nothing here is a
+     * reading of the picture except the rarity.
+     */
+    event: 'Platinum League',
+    result: '1st Place',
+    /**
+     * ⚠ My call, and the one you may want to change. `legendary` is not just
+     * a louder frame: it is also the travelling light around the hexagon,
+     * which repaints its path every frame, and exactly one badge on this page
+     * has it. A second would double that and make the comment in
+     * `AchievementBadge` untrue. Say the word and I will promote this one and
+     * fix the comment, or demote Red Cypher and give the light to this.
+     */
+    rarity: 'rare',
+    /** ⚠ The card carries no date and you have not given one. */
+    date: null,
+    note: null,
+    /**
+     * ⚠ BLANK ON PURPOSE. The picture never names the platform in words, and
+     * I am not putting a guess about where you compete on your own site. My
+     * reading of the card is TryHackMe: it shows a global rank, a level, a
+     * badge count out of 140, and leagues with a Platinum tier, which is
+     * their shape rather than Hack The Box's. Confirm it and this becomes one
+     * line. The badge renders without it; nothing is missing on screen.
+     */
+    organiser: null,
+    fieldNote: null,
+    images: [],
+    imageCredit: null,
+    /**
+     * The whole card, kept behind the hexagon. Same bargain as the Red Cypher
+     * scoreboard: this is the receipt for the words on the badge rather than
+     * a picture of a day, so it belongs behind the claim and not beside it.
+     *
+     * It is uncropped past the modal's own chrome. The rank, level and badge
+     * count are part of the card, and cutting a number out of a receipt
+     * because it flatters less is not something to do without being asked.
+     * Say so and the crop stops under the subtitle.
+     */
+    reveal: {
+      src: '/media/platinum-league.webp',
+      width: 1049,
+      height: 494,
+      alt: 'A badge award card on a dark plate. It reads: Archlin was awarded a badge, Platinum League, Platinum League 1st place, beside a silver hexagonal medal marked 1st. Three tiles under it read rank 60813, level 11, and 29 of 140 badges.',
+      caption: 'The league award',
+      hint: 'award',
+    },
   },
 ];
 

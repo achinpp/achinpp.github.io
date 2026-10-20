@@ -16,6 +16,7 @@ Reads  assets/study-coach-source.png        (Agent Development Kit, dark UI)
           names describe what is in the frame, so they have not been renamed)
        assets/red-cypher-*-source.jpg       (two photographs from the finals)
        assets/red-cypher-leaderboard-*.png  (the finals scoreboard, dark UI)
+       assets/platinum-league-source.png    (a league award card, dark UI)
        assets/volunteering-*-source.*       (four volunteering photographs)
 Writes public/media/*.webp
 
@@ -180,6 +181,13 @@ JOBS = [
         'red-cypher-leaderboard.webp',
         trim=(0, 0, 0, 28),
     ),
+    # The league award card, and the second picture on this site that lives
+    # behind a badge rather than on the page. A dark interface again, so the
+    # only work is the trim: 118 rows off the top take the modal's own close
+    # button with them, and 113 off the bottom take the empty plate under the
+    # call to action. The card itself runs y=178 to y=552, measured by row
+    # profile, and the crop leaves about 60px of plate on each side of it.
+    Job('platinum-league-source.png', 'platinum-league.webp', trim=(0, 118, 0, 113)),
     # The surveillance console is a dark interface too. The 74 rows off the
     # bottom are empty page under the device bar: dead space in a picture that
     # a card draws 240px tall is dead space the reader pays for.

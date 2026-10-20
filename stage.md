@@ -2356,6 +2356,59 @@ production build 398.09 kB JS (128.06 kB gzip). All four rows read off screensho
 
 ---
 
+## STAGE 27 — Platinum League On The Wall ✅
+
+A third badge, with the award card behind it.
+
+- [x] **`Platinum League` / `1st Place`** on the wall, third of four slots
+- [x] **The award card opens on hover** on a mouse
+- [x] **It opens on tap** where there is no hover
+- [x] **The close button and the dead plate** came off the card
+- [x] **`check:browser` gained two assertions** for the second disclosure
+
+**Accept when:** the hexagon says 1st Place and can prove it. ✅ Both paths driven in a browser.
+
+> NOTE: **No component work. This is what Stage 20 was for.** `BadgeReveal` already does hover
+> on a fine pointer, tap where there is none, focus and Escape for a keyboard, and
+> `aria-expanded` to say which. Giving the new entry a `reveal` object was the whole change, and
+> the badge became a button on its own.
+
+> NOTE: **Both paths were driven rather than assumed, and the first two attempts were my
+> harness being wrong, not the page.** A raw `pointerenter` never reaches React, which
+> synthesises enter and leave from the bubbling `pointerover`, so the first hover test opened
+> nothing. Then the tap test reported nothing because `hover` and `pointer` are not emulatable
+> through `Emulation.setEmulatedMedia`: Chrome derives them from the available pointer types, so
+> it takes `setTouchEmulationEnabled`. With both fixed: hover opens it and leaving closes it at
+> 1440, and at 390 with a coarse pointer the first tap opens it and the second closes it.
+
+> NOTE: ⚠ **The organiser line is blank on purpose.** The card never names the platform in
+> words. My reading is TryHackMe, from the shape of it: a global rank, a level, a badge count
+> out of 140, and leagues with a Platinum tier, which is their vocabulary rather than Hack The
+> Box's. I am not putting a guess about where you compete on your own site, so the field is
+> `null` with the reasoning in the file and a line in the README. The badge renders without it.
+
+> NOTE: ⚠ **`rare`, not `legendary`, and you may want to change that.** `legendary` is not only
+> a louder frame: it is the travelling light around the hexagon, which repaints its path every
+> frame, and exactly one badge on this page has it. A second would double that and make the
+> comment in `AchievementBadge` untrue. Red Cypher keeps it for now. Say the word and I will
+> promote this one and fix the comment, or move the light over to it.
+
+> NOTE: **The card is uncropped past the modal's own chrome.** 118 rows off the top take the
+> close button, 113 off the bottom take the empty plate under the call to action, and the card
+> itself runs y=178 to y=552 by row profile. The rank, the level and the badge count stay. They
+> are part of the receipt, and cutting a number out of a receipt because it flatters less is not
+> something to do without being asked.
+
+> NOTE: **`Competition results` went to 03 on its own**, the same way `Missions logged` did,
+> because it counts `ACHIEVEMENTS.length` rather than carrying a figure. One locked slot left.
+
+**Verified:** `check:browser` **all checks passed** · 14 images · LCP 1124ms (best of three,
+1124 to 1308ms) · CLS 0.0062 · no console errors · `tsc -b` clean · `eslint` clean (0 warnings)
+· `prettier --check` clean · `npm run test` 8/8 · production build 398.60 kB JS (128.28 kB
+gzip). The wall, the hover panel at 1440 and the tap panel at 390 were read off screenshots.
+
+---
+
 ## Working Agreement
 
 1. One stage at a time. I build it, you review it, we iterate, then we advance.
@@ -2385,7 +2438,7 @@ production build 398.09 kB JS (128.06 kB gzip). All four rows read off screensho
 
 ---
 
-**Current status:** `STAGE 26 — your order, your statuses` → remaining: **dates**, **four sets
+**Current status:** `STAGE 27 — platinum league on the wall` → remaining: **dates**, **four sets
 of role bullets**, the **OSCP question**, **project links**, a **PGP fingerprint**, **Lighthouse
 on the deployed site**, **Safari and Firefox**, a **screen reader pass**, and the **deploy**.
 See the README table.

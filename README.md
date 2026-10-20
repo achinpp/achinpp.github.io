@@ -62,9 +62,10 @@ Copy `.env.example` to `.env` and fill both variables in.
 | Expand `SKU`, if it stands for something                                   | `src/data/experience.ts`   |
 | Check the WebGoat Security framing: two capability lines are my reading    | `src/data/projects.ts`     |
 | Repo and demo links for the other five (`BRIEFING_07` never gets one)      | `src/data/projects.ts`     |
-| Dates for the two competition results (nothing renders without them)       | `src/data/achievements.ts` |
+| Dates for the three competition results (nothing renders without them)     | `src/data/achievements.ts` |
+| Name the platform behind the Platinum League badge (my reading: TryHackMe) | `src/data/achievements.ts` |
 | Check the photographer credit on the Red Cypher pictures is right          | `src/data/achievements.ts` |
-| More achievements: the wall has two badges and two locked slots            | `src/data/achievements.ts` |
+| More achievements: the wall has three badges and one locked slot           | `src/data/achievements.ts` |
 | Decide what to do about the `OSCP` pill (see the file header)              | `src/data/skills.ts`       |
 | A PGP fingerprint, if you have one (the footer line is omitted without it) | `src/data/contact.ts`      |
 | A HackTheBox handle, if you have one (the row shows the numeric id)        | `src/data/contact.ts`      |

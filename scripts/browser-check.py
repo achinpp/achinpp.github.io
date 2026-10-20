@@ -681,6 +681,24 @@ async def main() -> None:
         unsized = [m["path"] for m in media if not m["sized"]]
         check(not unsized, "every image reserves its box", "; ".join(unsized[:3]))
 
+        # Every badge that hides a picture is a disclosure button with a
+        # visible hint word in it. The probe below only drives the first one,
+        # so this is what notices if a second badge gains a reveal and loses
+        # its affordance, or its accessible name, on the way.
+        reveals = await page.evaluate(
+            "(() => Array.from("
+            "document.querySelectorAll('#battlestation button[aria-expanded]')"
+            ").map((b) => ({ name: (b.textContent || '').trim(), "
+            "expanded: b.getAttribute('aria-expanded') })))()"
+        )
+        check(len(reveals) >= 2, "every badge with a picture behind it is a button",
+              f"{len(reveals)} disclosure buttons")
+        check(
+            all(r["name"] and r["expanded"] == "false" for r in reveals),
+            "each one is named and starts closed",
+            "; ".join(r["name"][:40] for r in reveals),
+        )
+
         reveal = await page.evaluate(REVEAL_PROBE)
         if check(reveal is not None, "a badge offers a reveal"):
             check(not reveal["before"], "the picture is not on the page until it is asked for")
