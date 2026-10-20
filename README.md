@@ -60,8 +60,8 @@ Copy `.env.example` to `.env` and fill both variables in.
 | Dates for all five roles (they currently render `[ dates tbc ]`)           | `src/data/experience.ts`   |
 | Replace the draft role bullets on the other four roles                     | `src/data/experience.ts`   |
 | Expand `SKU`, if it stands for something                                   | `src/data/experience.ts`   |
-| Confirm the four guessed project status badges (three are already yours)   | `src/data/projects.ts`     |
-| Repo and demo links for the other four (`BRIEFING_07` never gets one)      | `src/data/projects.ts`     |
+| Check the WebGoat Security framing: two capability lines are my reading    | `src/data/projects.ts`     |
+| Repo and demo links for the other five (`BRIEFING_07` never gets one)      | `src/data/projects.ts`     |
 | Dates for the two competition results (nothing renders without them)       | `src/data/achievements.ts` |
 | Check the photographer credit on the Red Cypher pictures is right          | `src/data/achievements.ts` |
 | More achievements: the wall has two badges and two locked slots            | `src/data/achievements.ts` |

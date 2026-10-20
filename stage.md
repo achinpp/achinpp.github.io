@@ -2299,6 +2299,63 @@ All four rows and both new briefing panels were read off screenshots at 1440.
 
 ---
 
+## STAGE 26 — Your Order, Your Statuses ✅
+
+The wall is dealt in the order you asked for, and the pipeline briefing stops underselling itself.
+
+- [x] **Row 1:** S.H.I.E.L.D. CTF and WebGoat Security
+- [x] **Row 2:** Intelligent Adaptive Surveillance System and Northbridge Finance
+- [x] **Row 3:** EventPilot and Study Coach AI Agent
+- [x] **Row 4:** the classified briefing, alone
+- [x] **`COMPLETE` on all six**, `CLASSIFIED` on the seventh
+- [x] **`devfest_photo1.png` deleted**
+
+**Accept when:** the cards are in your order and no badge is my guess. ✅
+
+> NOTE: **`DevSecOps CI/CD Pipeline` is `WebGoat Security` now, and the copy moved with the
+> name.** The old title described one deliverable out of three, and the old brief opened with
+> `An automated security workflow`, which reads as though someone handed you a finished app and
+> you bolted CI onto it. It is written as the whole job now: standing the application up,
+> gating every commit to it, and attacking what comes out. Two capability lines are new, the
+> deployment and the path traversal, and both are read off the two captures already on that
+> briefing rather than invented. They are still a reading, so there is a line in the README
+> asking you to check them.
+
+> NOTE: **Reordering cost one array.** `Projects.tsx` maps `PROJECTS` straight through and
+> nothing in that file knows which briefing is which, so the order lives in `src/data` where
+> you can change it without touching a component. `index` is only the stamp; it was renumbered
+> to match and means nothing else.
+
+> NOTE: **Every `statusConfirmed` is `true` now, so the dev only warning fires nowhere.** The
+> marker stays in the code: it is there to catch the next briefing added with a guessed badge,
+> and a warning that has nothing to say is doing its job.
+
+> NOTE: **Four status values are now unused and all four stay.** Only `COMPLETE` and
+> `CLASSIFIED` are on a card. `ACTIVE`, `DEPLOYED`, `DELIVERED` and `ARCHIVED` are the
+> vocabulary rather than dead code: the moment something starts moving again, or ships, or is
+> handed over, the word is already here and already has a colour. Deleting them would mean
+> rediscovering the distinctions later.
+
+> NOTE: **Row 3 is the loosest row now, and that is just where the clamp lands.** The study
+> coach capture reaches the 240px clamp and the EventPilot one draws 207px, so those two titles
+> sit 34px out of line. That offset used to be in row 1, between the study coach and
+> Northbridge, and it moved with the cards rather than appearing. It is the cost of letting a
+> capture keep its own shape, which is the bargain this grid made in Stage 21.
+
+> NOTE: **The source file names were not renamed with the briefing.**
+> `assets/devsecops-pipeline-source.png` and `devsecops-webgoat-source.png` describe what is in
+> each frame, which has not changed, and renaming them would churn the asset pipeline, the data
+> file and two committed WebP files for nothing. A line in `process-media.py` says which
+> briefing they belong to.
+
+**Verified:** `check:browser` **all checks passed** · 14 images · LCP 1304ms (best of three,
+1304 to 2604ms, on the same loaded machine as Stage 25) · CLS 0.0068 · no console errors ·
+`tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean · `npm run test` 8/8 ·
+production build 398.09 kB JS (128.06 kB gzip). All four rows read off screenshots at 1440:
+702px, 649px, 655px and 502px of card content.
+
+---
+
 ## Working Agreement
 
 1. One stage at a time. I build it, you review it, we iterate, then we advance.
@@ -2328,7 +2385,7 @@ All four rows and both new briefing panels were read off screenshots at 1440.
 
 ---
 
-**Current status:** `STAGE 25 — eventpilot, and two that are finished` → remaining: **dates**, **four sets
+**Current status:** `STAGE 26 — your order, your statuses` → remaining: **dates**, **four sets
 of role bullets**, the **OSCP question**, **project links**, a **PGP fingerprint**, **Lighthouse
 on the deployed site**, **Safari and Firefox**, a **screen reader pass**, and the **deploy**.
 See the README table.

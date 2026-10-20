@@ -12,6 +12,8 @@ Reads  assets/study-coach-source.png        (Agent Development Kit, dark UI)
        assets/northbridge-source.png        (Cisco Packet Tracer topology, grey canvas)
        assets/devsecops-pipeline-source.png (a failing pipeline run, dark UI)
        assets/devsecops-webgoat-source.png  (a path traversal response, light page)
+         (both belong to the briefing now titled WebGoat Security; the file
+          names describe what is in the frame, so they have not been renamed)
        assets/red-cypher-*-source.jpg       (two photographs from the finals)
        assets/red-cypher-leaderboard-*.png  (the finals scoreboard, dark UI)
        assets/volunteering-*-source.*       (four volunteering photographs)

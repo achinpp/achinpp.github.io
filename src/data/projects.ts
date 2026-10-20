@@ -1,25 +1,30 @@
 /**
  * Mission briefings.
  *
- * ⚠ CONFIRM BEFORE DEPLOY. Most of this is grounded: titles, the capability
- * bullets and the named tools all come straight from the brief, and `kind`
- * was set by you. Two things are still mine:
+ * EVERY STATUS ON THIS PAGE IS NOW YOURS. You set all seven: six finished
+ * and one classified. `statusConfirmed` is `true` on every entry and the dev
+ * only warning it drives no longer fires anywhere, which is the point of
+ * having kept it.
  *
- * - `status`. The brief asked for `DEPLOYED / ACTIVE / ARCHIVED` badges but
- *   never said which applies to what. Where the value is my reading of a
- *   project's shape it is flagged with `statusConfirmed: false`, and a dev
- *   only marker shows on any card where that is false. Four are still
- *   guesses. Three are not: you said the study coach and the surveillance
- *   research are both finished, and that briefing 07 is classified.
- * - `tagline` and `brief`. My framing of each project, not supplied copy.
+ * What is still mine is `tagline` and `brief`, which are my framing of each
+ * project rather than supplied copy, and the capability bullets on WebGoat
+ * Security, which I widened past the three scanners when you said to write it
+ * as the whole job. The two it gained, the deployment and the path traversal,
+ * are read off the two captures on that briefing rather than invented, but
+ * they are a reading, so check them.
+ *
+ * THE ORDER HERE IS THE ORDER ON THE PAGE, and you set it. The grid takes
+ * `PROJECTS` as it is and `index` is just the stamp, so moving an entry up or
+ * down this array moves the card; the stamps are renumbered to match and mean
+ * nothing else.
  *
  * `repo` and `demo` are `null` wherever no link was supplied. That renders
  * no button at all rather than a dead one. S.H.I.E.L.D. CTF and EventPilot
  * carry one each, because you gave them.
  *
- * `media` is a list, and every briefing has one: the study coach agent, the
- * Northbridge topology, the IASS console, two for the DevSecOps pipeline, the
- * CTF title card, the EventPilot landing page, and the stamp that is all
+ * `media` is a list, and every briefing has one: the CTF title card, two for
+ * WebGoat Security, the IASS console, the Northbridge topology, the
+ * EventPilot landing page, the study coach agent, and the stamp that is all
  * there is of briefing 07.
  *
  * BRIEFING_07 IS DELIBERATELY EMPTY. You asked for the title, the picture and
@@ -39,22 +44,25 @@
 export type ProjectKind = 'PROJECT' | 'RESEARCH';
 
 /**
- * `DELIVERED` is a fourth value beyond the brief's three: a costed network
- * redesign is handed over, not deployed or archived, and calling it either
- * would be wrong.
+ * Only two of these are in use. You said every briefing is complete except
+ * the classified one, so `COMPLETE` is on six cards and `CLASSIFIED` is on
+ * the seventh.
  *
- * `COMPLETE` is a fifth: the work is done and is not being continued. You
- * told me the study coach and the surveillance research had both finished,
- * and none of the other four says that. `DEPLOYED` would claim they are
- * running somewhere, `DELIVERED` would claim they were handed to someone, and
- * `ARCHIVED` would say they were put down rather than finished. Say the word
- * if either is really one of those three and I will move it.
+ * The other four stay because they are the vocabulary, not dead code: the
+ * moment a project starts moving again, or ships somewhere, or is handed over
+ * and stops being yours to change, the word for it is already here and
+ * already has a colour in `components/projects/status.ts`. Deleting them
+ * would mean rediscovering the distinctions later.
  *
- * `CLASSIFIED` is a sixth, and it is the one value here that is not a guess.
- * Every other badge describes where a project got to; this one says the
- * question is not being answered. It is its own status rather than a flag
- * beside one, because any of the other four would be a fact published about
- * a briefing that publishes no facts.
+ * `COMPLETE` means the work is done and is not being continued, which is the
+ * one thing none of the original four could say. `DEPLOYED` claims a thing is
+ * running somewhere, `DELIVERED` claims it was handed to someone, `ARCHIVED`
+ * says it was put down rather than finished.
+ *
+ * `CLASSIFIED` is the odd one out, and deliberately so. Every other value
+ * describes where a project got to; this one says the question is not being
+ * answered. It is a status rather than a flag beside one, because any of the
+ * others would be a fact published about a briefing that publishes no facts.
  */
 export type ProjectStatus =
   'ACTIVE' | 'COMPLETE' | 'DEPLOYED' | 'DELIVERED' | 'ARCHIVED' | 'CLASSIFIED';
@@ -112,136 +120,13 @@ export type Project = {
 
 export const PROJECTS: Project[] = [
   {
-    id: 'study-coach',
-    index: 'BRIEFING_01',
-    title: 'Study Coach AI Agent',
-    kind: 'PROJECT',
-    tagline: 'An exam prep agent that builds the schedule, then teaches from it.',
-    status: 'COMPLETE',
-    // Yours, not my reading: you said this one is finished.
-    statusConfirmed: true,
-    stack: ['Google ADK', 'Gemini API', 'FastAPI', 'Python', 'Custom UI'],
-    capabilities: [
-      'Dynamic study schedule generation',
-      'Topic prioritization',
-      'Study session logging',
-      'Interactive AI tutoring and quizzing',
-    ],
-    brief:
-      'An exam preparation assistant built on Google ADK and the Gemini API, with a FastAPI backend and a custom interface. It plans what to study and when, then runs the session itself: prioritising topics, logging what was covered, and tutoring and quizzing against the plan.',
-    media: [
-      {
-        src: '/media/study-coach.webp',
-        width: 1280,
-        height: 626,
-        alt: 'The agent in the Agent Development Kit console, planning two exams and listing what is due next.',
-        label: 'the agent console',
-      },
-    ],
-    repo: null,
-    demo: null,
-  },
-  {
-    id: 'northbridge',
-    index: 'BRIEFING_02',
-    title: 'Northbridge Finance Security Upgrade',
-    kind: 'PROJECT',
-    tagline: 'An enterprise network redesign, threat modelled and costed into phases.',
-    status: 'DELIVERED',
-    statusConfirmed: false,
-    stack: ['Threat Modeling', 'VLANs', 'Extended ACLs', 'Port Security', 'Network Segmentation'],
-    capabilities: [
-      'Layer 2 and segmentation threat modeling',
-      'Extended ACLs between VLANs',
-      'Switchport port security',
-      'Cost analysis driving a three phase rollout',
-    ],
-    brief:
-      'A security redesign of an enterprise finance network. Threat modeling at Layer 2 and at the segmentation boundary drove the control set, which is VLANs with extended ACLs between them plus switchport port security. A cost analysis then turned the result into a three phase rollout rather than one unaffordable cutover.',
-    media: [
-      {
-        src: '/media/northbridge.webp',
-        width: 1280,
-        height: 517,
-        alt: 'The network topology: an ISP router, an HQ core switch, a separate management switch carrying AAA and syslog, a branch site, and the application, database and web servers behind the core.',
-        label: 'the segmented topology',
-      },
-    ],
-    repo: null,
-    demo: null,
-  },
-  {
-    id: 'adaptive-surveillance',
-    index: 'BRIEFING_03',
-    title: 'Intelligent Adaptive Surveillance System',
-    kind: 'RESEARCH',
-    tagline: 'Threat detection that holds up when the attacker wears the patch.',
-    status: 'COMPLETE',
-    // Yours, not my reading: you said this one is finished.
-    statusConfirmed: true,
-    stack: ['VGG19', 'YOLO', 'Adversarial ML', 'Computer Vision', 'Python'],
-    capabilities: [
-      'AI threat detection integrating VGG19 and YOLO',
-      'Mitigation of physical adversarial patch attacks',
-    ],
-    brief:
-      'An AI threat detection system combining VGG19 and YOLO, built around the failure mode that breaks most detectors in the field: a physical adversarial patch worn or carried into frame. The two models are integrated specifically to mitigate that class of attack rather than to raise clean input accuracy.',
-    media: [
-      {
-        src: '/media/adaptive-surveillance.webp',
-        width: 1280,
-        height: 584,
-        alt: 'The IASS console showing one frame twice. On the left the input, with the adversarial patch on the subject outlined and labelled; on the right the cleaned frame sent to YOLO, which detects a person at 0.92 confidence. The event log reads: adversarial patch removed, coverage 2.8 percent.',
-        label: 'before and after the patch guard',
-      },
-    ],
-    repo: null,
-    demo: null,
-  },
-  {
-    id: 'devsecops-pipeline',
-    index: 'BRIEFING_04',
-    title: 'DevSecOps CI/CD Pipeline',
-    kind: 'PROJECT',
-    tagline: 'Security gates on every commit, proved against a deliberately broken app.',
-    status: 'DEPLOYED',
-    statusConfirmed: false,
-    stack: ['Semgrep', 'Trivy', 'Gitleaks', 'CI/CD', 'OWASP WebGoat'],
-    capabilities: [
-      'Semgrep static analysis (SAST)',
-      'Trivy dependency and image scanning',
-      'Gitleaks secret detection',
-      'Automated security workflow for OWASP WebGoat deployment',
-    ],
-    brief:
-      'An automated security workflow wrapped around the deployment of OWASP WebGoat. Semgrep covers static analysis, Trivy covers dependencies, and Gitleaks catches committed secrets: three gates on the same pipeline, validated against an application that is vulnerable by design, so a pass that should fail is visible immediately.',
-    media: [
-      {
-        src: '/media/devsecops-pipeline.webp',
-        width: 956,
-        height: 771,
-        alt: 'A GitHub Actions run of the DevSecOps Pipeline workflow. Build and test, Semgrep, Trivy filesystem and Trivy container scanning all pass; the Gitleaks secrets gate fails, on a commit whose message says it adds a dummy AWS key to prove the gate.',
-        label: 'the secrets gate firing',
-      },
-      {
-        src: '/media/devsecops-webgoat.webp',
-        width: 1032,
-        height: 250,
-        alt: 'A path traversal request to WebGoat in the address bar, returning a directory listing with path-traversal-secret.jpg highlighted in it.',
-        label: 'the app it is proved against',
-      },
-    ],
-    repo: null,
-    demo: null,
-  },
-  {
     id: 'shield-ctf',
-    index: 'BRIEFING_05',
+    index: 'BRIEFING_01',
     title: 'S.H.I.E.L.D. CTF',
     kind: 'PROJECT',
     tagline: 'A capture the flag platform that hosts itself, eight stages deep.',
-    status: 'DEPLOYED',
-    statusConfirmed: false,
+    status: 'COMPLETE',
+    statusConfirmed: true,
     stack: ['Next.js', 'TypeScript', 'PostgreSQL', 'Argon2id', 'Docker'],
     capabilities: [
       'Eight stages, OSINT through to a cryptographic capstone',
@@ -264,13 +149,106 @@ export const PROJECTS: Project[] = [
     demo: null,
   },
   {
+    id: 'devsecops-pipeline',
+    index: 'BRIEFING_02',
+    title: 'WebGoat Security',
+    kind: 'PROJECT',
+    tagline: 'A deliberately broken app, stood up, gated on every commit, then broken by hand.',
+    status: 'COMPLETE',
+    statusConfirmed: true,
+    stack: ['OWASP WebGoat', 'Semgrep', 'Trivy', 'Gitleaks', 'CI/CD'],
+    capabilities: [
+      'OWASP WebGoat deployed and run end to end',
+      'Semgrep static analysis (SAST)',
+      'Trivy dependency and image scanning',
+      'Gitleaks secret detection',
+      'Path traversal run by hand against the live app',
+    ],
+    brief:
+      'The whole piece of work around OWASP WebGoat: standing the application up, putting security gates in front of every commit to it, and then attacking what came out. Semgrep covers static analysis, Trivy covers dependencies and images, and Gitleaks catches committed secrets, three gates on one pipeline. What they guard is an application vulnerable by design, so a gate that should fail and does not is visible immediately, and the same application is then exploited by hand: a path traversal request walks out of the web root and the directory listing comes back.',
+    media: [
+      {
+        src: '/media/devsecops-pipeline.webp',
+        width: 956,
+        height: 771,
+        alt: 'A GitHub Actions run of the DevSecOps Pipeline workflow. Build and test, Semgrep, Trivy filesystem and Trivy container scanning all pass; the Gitleaks secrets gate fails, on a commit whose message says it adds a dummy AWS key to prove the gate.',
+        label: 'the secrets gate firing',
+      },
+      {
+        src: '/media/devsecops-webgoat.webp',
+        width: 1032,
+        height: 250,
+        alt: 'A path traversal request to WebGoat in the address bar, returning a directory listing with path-traversal-secret.jpg highlighted in it.',
+        label: 'path traversal on the live app',
+      },
+    ],
+    repo: null,
+    demo: null,
+  },
+  {
+    id: 'adaptive-surveillance',
+    index: 'BRIEFING_03',
+    title: 'Intelligent Adaptive Surveillance System',
+    kind: 'RESEARCH',
+    tagline: 'Threat detection that holds up when the attacker wears the patch.',
+    status: 'COMPLETE',
+    statusConfirmed: true,
+    stack: ['VGG19', 'YOLO', 'Adversarial ML', 'Computer Vision', 'Python'],
+    capabilities: [
+      'AI threat detection integrating VGG19 and YOLO',
+      'Mitigation of physical adversarial patch attacks',
+    ],
+    brief:
+      'An AI threat detection system combining VGG19 and YOLO, built around the failure mode that breaks most detectors in the field: a physical adversarial patch worn or carried into frame. The two models are integrated specifically to mitigate that class of attack rather than to raise clean input accuracy.',
+    media: [
+      {
+        src: '/media/adaptive-surveillance.webp',
+        width: 1280,
+        height: 584,
+        alt: 'The IASS console showing one frame twice. On the left the input, with the adversarial patch on the subject outlined and labelled; on the right the cleaned frame sent to YOLO, which detects a person at 0.92 confidence. The event log reads: adversarial patch removed, coverage 2.8 percent.',
+        label: 'before and after the patch guard',
+      },
+    ],
+    repo: null,
+    demo: null,
+  },
+  {
+    id: 'northbridge',
+    index: 'BRIEFING_04',
+    title: 'Northbridge Finance Security Upgrade',
+    kind: 'PROJECT',
+    tagline: 'An enterprise network redesign, threat modelled and costed into phases.',
+    status: 'COMPLETE',
+    statusConfirmed: true,
+    stack: ['Threat Modeling', 'VLANs', 'Extended ACLs', 'Port Security', 'Network Segmentation'],
+    capabilities: [
+      'Layer 2 and segmentation threat modeling',
+      'Extended ACLs between VLANs',
+      'Switchport port security',
+      'Cost analysis driving a three phase rollout',
+    ],
+    brief:
+      'A security redesign of an enterprise finance network. Threat modeling at Layer 2 and at the segmentation boundary drove the control set, which is VLANs with extended ACLs between them plus switchport port security. A cost analysis then turned the result into a three phase rollout rather than one unaffordable cutover.',
+    media: [
+      {
+        src: '/media/northbridge.webp',
+        width: 1280,
+        height: 517,
+        alt: 'The network topology: an ISP router, an HQ core switch, a separate management switch carrying AAA and syslog, a branch site, and the application, database and web servers behind the core.',
+        label: 'the segmented topology',
+      },
+    ],
+    repo: null,
+    demo: null,
+  },
+  {
     id: 'eventpilot',
-    index: 'BRIEFING_06',
+    index: 'BRIEFING_05',
     title: 'EventPilot',
     kind: 'PROJECT',
     tagline: 'Describe an event in plain words and it runs the whole campaign.',
-    status: 'DEPLOYED',
-    statusConfirmed: false,
+    status: 'COMPLETE',
+    statusConfirmed: true,
     stack: ['Next.js', 'Gemini', 'Supabase', 'pgvector', 'Buffer API'],
     capabilities: [
       'A whole campaign plan from one event description',
@@ -290,6 +268,35 @@ export const PROJECTS: Project[] = [
       },
     ],
     repo: 'https://github.com/achinpp/Event_Management',
+    demo: null,
+  },
+  {
+    id: 'study-coach',
+    index: 'BRIEFING_06',
+    title: 'Study Coach AI Agent',
+    kind: 'PROJECT',
+    tagline: 'An exam prep agent that builds the schedule, then teaches from it.',
+    status: 'COMPLETE',
+    statusConfirmed: true,
+    stack: ['Google ADK', 'Gemini API', 'FastAPI', 'Python', 'Custom UI'],
+    capabilities: [
+      'Dynamic study schedule generation',
+      'Topic prioritization',
+      'Study session logging',
+      'Interactive AI tutoring and quizzing',
+    ],
+    brief:
+      'An exam preparation assistant built on Google ADK and the Gemini API, with a FastAPI backend and a custom interface. It plans what to study and when, then runs the session itself: prioritising topics, logging what was covered, and tutoring and quizzing against the plan.',
+    media: [
+      {
+        src: '/media/study-coach.webp',
+        width: 1280,
+        height: 626,
+        alt: 'The agent in the Agent Development Kit console, planning two exams and listing what is due next.',
+        label: 'the agent console',
+      },
+    ],
+    repo: null,
     demo: null,
   },
   {

@@ -674,8 +674,8 @@ async def main() -> None:
         broken = [m["path"] for m in media if not m["ok"]]
         # Portrait, seven briefing captures, four field photographs and two
         # photographs from the Red Cypher finals. Two pictures are deliberately
-        # not in this count: the second DevSecOps capture is in the briefing
-        # panel, and the finals scoreboard is behind the Finalist badge.
+        # not in this count: the second WebGoat Security capture is in the
+        # briefing panel, and the finals scoreboard is behind the Finalist badge.
         check(len(media) >= 14, "every expected image is on the page", f"{len(media)} images")
         check(not broken, "every image is served", "; ".join(broken[:3]))
         unsized = [m["path"] for m in media if not m["sized"]]

@@ -14,7 +14,7 @@
  * |  ~100| the query's characters appear in order   |
  * |    0 | no match                                 |
  *
- * The subsequence pass is what makes "dsp" find "DevSecOps Pipeline" and
+ * The subsequence pass is what makes "wgs" find "WebGoat Security" and
  * "cem" find "Copy email". Within that band, characters that land on word
  * starts and characters that land consecutively both score, because those are
  * the two things that make a loose match feel intentional rather than lucky.

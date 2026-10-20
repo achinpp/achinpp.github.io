@@ -36,9 +36,16 @@ const ProjectDetail = lazy(async () => ({
  * shape. That is what made the grid able to take two more without a redesign.
  *
  * What makes the row heights agree is in the card: a fixed height stamp at
- * the top, then a capture clamped to 240px. Across the first four briefings
- * that leaves about 50px between the tallest card in a row and the shortest,
- * which collects above the tag block where a card is expected to breathe.
+ * the top, then a capture clamped to 240px. That leaves a few tens of pixels
+ * between the tallest card in a row and the shortest, which collects above
+ * the tag block where a card is expected to breathe. The worst pairing is
+ * whichever row puts a capture that reaches the clamp next to one that does
+ * not, which is about 33px, and it has been about that since Stage 21.
+ *
+ * THE ORDER IS SET IN `src/data/projects.ts`, NOT HERE. This maps `PROJECTS`
+ * straight through, so moving an entry in that array moves the card. Nothing
+ * in this file knows which briefing is which, which is why reordering all
+ * seven of them cost one array and a renumbered stamp.
  *
  * THE CLASSIFIED BRIEFING GOES LAST, AND THAT IS WHY IT IS SEVENTH. It
  * publishes no capabilities and no stack, so paired with anything it ran
@@ -64,7 +71,7 @@ export function Projects() {
       <SectionHeading
         id="projects"
         title="Mission Briefings"
-        lede="Six projects and one research effort. An AI study agent, an enterprise network redesign, detection that survives adversarial patches, a pipeline that fails the build on a committed secret, a capture the flag platform that hosts itself, an event campaign written by an agent, and one briefing that stays shut."
+        lede="Six projects and one research effort. A capture the flag platform that hosts itself, a deliberately broken app stood up and then broken again by hand, detection that survives adversarial patches, an enterprise network redesign, an event campaign written by an agent, an AI study agent, and one briefing that stays shut."
       />
 
       <motion.div
