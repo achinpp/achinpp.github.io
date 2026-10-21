@@ -23,8 +23,18 @@ function git(command: string, fallback: string) {
   }
 }
 
-/** The repo's GitHub Pages URL — a working default, not a placeholder. */
-const DEFAULT_SITE_URL = 'https://achinpp.github.io/APC';
+/**
+ * The repo's GitHub Pages URL — a working default, not a placeholder.
+ *
+ * The repo is named `achinpp.github.io`, so Pages serves it from the domain
+ * ROOT and `base` stays at its default `'/'`. That is the whole reason the
+ * absolute asset paths in `src/data/` (`/media/*.webp`, `/resume.pdf`,
+ * `/portrait.webp`) need no rewriting: Vite would fix the ones in
+ * index.html under a sub-path, but not those, because they are plain strings
+ * it never parses. Moving this site to a project-page sub-path means setting
+ * `base` AND making those paths base-aware.
+ */
+const DEFAULT_SITE_URL = 'https://achinpp.github.io';
 
 export default defineConfig(({ mode }) => {
   // `loadEnv` with an empty prefix reads .env files the way the client does.

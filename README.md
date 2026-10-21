@@ -81,6 +81,33 @@ while you review and invisible once you ship.
 
 The output is a static site. `dist/` can go anywhere.
 
+### GitHub Pages — this is where the site lives
+
+`.github/workflows/deploy.yml` builds and publishes on every push to `main`. It typechecks,
+lints and tests before it builds, so a red gate stops the deploy rather than shipping past it.
+Nothing is committed to a `gh-pages` branch: the workflow uploads `dist/` as a Pages artifact,
+which is why `dist/` stays in `.gitignore`.
+
+One-time setup, all of it in the repo's web UI:
+
+1. The repo must be **public**. On the Free plan, Pages only publishes from public repos —
+   private-repo Pages needs GitHub Enterprise Cloud.
+2. The repo must be named **`achinpp.github.io`** for the root URL this is configured for.
+   Under a different name Pages serves from `/<repo>/`, which needs Vite's `base` set **and**
+   the absolute paths in `src/data/` made base-aware — see the comment on `DEFAULT_SITE_URL` in
+   `vite.config.ts`.
+3. _Settings → Pages → Build and deployment → Source_ = **GitHub Actions**. Not "Deploy from a
+   branch"; that setting ignores the workflow and looks for an `index.html` in the repo root.
+4. _Settings → Secrets and variables → Actions → Variables_: add `VITE_FORM_ENDPOINT` to turn
+   the contact form on, and `VITE_SITE_URL` only if the origin is not the default above. Both
+   are **variables, not secrets** — one is a public POST target, the other a public origin, and
+   a secret would be masked in the logs for no benefit. Vite inlines them at build time, so
+   changing either needs a new workflow run (_Actions → Deploy → Run workflow_).
+
+Pages serves `public/404.html` for unknown paths on its own. **Do not add an SPA rewrite to
+`index.html`**: there is no client-side router here, so a rewrite would turn every typo into a
+soft 200 and hide the 404 page.
+
 ### Vercel
 
 ```bash
@@ -91,21 +118,12 @@ Framework preset **Vite** (auto-detected). Build `npm run build`, output `dist`.
 `VITE_SITE_URL` and `VITE_FORM_ENDPOINT` under _Settings → Environment Variables_, then redeploy
 Vite inlines them at build time, so changing them needs a new build, not just a restart.
 
-Vercel serves `public/404.html` for unknown paths automatically. **Do not add an SPA rewrite to
-`index.html`**: there is no client-side router here, so a rewrite would turn every typo into a
-soft 200 and hide the 404 page.
+Vercel serves `public/404.html` for unknown paths automatically. Same warning about SPA rewrites.
 
 ### Netlify
 
 Build `npm run build`, publish `dist`. Environment variables under _Site configuration → Build &
 deploy_. `404.html` is picked up automatically. Same warning about SPA rewrites.
-
-### GitHub Pages
-
-The default `VITE_SITE_URL` already points at `https://achinpp.github.io/APC`. Because the site
-is served from a sub path there, set Vite's `base` to `'/APC/'` in `vite.config.ts` first.
-Without it every asset URL resolves to the domain root and nothing loads. Deploying to a custom
-domain or to `achinpp.github.io` (no sub-path) needs no `base`.
 
 ### Custom domain
 

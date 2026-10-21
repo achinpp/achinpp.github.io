@@ -2409,6 +2409,64 @@ gzip). The wall, the hover panel at 1440 and the tap panel at 390 were read off 
 
 ---
 
+## STAGE 28 — The Deploy
+
+GitHub Pages, free, building itself on every push.
+
+- [x] **`.github/workflows/deploy.yml`** — typecheck, lint, test, build, publish
+- [x] **`DEFAULT_SITE_URL` moved to the root origin**, `https://achinpp.github.io`
+- [x] **The README's `Deploying` section leads with Pages**, because that is where it lives now
+- [x] **Checked for committed secrets** before recommending the repo go public
+- [ ] **The repo made public, renamed, and Pages pointed at Actions** — three UI steps, yours
+
+**Accept when:** `https://achinpp.github.io` serves the site and the footer's `LAST_BUILD` line
+shows the commit that built it. Pending the three steps above.
+
+> NOTE: **Free means public, and that is the only real constraint.** Pages on the Free plan
+> publishes from public repos only; private-repo Pages is an Enterprise Cloud feature, not
+> something Pro buys for a personal account. So the choice was the repo going public or a
+> different free host. Before recommending public I checked what would be exposed: `.env` is
+> untracked and does not exist locally, the only env file in git is `.env.example`, and a grep
+> for key-shaped strings across the tree found nothing but the word "secret" in prose and in the
+> WebGoat Gitleaks copy. Cloudflare Pages was the alternative if the answer had been no — also
+> free, also unlimited bandwidth, and it builds from a private repo.
+
+> NOTE: **The repo name is load-bearing, which is why it changed rather than `base`.** Named
+> `APC`, Pages serves from `/APC/`, and that needs Vite's `base` set. But `base` only fixes the
+> URLs Vite parses — the ones in index.html. It does nothing for the 18 absolute paths sitting
+> in `src/data/` as plain strings: `/media/*.webp` across projects, achievements and
+> volunteering, plus `/resume.pdf` and `/portrait.webp`. Every one of those would 404 under a
+> sub-path, so a sub-path deploy costs a base-aware asset helper and 18 call sites. Renaming the
+> repo to `achinpp.github.io` costs nothing, serves from the domain root, keeps `base` at `'/'`,
+> and is the better URL to put on a CV. GitHub redirects the old name, so the existing remote
+> keeps working. The reasoning is now a comment on `DEFAULT_SITE_URL` so the next person to
+> consider a sub-path reads it first.
+
+> NOTE: **The artifact path, not a `gh-pages` branch.** The workflow uploads `dist/` as a Pages
+> artifact, so the build output never enters git history and `.gitignore` can go on ignoring
+> `dist/`. It also means Jekyll never runs over the output, so there is no `.nojekyll` to
+> remember.
+
+> NOTE: **The gates run before the deploy, and a red one stops it.** `typecheck`, `lint` and
+> `test` in that order, cheapest failure first, then `build`. A portfolio that is broken in
+> public is worse than one that did not ship. `check:browser` is deliberately not in the
+> workflow: it drives a real Chrome and belongs on the deployed site, which is the next thing
+> to do once the URL answers.
+
+> NOTE: ⚠ **The contact form is still off, and will be until you add the endpoint.**
+> `VITE_FORM_ENDPOINT` is wired as an Actions *variable*, not a secret — it is a public POST
+> target and masking it in logs buys nothing. Unset, it arrives as an empty string and
+> production disables the submit button, leaving the email link as the working path, which is
+> the Stage 7 behaviour and not a regression. Add the variable and re-run the workflow to turn
+> it on. `VITE_SITE_URL` is wired the same way but only needs setting for a custom domain.
+
+**Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
+`npm run test` 8/8 · production build 398.60 kB JS (128.28 kB gzip) · the built `dist/index.html`
+reads `og:url`, `canonical` and `og:image` as `https://achinpp.github.io/` — confirmed off the
+output, not assumed. The live site is unverified until the three UI steps are done.
+
+---
+
 ## Working Agreement
 
 1. One stage at a time. I build it, you review it, we iterate, then we advance.
@@ -2438,7 +2496,8 @@ gzip). The wall, the hover panel at 1440 and the tap panel at 390 were read off 
 
 ---
 
-**Current status:** `STAGE 27 — platinum league on the wall` → remaining: **dates**, **four sets
-of role bullets**, the **OSCP question**, **project links**, a **PGP fingerprint**, **Lighthouse
-on the deployed site**, **Safari and Firefox**, a **screen reader pass**, and the **deploy**.
-See the README table.
+**Current status:** `STAGE 28 — the deploy` → the pipeline is in the repo; it goes live on three
+UI steps (**repo public**, **renamed `achinpp.github.io`**, **Pages source = GitHub Actions**).
+Remaining after that: a **contact form endpoint**, **dates**, **four sets of role bullets**, the
+**OSCP question**, **project links**, a **PGP fingerprint**, **Lighthouse on the deployed
+site**, **Safari and Firefox**, and a **screen reader pass**. See the README table.

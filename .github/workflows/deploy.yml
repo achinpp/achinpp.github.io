@@ -1,0 +1,80 @@
+name: Deploy
+
+# The site is static, so there is nothing to run on a server: `npm run build`
+# produces `dist/`, Pages serves it. Deploying from the Actions artifact
+# rather than a `gh-pages` branch keeps `dist/` out of git history, which is
+# why `.gitignore` can go on ignoring it.
+on:
+  push:
+    branches: [main]
+  # So a deploy can be re-run after changing a build variable, without
+  # needing an empty commit to trigger one.
+  workflow_dispatch:
+
+# `id-token` is how deploy-pages proves to Pages that the artifact came from
+# this run. Without it the deploy fails on a permissions error that does not
+# name the missing token, which is a miserable thing to debug.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time, and never cancel one already running: a cancelled
+# deploy can leave the site half-swapped. Queue behind it instead.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # The footer's LAST_BUILD line comes from `git rev-parse` and
+      # `git log -1` in vite.config.ts. A shallow clone answers both, so the
+      # default fetch-depth is all this needs.
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # The gates, cheapest-failing first. This is a portfolio: a build that
+      # is broken in public is worse than one that did not ship.
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+
+      - run: npm run build
+        env:
+          # Both are set under Settings -> Secrets and variables -> Actions
+          # -> Variables, not Secrets: VITE_SITE_URL is the public origin and
+          # VITE_FORM_ENDPOINT is a public POST target. Unset, they arrive
+          # here as empty strings; VITE_SITE_URL then falls back to the
+          # default in vite.config.ts, and an empty form endpoint disables
+          # the submit button and leaves the email link as the working path.
+          #
+          # Vite inlines both at build time, so changing either one needs a
+          # new run of this workflow, not just a Pages re-publish.
+          VITE_SITE_URL: ${{ vars.VITE_SITE_URL }}
+          VITE_FORM_ENDPOINT: ${{ vars.VITE_FORM_ENDPOINT }}
+
+      - uses: actions/configure-pages@v5
+
+      # Uploads `dist/` as a Pages artifact. This path is a static upload, so
+      # Jekyll never runs over it and no `.nojekyll` file is needed.
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
