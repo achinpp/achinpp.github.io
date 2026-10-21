@@ -2409,7 +2409,7 @@ gzip). The wall, the hover panel at 1440 and the tap panel at 390 were read off 
 
 ---
 
-## STAGE 28 — The Deploy
+## STAGE 28 — The Deploy ✅
 
 GitHub Pages, free, building itself on every push.
 
@@ -2417,10 +2417,10 @@ GitHub Pages, free, building itself on every push.
 - [x] **`DEFAULT_SITE_URL` moved to the root origin**, `https://achinpp.github.io`
 - [x] **The README's `Deploying` section leads with Pages**, because that is where it lives now
 - [x] **Checked for committed secrets** before recommending the repo go public
-- [ ] **The repo made public, renamed, and Pages pointed at Actions** — three UI steps, yours
+- [x] **The repo made public, renamed, and Pages pointed at Actions** — three UI steps, yours
 
 **Accept when:** `https://achinpp.github.io` serves the site and the footer's `LAST_BUILD` line
-shows the commit that built it. Pending the three steps above.
+shows the commit that built it. ✅ Both read off the live site.
 
 > NOTE: **Free means public, and that is the only real constraint.** Pages on the Free plan
 > publishes from public repos only; private-repo Pages is an Enterprise Cloud feature, not
@@ -2460,10 +2460,30 @@ shows the commit that built it. Pending the three steps above.
 > the Stage 7 behaviour and not a regression. Add the variable and re-run the workflow to turn
 > it on. `VITE_SITE_URL` is wired the same way but only needs setting for a custom domain.
 
+> NOTE: ⚠ **The repo name must equal the username, and nothing about it says so.** The first
+> rename went to `achinpasindu.github.io`, which reads better and is not a user site: Pages
+> only treats `<username>.github.io` as one, so under the username `achinpp` that name is an
+> ordinary project repo and the site would have served from
+> `achinpp.github.io/achinpasindu.github.io/` — a sub-path, and a worse one than `/APC/`, with
+> the same 18 broken asset paths. Pages reports no error for this; it just quietly serves
+> somewhere else. Caught before the first push, so nothing was ever live at the wrong URL. The
+> name is back to `achinpp.github.io` and the rule is now written into the README step list.
+> `achinpasindu` is an unclaimed username, so the nicer URL stays available at the cost of a
+> username change: 15 `achinpp` references across `src/data/`, `index.html`, `404.html`,
+> `favicon.svg` and the OG card script, a regenerated OG image, and a dead `github.com/achinpp`
+> profile link, which GitHub does not redirect. Not worth it today. A custom domain is the
+> version of that wish that costs no identity.
+
 **Verified:** `tsc -b` clean · `eslint` clean (0 warnings) · `prettier --check` clean ·
-`npm run test` 8/8 · production build 398.60 kB JS (128.28 kB gzip) · the built `dist/index.html`
-reads `og:url`, `canonical` and `og:image` as `https://achinpp.github.io/` — confirmed off the
-output, not assumed. The live site is unverified until the three UI steps are done.
+`npm run test` 8/8 · production build 398.60 kB JS (128.28 kB gzip). **Live** at
+`https://achinpp.github.io`: first workflow run green, page 200, `favicon.svg`, `og.png`,
+`portrait.webp`, `resume.pdf`, `site.webmanifest` and the `/media/*.webp` captures all 200 with
+the right content types, the hashed JS and CSS both 200, `/no-such-page` returns a real **404**
+serving `404 | No such route` rather than a soft 200, HSTS present, and `canonical`, `og:url`
+and `og:image` all read `https://achinpp.github.io/` with no `%SITE_URL%` left in any
+attribute. The live bundle bakes `99526a6`, the commit that built it, so `LAST_BUILD` is
+telling the truth — which is also why its hash differs from the local build above, made one
+commit earlier.
 
 ---
 
@@ -2496,8 +2516,8 @@ output, not assumed. The live site is unverified until the three UI steps are do
 
 ---
 
-**Current status:** `STAGE 28 — the deploy` → the pipeline is in the repo; it goes live on three
-UI steps (**repo public**, **renamed `achinpp.github.io`**, **Pages source = GitHub Actions**).
-Remaining after that: a **contact form endpoint**, **dates**, **four sets of role bullets**, the
-**OSCP question**, **project links**, a **PGP fingerprint**, **Lighthouse on the deployed
-site**, **Safari and Firefox**, and a **screen reader pass**. See the README table.
+**Current status:** `STAGE 28 — the deploy` → **live at https://achinpp.github.io**, rebuilding
+itself on every push to `main`. Remaining: a **real résumé PDF** (still the placeholder), a
+**contact form endpoint**, **dates**, **four sets of role bullets**, the **OSCP question**,
+**project links**, a **PGP fingerprint**, **Lighthouse on the deployed site**, **Safari and
+Firefox**, and a **screen reader pass**. See the README table.

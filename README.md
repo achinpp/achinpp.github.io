@@ -93,9 +93,11 @@ One-time setup, all of it in the repo's web UI:
 1. The repo must be **public**. On the Free plan, Pages only publishes from public repos —
    private-repo Pages needs GitHub Enterprise Cloud.
 2. The repo must be named **`achinpp.github.io`** for the root URL this is configured for.
-   Under a different name Pages serves from `/<repo>/`, which needs Vite's `base` set **and**
-   the absolute paths in `src/data/` made base-aware — see the comment on `DEFAULT_SITE_URL` in
-   `vite.config.ts`.
+   That name has to match the account username **exactly** — a user site is only a user site
+   when the repo is `<username>.github.io`. Any other name, however much it looks the part, is
+   an ordinary project repo that Pages serves from `/<repo>/`, which needs Vite's `base` set
+   **and** the absolute paths in `src/data/` made base-aware. See the comment on
+   `DEFAULT_SITE_URL` in `vite.config.ts`.
 3. _Settings → Pages → Build and deployment → Source_ = **GitHub Actions**. Not "Deploy from a
    branch"; that setting ignores the workflow and looks for an `index.html` in the repo root.
 4. _Settings → Secrets and variables → Actions → Variables_: add `VITE_FORM_ENDPOINT` to turn
